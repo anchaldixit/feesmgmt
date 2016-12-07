@@ -1,0 +1,4 @@
+services:
+#    intelligent_user.example:
+#        class: Intelligent\UserBundle\Example
+#        arguments: ["@service_id", "plain_value", "%parameter%"]
