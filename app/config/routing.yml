@@ -1,6 +1,10 @@
 intelligent_user:
     resource: "@IntelligentUserBundle/Resources/config/routing.yml"
     prefix:   /
+    
+intelligent_shared:
+    resource: "@IntelligentSharedBundle/Resources/config/routing.yml"
+    prefix:   /
 
 app:
     resource: "@AppBundle/Controller/"

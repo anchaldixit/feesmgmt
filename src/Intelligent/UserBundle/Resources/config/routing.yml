@@ -1,3 +1,25 @@
 intelligent_user_homepage:
-    path:     /
+    path: /
     defaults: { _controller: IntelligentUserBundle:Default:index }
+    
+login:
+    path: /login
+    defaults: { _controller: IntelligentUserBundle:Default:login }
+    
+logout:
+    path: /logout
+    
+login_check:
+    path: /login_check
+    
+reset_password:
+    path: /resetPassword/{resetPasswordId}
+    defaults: { _controller: IntelligentUserBundle:Default:resetPassword }
+    
+intelligent_api_v1_genaral:
+    path: /api/v1/general
+    defaults: { _controller: IntelligentUserBundle:Api:v1EndPoint }
+    
+intelligent_api_v1:
+    path: /api/v1
+    defaults: { _controller: IntelligentUserBundle:Api:v1EndPoint }

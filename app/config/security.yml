@@ -4,21 +4,41 @@ security:
 
     # http://symfony.com/doc/current/security.html#b-configuring-how-users-are-loaded
     providers:
-        in_memory:
-            memory: ~
+#        in_memory:
+#            memory: 
+#                users:
+#                    tejaswi:  { password: chikoo@1, roles: 'ROLE_USER' }
+        main:
+            entity: 
+                class: Intelligent\UserBundle\Entity\User
+                property: email
+        
+                
 
     firewalls:
         # disables authentication for assets and the profiler, adapt it according to your needs
         dev:
             pattern: ^/(_(profiler|wdt)|css|images|js)/
             security: false
-
-        main:
+        reset_password_firewall:
+            pattern: ^/resetPassword
             anonymous: ~
-            # activate different ways to authenticate
-
-            # http_basic: ~
-            # http://symfony.com/doc/current/security.html#a-configuring-how-your-users-will-authenticate
-
-            # form_login: ~
-            # http://symfony.com/doc/current/cookbook/security/form_login_setup.html
+        api_general_firewall:
+            pattern: ^/api/v1/general$
+            anonymous: ~
+        login_firewall:
+            pattern: ^/login$
+            anonymous: ~
+        secured_area:
+            pattern: ^/
+            form_login: 
+                login_path: login
+                check_path: login_check
+            logout:
+                path: /logout
+                target: /login
+                
+                
+    encoders:
+        Symfony\Component\Security\Core\User\User: plaintext
+        Intelligent\UserBundle\Entity\User: plaintext

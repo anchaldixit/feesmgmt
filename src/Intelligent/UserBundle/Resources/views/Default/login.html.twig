@@ -1,0 +1,94 @@
+{# empty Twig template #}
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Aizan</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link href="{{ asset('bundles/intelligentuser/css/font-awesome.min.css') }}" rel="stylesheet">
+        <link href="{{ asset('bundles/intelligentuser/css/style.css') }}" rel="stylesheet">
+        <script src="{{ asset('bundles/intelligentuser/js/jquery-3.1.1.min.js') }}" type="text/javascript"></script>
+        <script src="{{ asset('bundles/intelligentuser/js/ui.js') }}" type="text/javascript"></script>
+    </head>
+    <body>
+        <div class="wrapper login-bg">
+            <header class="header">
+                <div class="header-inner">
+
+                    <div class="logo" style="text-align: left;">
+                        <a href="/">
+                            <img src="{{ asset('bundles/intelligentuser/images/aizan_logo2.png') }}" width="120" alt=""/></a>
+                    </div>
+                </div>
+            </header>
+
+            <div class="login-wrapper">
+                
+                <div class="card effect__click">
+                <div class="login card__front">
+                    <div class="login-header">
+                        <h6>Sign In Now</h6>
+                    </div>
+                    <div class="login-form">
+                        <p>Sign In to see your assigned role in the projects and many more. </p>
+                        <form action="{{ path('login_check') }}" method="post">
+                            <ul>
+                                {% if error %}
+                                <li style="color:red">
+                                    {{error}}
+                                </li>
+                                {% endif %}
+                                <li>
+                                    <input type="text" placeholder="username or email" name="_username" value="{{last_username}}" />
+                                </li>
+                                <li>
+                                    <input type="password" placeholder="password" name="_password" value="" />
+                                </li>
+                                <li>
+                                    <input type="submit" value="Submit" name="submit" style="cursor: pointer" />
+                                </li>
+                            </ul>
+                            <p><a href="#" class="flip">Forget Password</a></p>
+                        </form>
+                    </div>
+                </div>
+                <div class="login card__back">
+                    <div class="login-header">
+                        <h6>Forget my Password</h6>
+                    </div>
+                    <div class="login-form">
+                        <p>Don't worry, It happens to everyone. We'll get you back into Aizan right away. </p>
+                        <form>
+                            <ul>
+                                <li>
+                                    <input type="text" placeholder="username or email" name="username" value="" />
+                                </li>
+                                
+                                <li>
+                                    <input type="submit" value="Rest my Password" name="reset_password" />
+                                </li>
+                            </ul>
+                            <p><a href="#" class="flip">Back to Sign In</a></p>
+                        </form>
+                    </div>
+                </div>
+                
+                </div>
+            </div>
+            
+            
+            
+            <footer class="footer">
+                <div class="left-footer">
+                    <p>&copy; aizan.com</p>
+                </div>
+                <div class="right-footer">
+                    <p>
+                        <a href="#">Privecy Policy</a>
+                    </p>
+                </div>
+            </footer>
+
+        </div>
+    </body>
+</html>
