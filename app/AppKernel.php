@@ -22,8 +22,9 @@ class AppKernel extends Kernel
             new Sensio\Bundle\FrameworkExtraBundle\SensioFrameworkExtraBundle(),
             new AppBundle\AppBundle(),
             new Intelligent\UserBundle\IntelligentUserBundle(),
-            new Intelligent\SettingBundle\IntelligentSettingBundle(),
-        );
+            new Intelligent\SharedBundle\IntelligentSharedBundle(),
+
+            );
 
         if (in_array($this->getEnvironment(), array('dev', 'test'), true)) {
             $bundles[] = new Symfony\Bundle\DebugBundle\DebugBundle();

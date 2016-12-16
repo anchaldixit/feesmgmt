@@ -1,0 +1,4 @@
+services:
+#    intelligent_shared.example:
+#        class: Intelligent\SharedBundle\Example
+#        arguments: ["@service_id", "plain_value", "%parameter%"]

@@ -1,0 +1,3 @@
+intelligent_shared_homepage:
+    path:     /
+    defaults: { _controller: IntelligentSharedBundle:Default:index }
