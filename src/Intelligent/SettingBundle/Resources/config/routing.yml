@@ -1,0 +1,9 @@
+intelligent_setting_homepage:
+    path:     /settings/
+    defaults: { _controller: IntelligentSettingBundle:Default:index }
+intelligent_setting_edit:
+    path:     /settings/edit/{edit_id}
+    defaults: { _controller: IntelligentSettingBundle:Default:edit }
+intelligent_setting_save:
+    path:     /settings/save/
+    defaults: { _controller: IntelligentSettingBundle:Default:save }

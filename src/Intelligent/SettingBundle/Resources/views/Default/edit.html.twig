@@ -1,0 +1,96 @@
+{# Intelligent/SettingBundle/Resources/views/Default/edit.html.twig #}
+{% extends "base.html.twig"  %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+
+    </script>
+{% endblock %}
+{% block body %}
+    <h1>Edit Settings</h1>
+    {% if msg is defined and msg is not empty %}
+        <div style="color:red"> {{msg}} </div>
+    {% endif %}
+    <form action="" method="POST">
+        <ul>
+            {% for config in field %}
+
+                <li><label>Module:</label> 
+                    <select name="module" id="module" >
+                        <option value="">Select Module</option>
+                        {% for keyname, module in modules %}
+                            <option value="{{keyname}}" {{config.module is defined and config.module == keyname ? 'SELECTED': ''}}>{{module}}</option>
+                        {% endfor %}
+                    </select>
+                </li>
+
+                <li><label>Module Field Name:</label> 
+                    <input name="module_field_display_name" id="module_field_display_name"  value="{{config.module_field_display_name is defined ? config.module_field_display_name : ''}}" type="text" ><br></li>
+                <li>
+                    <label>Module Field Identifier:</label> 
+                    <input name="module_field_name" id="module_field_name"  value = "{{config.module_field_name is defined ? config.module_field_name : ''}}" type="text"><br></li>
+                <li>Module Field Type: 
+                    <select name="module_field_datatype" id="module_field_datatype" >
+                        {% for keyname, datatype in datatypes %} 
+                            <option value="{{keyname}}" {{config.module_field_datatype is defined and config.module_field_datatype == keyname ? 'SELECTED': ''}}>{{datatype}}</option>
+                        {% endfor %}
+                    </select><br>
+                </li>
+                <li>
+                    <label>Link Text:</label> 
+                    <input name="link_text" id="link_text" value="{{config.link_text is defined ? config.link_text : ''}}"><br>
+                </li>
+                <li><label>Enable Filter:</label> 
+                    <select name="enable_filter" id="enable_filter" >
+                        <option value="N" {{config.enable_filter is defined and config.enable_filter == 'N' ? 'SELECTED': ''}}>No</option>
+                        <option value="Y" {{config.enable_filter is defined and config.enable_filter == 'Y' ? 'SELECTED': ''}}>Yes</option>
+                    </select><br>
+                </li>
+                <li> <label>Show in Grid:</label> 
+                    <select name="show_in_grid" id="show_in_grid" >
+                        <option value="Y" {{config.show_in_grid is defined and config.show_in_grid == 'Y' ? 'SELECTED': ''}}>Yes</option>
+                        <option value="N" {{config.show_in_grid is defined and config.show_in_grid == 'N' ? 'SELECTED': ''}}>No</option>
+
+                    </select><br>
+                </li>
+                <li><label>Is a forgien key:</label> 
+                    <select name="is_" id="enable_filter" >
+                        <option value="N" {{config.relationship_module is defined and config.relationship_module is empty ? 'SELECTED': ''}}>No</option>
+                        <option value="Y" {{config.relationship_module is defined and config.relationship_module is not empty ? 'SELECTED': ''}}>Yes</option>
+                    </select><br></li>
+                <li> 
+                    <label>Relationship Table: </label>
+                    <select name="relationship_module" id="relationship_module" >
+                        <option value="">Select Module..</option>
+                        {% for keyname, module in modules %}
+                            <option value="{{keyname}}" {{config.relationship_module is defined and config.relationship_module == keyname ? 'SELECTED': ''}}>{{module}}</option>
+                        {% endfor %}
+                    </select>
+                </li>
+                {% if config.modified_datetime is defined %}
+                    <li> 
+                        <label>Last Modified:</label> 
+                        {{config.modified_datetime}}<br>
+                    </li>
+                    <li>
+                        <label>Modified by:</label> 
+                        {{config.modified_by}}
+                    </li>
+                {% endif %}
+
+            {% endfor %}
+            {% if id is defined and id is not empty %}
+                <input type="hidden" name="id" value="{{id}}">
+                <input type="submit" name="edit_submit" value="Edit" > 
+                <input type="submit" name="delete_submit" value="Delete" >
+            {% else %}
+                <input type="submit" name="add_submit" value="Add" > 
+            {% endif %}
+
+        </ul>
+    </form>
+
+
+
+{% endblock %}
