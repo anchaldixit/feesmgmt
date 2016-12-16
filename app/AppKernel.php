@@ -23,6 +23,7 @@ class AppKernel extends Kernel
             new AppBundle\AppBundle(),
             new Intelligent\UserBundle\IntelligentUserBundle(),
             new Intelligent\SharedBundle\IntelligentSharedBundle(),
+            new Intelligent\SettingBundle\IntelligentSettingBundle(),
 
             );
 

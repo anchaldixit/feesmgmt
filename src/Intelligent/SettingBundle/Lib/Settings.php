@@ -11,21 +11,25 @@ namespace Intelligent\SettingBundle\Lib;
 class Settings {
 
     var $db;
-    var $table = 'settings';
+    var $table = 'module_settings';
     /*
      * module is variable that holds all the logical modules which this applicaiton support.
      * KEY is exact name of db table & VALUE is display name
      */
     var $module = array(
         'customer' => 'Customer',
+        'marketing_projects' => 'Marketing Projects',
         'campaign' => 'Campanigns',
         'campaign_contacts' => 'Campanigns Contact',
-        'marketing_initiatives' => 'Marketing Initiatives');
+        'psuedo_email_accounts' => 'Psuedo Email Accounts',
+        'assign_psuedo' => 'Assign Psuedo'
+);
     var $module_datatypes = array(
         'varchar'=>'Limited Char',
         'text' => 'Long Text',
         'currency' => 'Currency',
         'decimal' => 'Decimal',
+        'enum' => 'Value Set',
         'link' => 'Link',
         'user' => 'User',
         'date' => 'Date',
@@ -57,7 +61,7 @@ class Settings {
 
     public function fetchAll() {
 
-        $result = $this->db->fetchAll('SELECT * FROM settings limit 1');
+        $result = $this->db->fetchAll("SELECT * FROM {$this->table} limit 1");
         return $result;
     }
 
@@ -74,7 +78,7 @@ class Settings {
             $extended_where = 'where ' . implode(' and ', $arr_where);
         }
 
-        $result = $this->db->fetchAll("SELECT * FROM settings $extended_where");
+        $result = $this->db->fetchAll("SELECT * FROM {$this->table} $extended_where");
         return $result;
     }
 
@@ -192,6 +196,12 @@ class Settings {
         } else {
             $data['link_text'] = $post_data['link_text'];
         }
+        if ($post_data['module_field_datatype'] == 'enum' and empty($post_data['value'])) {
+            $error[] = "Value set can be empty for selected datatype";
+        } else {
+            $data['value'] = $post_data['value'];
+        }
+
 
         if (empty($post_data['enable_filter'])) {
             $error[] = "Enable filter field cannot be empty";
@@ -224,7 +234,7 @@ class Settings {
             $index = ", ADD INDEX `$field_name` (`$field_name` ASC)";
         }
         $type = '';
-        if ($datatype == 'varchar') {
+        if (in_array($datatype, array('varchar', 'enum'))) {
             $type = 'varchar(400)';
         } elseif ($datatype == 'text') {
             $type = 'text';
