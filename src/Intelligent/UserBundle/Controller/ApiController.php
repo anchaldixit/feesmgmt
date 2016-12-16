@@ -104,7 +104,7 @@ class ApiController extends Controller {
                     throw new \Exception("Unable to send reset password email", 500);
                 }
 
-                return $this->_handleSuccessfulRequest(null);
+                return $this->_handleSuccessfulRequest();
             }
         } else {
             throw new \Exception("email variable do not exists in the request json", 400);
@@ -122,7 +122,6 @@ class ApiController extends Controller {
      * @throws \Exception
      */
     private function changePassword(Request $request, $json) {
-        $tmp = $this->get('user_settings')->getViewPermission("Customer");
         $user = $this->getUser();
         if(isset($json->body->old_password) && isset($json->body->new_password)){
             # Now compare passwords
@@ -133,7 +132,7 @@ class ApiController extends Controller {
                 
                 $em->persist($user);
                 $em->flush();
-                return $this->_handleSuccessfulRequest(array('permission' => $tmp));
+                return $this->_handleSuccessfulRequest();
             }else{
                 throw new \Exception("Old password do not match with the current user" , 403);
             }
@@ -165,7 +164,7 @@ class ApiController extends Controller {
                 
                 $em->persist($user);
                 $em->flush();
-                return $this->_handleSuccessfulRequest(null);
+                return $this->_handleSuccessfulRequest();
             }else{
                 throw new \Exception("reset_password_id do not exists or has already used" , 403);
             }
@@ -194,7 +193,7 @@ class ApiController extends Controller {
             
             $em->persist($user);
             $em->flush();
-            return $this->_handleSuccessfulRequest(null);
+            return $this->_handleSuccessfulRequest();
         }else{
             throw new \Exception("First name or last name is not set in the request json",400);
         }
@@ -232,13 +231,22 @@ class ApiController extends Controller {
      * @param type $responseData
      * @return Response
      */
-    private function _handleSuccessfulRequest($responseData) {
-        $response = new Response(json_encode(array(
-                    'head' => array(
-                        'status' => 'success'
-                    ),
-                    'body' => $responseData
-        )));
+    private function _handleSuccessfulRequest($responseData = null) {
+        if(is_null($responseData)){
+            $final_response = array(
+                'head' => array(
+                    'status' => 'success'
+                )
+            );
+        }else{
+            $final_response = array(
+                'head' => array(
+                    'status' => 'success'
+                ),
+                'body' => $responseData
+            );
+        }
+        $response = new Response(json_encode($final_response));
         $response->setStatusCode(200);
         $response->headers->set("Content-Type", "application/json");
         return $response;
