@@ -122,6 +122,7 @@ class ApiController extends Controller {
      * @throws \Exception
      */
     private function changePassword(Request $request, $json) {
+        $tmp = $this->get('user_settings')->getViewPermission("Customer");
         $user = $this->getUser();
         if(isset($json->body->old_password) && isset($json->body->new_password)){
             # Now compare passwords
@@ -132,7 +133,7 @@ class ApiController extends Controller {
                 
                 $em->persist($user);
                 $em->flush();
-                return $this->_handleSuccessfulRequest(null);
+                return $this->_handleSuccessfulRequest(array('permission' => $tmp));
             }else{
                 throw new \Exception("Old password do not match with the current user" , 403);
             }
@@ -199,6 +200,10 @@ class ApiController extends Controller {
         }
     }
 
+    private function getUsers(Request $request, $json){
+        $user = $this->getUser();
+    }
+    
     /**
      * This function will convert the exception into a response object 
      * 
@@ -215,7 +220,8 @@ class ApiController extends Controller {
                         'error_msg' => $exception->getMessage()
                     )
         )));
-        $response->setStatusCode($exception->getCode());
+        $http_code = $exception->getCode()? $exception->getCode() :500;
+        $response->setStatusCode($http_code);
         $response->headers->set("Content-Type", "application/json");
         return $response;
     }

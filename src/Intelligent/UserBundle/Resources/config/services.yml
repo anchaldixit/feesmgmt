@@ -2,3 +2,7 @@ services:
 #    intelligent_user.example:
 #        class: Intelligent\UserBundle\Example
 #        arguments: ["@service_id", "plain_value", "%parameter%"]
+
+    user_permissions:
+        class: Intelligent\UserBundle\Services\UserPermissions
+        arguments: ["@security.token_storage","@doctrine"]

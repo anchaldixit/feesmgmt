@@ -3,6 +3,8 @@
 namespace Intelligent\UserBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Intelligent\UserBundle\Entity\RoleGlobalPermission;
+use Intelligent\UserBundle\Entity\RoleModulePermission;
 
 /**
  * Role
@@ -38,7 +40,7 @@ class Role
     /**
      * @var boolean
      *
-     * @ORM\Column(name="status", type="boolean", nullable=false)
+     * @ORM\Column(name="status", type="integer", nullable=false)
      */
     private $status;
 
@@ -55,8 +57,20 @@ class Role
      * @ORM\Column(name="update_datetime", type="datetime", nullable=false)
      */
     private $updateDatetime;
+    
+    /**
+     * @var RoleGlobalPermission
+     *
+     * @ORM\OneToOne(targetEntity="RoleGlobalPermission", mappedBy="role")
+     */
+    private $globalPermission;
 
-
+    /**
+     * @var ArrayList
+     *
+     * @ORM\OneToMany(targetEntity="RoleModulePermission", mappedBy="role")
+     */
+    private $modulePermissions;
 
     /**
      * Get id
@@ -117,7 +131,7 @@ class Role
     /**
      * Set status
      *
-     * @param boolean $status
+     * @param integer $status
      * @return Role
      */
     public function setStatus($status)
@@ -130,7 +144,7 @@ class Role
     /**
      * Get status
      *
-     * @return boolean 
+     * @return integer 
      */
     public function getStatus()
     {
@@ -181,5 +195,68 @@ class Role
     public function getUpdateDatetime()
     {
         return $this->updateDatetime;
+    }
+    /**
+     * Constructor
+     */
+    public function __construct()
+    {
+        $this->modulePermissions = new \Doctrine\Common\Collections\ArrayCollection();
+    }
+
+    /**
+     * Set globalPermission
+     *
+     * @param \Intelligent\UserBundle\Entity\RoleGlobalPermission $globalPermission
+     * @return Role
+     */
+    public function setGlobalPermission(\Intelligent\UserBundle\Entity\RoleGlobalPermission $globalPermission = null)
+    {
+        $this->globalPermission = $globalPermission;
+
+        return $this;
+    }
+
+    /**
+     * Get globalPermission
+     *
+     * @return \Intelligent\UserBundle\Entity\RoleGlobalPermission 
+     */
+    public function getGlobalPermission()
+    {
+        return $this->globalPermission;
+    }
+
+    /**
+     * Add modulePermissions
+     *
+     * @param \Intelligent\UserBundle\Entity\RoleModulePermission $modulePermissions
+     * @return Role
+     */
+    public function addModulePermission(\Intelligent\UserBundle\Entity\RoleModulePermission $modulePermissions)
+    {
+        $this->modulePermissions[] = $modulePermissions;
+
+        return $this;
+    }
+
+    /**
+     * Remove modulePermissions
+     *
+     * @param \Intelligent\UserBundle\Entity\RoleModulePermission $modulePermissions
+     */
+    public function removeModulePermission(\Intelligent\UserBundle\Entity\RoleModulePermission $modulePermissions)
+    {
+        $this->modulePermissions->removeElement($modulePermissions);
+    }
+
+    /**
+     * Get modulePermissions
+     *
+     * @return \Doctrine\Common\Collections\Collection 
+     */
+    public function getModulePermissions()
+    {
+        return $this->modulePermissions;
     }
 }

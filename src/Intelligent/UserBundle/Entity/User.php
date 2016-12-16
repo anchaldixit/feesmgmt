@@ -4,6 +4,7 @@ namespace Intelligent\UserBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Intelligent\UserBundle\Entity\Role;
 
 /**
  * User
@@ -80,12 +81,19 @@ class User implements UserInterface, \Serializable
     private $status;
 
     /**
-     * @var integer
-     *
-     * @ORM\Column(name="role_id", type="integer", nullable=true)
+     * @var Role
+     * @ORM\OneToOne(targetEntity="Role")
+     * @ORM\JoinColumn(name="role_id", referencedColumnName="id")
      */
-    private $roleId;
+    private $role;
 
+    /**
+     * @var \DateTime
+     *
+     * @ORM\Column(name="last_login", type="datetime", nullable=true)
+     */
+    private $lastLogin;
+    
     /**
      * @var \DateTime
      *
@@ -100,30 +108,57 @@ class User implements UserInterface, \Serializable
      */
     private $updateDatetime;
 
+    /**
+     * 
+     * @return type
+     */
     public function getSalt(){
         return null;
     }
     
+    /**
+     * This function returns the username which is
+     * the email in this case
+     * 
+     * @return string returns the email as username
+     */
     public function getUsername() {
         return $this->email;
     }
     
-    public function getPassword() {
-        return $this->password;
-    }
-    
+    /**
+     * This function will return the symfony roles
+     * 
+     * @return array 
+     */
     public function getRoles() {
         return array("ROLE_USER");
     }
-    
+
+    /**
+     * This function will be called to erase the user credentials
+     * Not sure what it is
+     */
     public function eraseCredentials() {
         ;
     }
     
+    /**
+     * This will return the serialized array of the 
+     * user information 
+     * 
+     * @return string
+     */
     public function serialize() {
         return serialize(array($this->id, $this->email, $this->password ));
     }
     
+    /**
+     * This function will return the user object from
+     * the serialized array
+     * 
+     * @param type $serialized
+     */
     public function unserialize($serialized) {
         list (
             $this->id,
@@ -178,6 +213,15 @@ class User implements UserInterface, \Serializable
         return $this;
     }
 
+    /**
+     * This function will return the password
+     * 
+     * @return string
+     */
+    public function getPassword() {
+        return $this->password;
+    }
+    
     /**
      * Set firstName
      *
@@ -293,29 +337,31 @@ class User implements UserInterface, \Serializable
         return $this->status;
     }
 
+    
+
     /**
-     * Set roleId
+     * Set lastLogin
      *
-     * @param integer $roleId
+     * @param \DateTime $lastLogin
      * @return User
      */
-    public function setRoleId($roleId)
+    public function setLastLogin($lastLogin)
     {
-        $this->roleId = $roleId;
+        $this->lastLogin = $lastLogin;
 
         return $this;
     }
 
     /**
-     * Get roleId
+     * Get lastLogin
      *
-     * @return integer 
+     * @return \DateTime 
      */
-    public function getRoleId()
+    public function getLastLogin()
     {
-        return $this->roleId;
+        return $this->lastLogin;
     }
-
+    
     /**
      * Set createDatetime
      *
@@ -360,5 +406,28 @@ class User implements UserInterface, \Serializable
     public function getUpdateDatetime()
     {
         return $this->updateDatetime;
+    }
+
+    /**
+     * Set role
+     *
+     * @param \Intelligent\UserBundle\Entity\Role $role
+     * @return User
+     */
+    public function setRole(\Intelligent\UserBundle\Entity\Role $role = null)
+    {
+        $this->role = $role;
+
+        return $this;
+    }
+
+    /**
+     * Get role
+     *
+     * @return \Intelligent\UserBundle\Entity\Role 
+     */
+    public function getRole()
+    {
+        return $this->role;
     }
 }

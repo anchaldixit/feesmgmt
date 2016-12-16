@@ -3,6 +3,7 @@
 namespace Intelligent\UserBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Intelligent\UserBundle\Entity\Role;
 
 /**
  * RoleGlobalPermission
@@ -22,11 +23,26 @@ class RoleGlobalPermission
     private $id;
 
     /**
-     * @var integer
-     *
-     * @ORM\Column(name="role_id", type="integer", nullable=false)
+     * @var Role
+     * 
+     * @ORM\OneToOne(targetEntity="Role", inversedBy="globalPermission")
+     * @ORM\JoinColumn(name="role_id", referencedColumnName="id")
      */
-    private $roleId;
+    private $role;
+
+    /**
+     * @var boolean
+     *
+     * @ORM\Column(name="manage_user_app_permission", type="boolean", nullable=false)
+     */
+    private $manageUserAppPermission;
+
+    /**
+     * @var boolean
+     *
+     * @ORM\Column(name="edit_app_structure_permission", type="boolean", nullable=false)
+     */
+    private $editAppStructurePermission;
 
 
 
@@ -41,25 +57,71 @@ class RoleGlobalPermission
     }
 
     /**
-     * Set roleId
+     * Set manageUserAppPermission
      *
-     * @param integer $roleId
+     * @param boolean $manageUserAppPermission
      * @return RoleGlobalPermission
      */
-    public function setRoleId($roleId)
+    public function setManageUserAppPermission($manageUserAppPermission)
     {
-        $this->roleId = $roleId;
+        $this->manageUserAppPermission = $manageUserAppPermission;
 
         return $this;
     }
 
     /**
-     * Get roleId
+     * Get manageUserAppPermission
      *
-     * @return integer 
+     * @return boolean 
      */
-    public function getRoleId()
+    public function getManageUserAppPermission()
     {
-        return $this->roleId;
+        return $this->manageUserAppPermission;
+    }
+
+    /**
+     * Set editAppStructurePermission
+     *
+     * @param boolean $editAppStructurePermission
+     * @return RoleGlobalPermission
+     */
+    public function setEditAppStructurePermission($editAppStructurePermission)
+    {
+        $this->editAppStructurePermission = $editAppStructurePermission;
+
+        return $this;
+    }
+
+    /**
+     * Get editAppStructurePermission
+     *
+     * @return boolean 
+     */
+    public function getEditAppStructurePermission()
+    {
+        return $this->editAppStructurePermission;
+    }
+
+    /**
+     * Set role
+     *
+     * @param \Intelligent\UserBundle\Entity\Role $role
+     * @return RoleGlobalPermission
+     */
+    public function setRole(\Intelligent\UserBundle\Entity\Role $role = null)
+    {
+        $this->role = $role;
+
+        return $this;
+    }
+
+    /**
+     * Get role
+     *
+     * @return \Intelligent\UserBundle\Entity\Role 
+     */
+    public function getRole()
+    {
+        return $this->role;
     }
 }
