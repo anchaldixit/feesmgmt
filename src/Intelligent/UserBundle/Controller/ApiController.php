@@ -208,6 +208,55 @@ class ApiController extends Controller {
         $user = $this->getUser();
     }
     
+    private function disableUser(Request $request, $json){
+        $user_permissions = $this->get('user_permissions');
+        if($user_permissions){
+            if(isset($json->body->user_id)){
+                $em = $this->getDoctrine()->getManager();
+                $user = $em->getRepository("IntelligentUserBundle:User")->find($json->body->user_id);
+                if($user){
+                    $user->setStatus(4)->setUpdateDatetime(new \DateTime());
+                    $em->flush();
+                    return $this->_handleSuccessfulRequest();
+                }else{
+                    throw new \Exception("User with this user_id not found",404);
+                }
+            }else{
+                throw new \Exception("user_id is not set in the request json",400);
+            }
+        }else{
+            throw new \Exception("Current user has no access to change user role", 403);
+        }
+    }
+    
+    private function changeRole(Request $request, $json){
+        $user_permissions = $this->get('user_permissions');
+        if($user_permissions){
+            if(isset($json->body->user_id) && isset($json->body->new_role_id)){
+                $em = $this->getDoctrine()->getManager();
+                // Get user
+                $user = $em->getRepository("IntelligentUserBundle:User")->find($json->body->user_id);
+                if($user){
+                    // Now get role 
+                    $role = $em->getRepository("IntelligentUserBundle:Role")->find($json->body->new_role_id);
+                    if($role){
+                        $user->setRole($role)->setUpdateDatetime(new \DateTime());
+                        $em->flush();
+                        return $this->_handleSuccessfulRequest();
+                    }else{
+                        throw new \Exception("Role with this new_role_id not found",404);
+                    }
+                }else{
+                    throw new \Exception("User with this user_id not found",404);
+                }
+            }else{
+                throw new \Exception("user_id or new_role_id is not set in the request json",400);
+            }
+        }else{
+            throw new \Exception("Current user has no access to change user role", 403);
+        }
+    }
+    
     /**
      * This function will convert the exception into a response object 
      * 
