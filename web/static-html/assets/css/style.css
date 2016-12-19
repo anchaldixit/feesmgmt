@@ -336,6 +336,37 @@ body {
       font-size: 12px;
       font-weight: 600; }
 
+.content-table {
+  overflow: hidden; }
+  .content-table .left-sidebar {
+    float: left;
+    width: 150px;
+    margin-top: 30px;
+    padding-left: 15px; }
+    .content-table .left-sidebar h6 a {
+      display: block;
+      text-decoration: none;
+      background-color: #1fa67a;
+      color: #fff;
+      font-weight: 400;
+      padding: 7px 10px;
+      overflow: hidden; }
+      .content-table .left-sidebar h6 a:hover {
+        background-color: #5aa3ff; }
+      .content-table .left-sidebar h6 a i {
+        float: right; }
+    .content-table .left-sidebar ul {
+      margin: 15px 0; }
+      .content-table .left-sidebar ul li {
+        list-style: none;
+        margin-left: 8px; }
+        .content-table .left-sidebar ul li label {
+          font-size: 13px;
+          margin-left: 8px; }
+  .content-table .table-content {
+    float: right;
+    width: calc(100% - 210px); }
+
 .table-content {
   padding: 0 15px;
   margin-top: 30px;
