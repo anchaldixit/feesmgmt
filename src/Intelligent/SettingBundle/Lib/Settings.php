@@ -65,32 +65,45 @@ class Settings {
         return $result;
     }
 
-    public function fetch($nd_condition = array('field-name' => 'value')) {
+    public function fetch($nd_condition = array('field-name' => 'value'),$sort=array('field-name' => 'ASC')) {
 
         $extended_where = '';
-        if (!isset($nd_condition['field-name']) and is_array($nd_condition)) {
+        $order_by='';
+        $params=array();
+        if (!isset($nd_condition['field-name']) and is_array($nd_condition) and count($nd_condition)) {
             //Parameter is not default, create the where clause
 
             $arr_where = array();
             foreach ($nd_condition as $column => $value) {
-                $arr_where[] = " $column='$value'";
+                if(is_array($value) and isset($value['like'])){
+                    //$arr_where[]= " $column like '{$value['like']}'";
+                    $arr_where[]= " $column like ?";
+                    $params[] = "%{$value['like']}%";
+                }else{
+                    $arr_where[] = " $column=?";
+                    $params[] = $value;
+                    
+                }
+                
+                
             }
             $extended_where = 'where ' . implode(' and ', $arr_where);
         }
-
-        $result = $this->db->fetchAll("SELECT * FROM {$this->table} $extended_where");
+        if (!isset($sort['field-name']) and is_array($sort)) {
+            
+            $arr_orderby = array();
+            foreach ($sort as $column => $type) {
+                $arr_orderby[] = " $column $type";
+            }
+            $order_by = 'ORDER BY ' . implode(' , ', $arr_orderby);
+            
+        }
+        
+        $sql = "SELECT * FROM {$this->table} $extended_where $order_by";
+        $result = $this->db->fetchAll($sql,$params);
         return $result;
     }
-
-    public function insert() {
-        $data = array(
-            'display_name' => 'Campaign End Date',
-            'table_field_name' => 'campaign_end_date',
-            'datatype' => 'datetime',
-            'table_name' => 'campaign',
-        );
-        $result = $this->db->insert($this->table, $data);
-    }
+    
 
     public function save($post_data) {
 
@@ -207,6 +220,11 @@ class Settings {
             $error[] = "Enable filter field cannot be empty";
         } else {
             $data['enable_filter'] = $post_data['enable_filter'];
+        }
+        if (empty($post_data['show_in_grid'])) {
+            $error[] = "Show in Grid field cannot be empty";
+        } else {
+            $data['show_in_grid'] = $post_data['show_in_grid'];
         }
         if ($type == 'save') {//Edit not allowed on this field, set it only for new row
             $data['relationship_module'] = $post_data['relationship_module'];

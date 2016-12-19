@@ -10,6 +10,16 @@ $(document).ready(function(){
     $('.card').toggleClass('flipped');
     return false;
     });
+    
+    $('.tab ul li a').click(function(){
+        var id = $(this).attr('href');
+        $('.tab ul li a').removeClass('active');
+        $(this).addClass('active');
+        $('.tab-body').hide();
+        $(id).show();
+        
+        return false;
+    });
 });
 
 

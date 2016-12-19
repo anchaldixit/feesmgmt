@@ -1,0 +1,153 @@
+{# Intelligent/SettingBundle/Resources/views/Default/view.html.twig #}
+{% extends "base.html.twig"  %}
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        .full-container{
+            width: 100%;
+        }
+        .left-container{
+            width: 20%;
+            float: left;
+        }
+        .right-container{
+            width: 80%;
+            float: left;
+        }
+        .right-container table{
+            width: 100%
+        }
+
+        .selected_fitlers_container{
+            width: 100%;
+        }
+        .selected_filter{
+            float: left;
+            padding: 5px 15px;
+            margin: 5px 15px;
+        }
+
+
+
+
+    </style>
+{% endblock %}
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+
+        jQuery(document).ready(function ($) {
+
+            $("#filter_form input[type='radio'],#filter_form select").change(function () {
+
+                $("#filter_form").submit();
+            });
+            $('.selected_fitlers_container .selected_filter span').on('click', function () {
+
+                var filter = $(this).attr('data-resetfilter');
+                if (filter == 'module_field_display_name') {
+                    $("#filter_form input[name='filter[text][" + filter + "]'").val('')
+                } else {
+                    $("#filter_form input[name='filter[match][" + filter + "]'").prop('checked', false);
+                    
+                }
+                $(this).parent().remove();
+                $("#filter_form").submit();
+
+            })
+        })
+
+    </script>
+{% endblock %}
+{% block body %}
+
+    <h1>Module Settings</h1>
+    <a href="/app_dev.php/settings/edit/new">New</a>
+    <div class="full-container">
+        <div class="left-container">
+            <form method='GET' id="filter_form">
+                <h3>Sort</h3>
+                <select name="sort">
+                    <option value="">Sort By</option>
+                    <option value="module|asc"  {{selected_filters.sort is defined and selected_filters.sort == 'module|asc'? 'SELECTED':'' }}>Module(asc)</option>
+                    <option value="module|desc" {{selected_filters.sort is defined and selected_filters.sort == 'module|desc'? 'SELECTED':'' }}>Module(desc)</option>
+                    <option value="module_field_display_name|asc" {{selected_filters.sort is defined and selected_filters.sort == 'module_field_display_name|asc'? 'SELECTED':'' }}>Field Name(asc)</option>
+                    <option value="module_field_display_name|desc" {{selected_filters.sort is defined and selected_filters.sort == 'module_field_display_name|desc'? 'SELECTED':'' }}>Field Name(desc)</option>
+                    <option value="module_field_datatype|asc" {{selected_filters.sort is defined and selected_filters.sort == 'module_field_datatype|asc'? 'SELECTED':'' }}>Datatype(asc)</option>
+                    <option value="module_field_datatype|desc" {{selected_filters.sort is defined and selected_filters.sort == 'module_field_datatype|desc'? 'SELECTED':'' }}>Datatype(desc)</option>
+
+                </select>
+                <h3>Filters</h3>
+                <b>Field Name</b><br>
+                <input name="filter[text][module_field_display_name]" type="text" placeholder="Text search" value="{{selected_filters.filter.text.module_field_display_name is defined and selected_filters.filter.text.module_field_display_name is not empty ? selected_filters.filter.text.module_field_display_name | trim:'' }}">
+                <input type='submit' value=">>">
+
+                <br>
+                <br>
+                <b>Modules</b><br>
+                {% for keyname, module in modules %}
+                    <input type="radio" name="filter[match][module]"  value="{{keyname}}"
+                           {{selected_filters.filter.match.module is defined and selected_filters.filter.match.module == keyname? 'CHECKED':'' }}>{{module}}<br>
+                {% endfor %}
+                <br>
+                <b>Datatype</b><br>
+                {% for keyname, datatype in datatypes %}
+                    <input type="radio" name="filter[match][module_field_datatype]" value="{{keyname}}"
+                           {{selected_filters.filter.match.module_field_datatype is defined and selected_filters.filter.match.module_field_datatype == keyname? 'CHECKED':'' }}> {{datatype}}<br>
+                {% endfor %}
+            </form>
+
+        </div>
+        <div class="right-container">
+            <div class="selected_fitlers_container">
+                
+                {% if selected_filters.filter.text.module_field_display_name is defined and  selected_filters.filter.text.module_field_display_name is not empty%}
+                    <div class="selected_filter">
+                        Field name like {{selected_filters.filter.text.module_field_display_name}} <span data-resetfilter="module_field_display_name">X</span> 
+                    </div>
+                {% endif %}
+                {% if selected_filters.filter.match.module is defined%}
+                    <div class="selected_filter" >
+                        Module: {{modules[selected_filters.filter.match.module]}}  <span data-resetfilter="module">X</span> 
+                    </div>
+                {% endif %}
+                {% if selected_filters.filter.match.module_field_datatype is defined%}
+                    <div class="selected_filter" >
+                        DataType: {{datatypes[selected_filters.filter.match.module_field_datatype]}}  <span data-resetfilter="module_field_datatype">X</span> 
+                    </div>
+                {% endif %}
+                {% if selected_filters.sort is defined and  selected_filters.sort is not empty%}
+                    <!--<div class="selected_filter">
+                        Sort By {{selected_filters.filter.text.module_field_display_name}} <span data-resetfilter="module_field_display_name">X</span> 
+                    </div>-->
+                {% endif %}
+            </div>
+            <table>
+                <tr>
+                    <td>Module</td>
+                    <td>Field Name</td>
+                    <td>Data Type</td>
+                    <td>Filtered Enable<td>
+                    <td>Last Modified<td>
+                    <td>Action<td>
+                </tr>
+
+                {% for row in rows %}
+                    <tr>
+                        <td>{{modules[row.module]}}</td>
+                        <td>{{row.module_field_display_name}}</td>
+                        <td>{{attribute(datatypes,row.module_field_datatype)}}</td>
+                        <td>{{row.enable_filter}}<td>
+                        <td>{{row.modified_datetime}}<td>
+                        <td><a href="/app_dev.php/settings/edit/{{row.id}}">view</a> | <a href="/app_dev.php/settings/edit/{{row.id}}">edit</a> | <a href="/app_dev.php/settings/delete/{{row.id}}">delete</a><td>
+                    </tr>
+                {% endfor %}
+
+            </table>
+
+        </div>
+
+
+
+    </div>
+{% endblock %}
