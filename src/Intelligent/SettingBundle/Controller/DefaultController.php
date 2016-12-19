@@ -19,6 +19,7 @@ class DefaultController extends Controller {
         $settings = new Settings($conn);
         $modules = $settings->getModule();
         $datatypes = $settings->getModuleDataTypes();
+        //$columns = $settings->fetch(array('module'=>'marketing_projects'));
 
 
 
@@ -38,13 +39,13 @@ class DefaultController extends Controller {
                     $this->get('session')->getFlashBag()->add('success', "Row added successfully.");
                     return $this->redirectToRoute('intelligent_setting_edit', array('edit_id' => $id));
                 } else {
-                    
+
                     if (!empty($request->request->get('delete_submit'))) {
                         //delete
                         $settings->delete($request->request->get('id'));
                         //@todo: redirect should be done 
                         $this->get('session')->getFlashBag()->add('success', "Row Deleted Successfully.");
-                        return $this->redirectToRoute('intelligent_setting_edit', array('edit_id' => 'new'));
+                        return $this->redirectToRoute('intelligent_setting_view');
                     } else {//update
                         $id = $edit_id;
                         $settings->update($post);
@@ -86,6 +87,65 @@ class DefaultController extends Controller {
         return $this->render('IntelligentSettingBundle:Default:edit.html.twig', $parameters);
     }
 
+    public function viewAction() {
 
+        $conn = $this->get('database_connection');
+
+        $request = Request::createFromGlobals();
+        $settings = new Settings($conn);
+
+        $filters = $request->query->all();
+        array_walk_recursive($filters, function(&$val) {
+            $val = trim($val);
+            $val = stripslashes($val);
+        });
+        //var_dump($filters);
+        $params = array();
+        $sort = array('module' => 'ASC');
+        if (isset($filters['filter'])) {
+            if (!empty($filters['filter']['text']['module_field_display_name'])) {
+                $params['module_field_display_name']['like'] = "%{$filters['filter']['text']['module_field_display_name']}%";
+            }
+            if (!empty($filters['filter']['match'])) {
+
+                foreach ($filters['filter']['match'] as $field => $value) {
+                    $params[$field] = $value;
+                }
+            }
+        }
+        //Set sort filter
+        if (isset($filters['sort']) and ! empty($filters['sort'])) {
+            $sort = array();
+            $arr_sort = explode('|', $filters['sort']);
+            $sort[$arr_sort[0]] = $arr_sort[1];
+        }
+        //Fetch the data
+        $row = $settings->fetch($params, $sort);
+
+
+        $modules = $settings->getModule();
+        $datatypes = $settings->getModuleDataTypes();
+
+        //var_dump($filters);
+
+        $parameters = array('rows' => $row,
+            'modules' => $modules,
+            'datatypes' => $datatypes,
+            'selected_filters' => $filters
+        );
+        return $this->render('IntelligentSettingBundle:Default:view.html.twig', $parameters);
+    }
+
+    public function deleteAction($delete_id) {
+
+        $conn = $this->get('database_connection');
+
+        $settings = new Settings($conn);
+
+        $settings->delete($delete_id);
+        
+        $this->get('session')->getFlashBag()->add('success', "Row Deleted Successfully.");
+        return $this->redirectToRoute('intelligent_setting_view');
+    }
 
 }

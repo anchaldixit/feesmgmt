@@ -4,6 +4,9 @@ intelligent_setting_homepage:
 intelligent_setting_edit:
     path:     /settings/edit/{edit_id}
     defaults: { _controller: IntelligentSettingBundle:Default:edit }
-intelligent_setting_save:
-    path:     /settings/save/
-    defaults: { _controller: IntelligentSettingBundle:Default:save }
+intelligent_setting_delete:
+    path:     /settings/delete/{delete_id}
+    defaults: { _controller: IntelligentSettingBundle:Default:delete }
+intelligent_setting_view:
+    path:     /settings/view/
+    defaults: { _controller: IntelligentSettingBundle:Default:view }
