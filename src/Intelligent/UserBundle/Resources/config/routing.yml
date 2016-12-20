@@ -23,3 +23,11 @@ intelligent_api_v1_genaral:
 intelligent_api_v1:
     path: /api/v1
     defaults: { _controller: IntelligentUserBundle:Api:v1EndPoint }
+    
+intelligent_users:
+    path: /users
+    defaults: { _controller: IntelligentUserBundle:Default:users }
+    
+intelligent_roles:
+    path: /roles
+    defaults: { _controller: IntelligentUserBundle:Default:roles }

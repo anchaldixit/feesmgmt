@@ -30,6 +30,7 @@ class DefaultController extends Controller {
         // last username entered by the user
         $lastUsername = (null === $session) ? '' :
                 $session->get(SecurityContextInterface::LAST_USERNAME);
+        
         return $this->render('IntelligentUserBundle:Default:login.html.twig', array(
             // last username entered by the user
             'last_username' => $lastUsername,
@@ -38,7 +39,17 @@ class DefaultController extends Controller {
     }
     
     public function resetPasswordAction($resetPasswordId){
-        return new Response("Reset Password Id:" . $resetPasswordId);
+        return $this->render('IntelligentUserBundle:Default:reset.html.twig', array(
+            'resetPasswordId' => $resetPasswordId
+        ));
+    }
+    
+    public function usersAction(Request $request){
+        return $this->render('IntelligentUserBundle:Default:users.html.twig', array());
+    }
+    
+    public function rolesAction(Request $request){
+        return $this->render('IntelligentUserBundle:Default:roles.html.twig', array());
     }
 
 }

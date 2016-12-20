@@ -14,6 +14,8 @@ use Intelligent\UserBundle\Entity\RoleModulePermission;
  */
 class Role
 {
+    const ACTIVE = 1;
+    const DEACTIVE = 0;
     /**
      * @var integer
      *

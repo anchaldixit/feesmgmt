@@ -6,6 +6,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Intelligent\UserBundle\Entity\User;
+use Intelligent\UserBundle\Entity\Role;
 use Symfony\Component\Security\Core\Util\StringUtils;
 
 class ApiController extends Controller {
@@ -204,18 +205,67 @@ class ApiController extends Controller {
         }
     }
 
+    /**
+     * This function will give the list of the users 
+     * 
+     * @param Request $request
+     * @param type $json
+     * @return Response
+     * @throws \Exception
+     */
     private function getUsers(Request $request, $json){
-        $user = $this->getUser();
+        $user_permissions = $this->get('user_permissions');
+        if($user_permissions->getManageUserAndShareAppPermission()){
+            $body = $json->body;
+            if(!isset($body->where)){
+                throw new \Exception("where is not set in the request json",400);
+            }else if(!isset($body->order_by)){
+                throw new \Exception("order_by is not set in the request json",400);
+            }else if(!isset($body->order_type)){
+                throw new \Exception("order_type is not set in the request json",400);
+            }else{
+                $where = $body->where;
+                if(!isset($where->name)){
+                    throw new \Exception("where.name is not set in the request json",400);
+                }else if(!isset($where->role)){
+                    throw new \Exception("where.role is not set in the request json",400);
+                }else if(!isset($where->status)){
+                    throw new \Exception("where.status is not set in the request json",400);
+                }else{
+                    // Check roles or status ids 
+                    $this->_checkRoles($where->role);
+                    $this->_checkStatus($where->status);
+                    // check order by and order type
+                    $this->_checkOrderBy($body->order_by, array("name", "role", "status", "last_login"));
+                    $this->_checkOrderType($body->order_type);
+                    
+                    
+                    // So all data is checked now so get the data;
+                    $dql = "SELECT u from IntelligentUserBundle:User where ";
+                }
+            }
+        }else{
+            throw new \Exception("Current user has no access to user data", 403);
+        }
     }
     
+    /**
+     * This api action will be used to disable users
+     * 
+     * @param Request $request
+     * @param type $json
+     * @return type
+     * @throws \Exception
+     */
     private function disableUser(Request $request, $json){
         $user_permissions = $this->get('user_permissions');
-        if($user_permissions){
+        if($user_permissions->getManageUserAndShareAppPermission()){
             if(isset($json->body->user_id)){
                 $em = $this->getDoctrine()->getManager();
                 $user = $em->getRepository("IntelligentUserBundle:User")->find($json->body->user_id);
                 if($user){
-                    $user->setStatus(4)->setUpdateDatetime(new \DateTime());
+                    // If user is available then disable it
+                    $user->setStatus(User::DEACTIVATED)->setUpdateDatetime(new \DateTime());
                     $em->flush();
                     return $this->_handleSuccessfulRequest();
                 }else{
@@ -229,9 +279,18 @@ class ApiController extends Controller {
         }
     }
     
+    
+    /**
+     * This api action will be used to change role of the user 
+     * 
+     * @param Request $request
+     * @param type $json
+     * @return type
+     * @throws \Exception
+     */
     private function changeRole(Request $request, $json){
         $user_permissions = $this->get('user_permissions');
-        if($user_permissions){
+        if($user_permissions->getManageUserAndShareAppPermission()){
             if(isset($json->body->user_id) && isset($json->body->new_role_id)){
                 $em = $this->getDoctrine()->getManager();
                 // Get user
@@ -240,6 +299,7 @@ class ApiController extends Controller {
                     // Now get role 
                     $role = $em->getRepository("IntelligentUserBundle:Role")->find($json->body->new_role_id);
                     if($role){
+                        // If both are present then change it
                         $user->setRole($role)->setUpdateDatetime(new \DateTime());
                         $em->flush();
                         return $this->_handleSuccessfulRequest();
@@ -355,6 +415,74 @@ class ApiController extends Controller {
             }else{
                 return false;
             }
+        }
+    }
+    
+    /**
+     * This function will check if any role ids passed is
+     * not available or inactive
+     * 
+     * @param type $rolesArr array of role ids
+     * @throws \Exception if any role ids passed is not active
+     */
+    private function _checkRoles($rolesArr){
+        if(!is_array($rolesArr)){
+            $rolesArr = array($rolesArr);
+        }
+        $repo = $this->getDoctrine()->getManager()->getRepository("IntelligentUserBundle:Role");
+        $all_active_roles = $repo->findBy(array("status" => Role::ACTIVE));
+        $active_role_ids = array();
+        foreach($all_active_roles as $role){
+            $active_role_ids[] = $role->getId();
+        }
+        
+        $not_available_roles = array();
+        foreach($rolesArr as $role_id){
+            if(!in_array($role_id,$active_role_ids)){
+                $not_available_roles[] = $role_id;
+            }
+        }
+        if(count($not_available_roles) > 0){
+            $not_available_roles_str = implode(", ", $not_available_roles);
+            throw new \Exception("role ids ($not_available_roles_str) not available or inactive", 412);
+        }
+        
+    }
+    
+    /**
+     * This function will check if all the status ids
+     * are correct
+     * 
+     * @param mived $statusArr 
+     * @throws \Exception
+     */
+    private function _checkStatus($statusArr){
+        if(!is_array($statusArr)){
+            $statusArr = array($statusArr);
+        }
+        
+        $valid_status_id_arr = array(1,2,3,4,5,6);
+        $not_valid_status_id_arr = array();
+        foreach($statusArr as $status_id){
+            if(!in_array($status_id,$valid_status_id_arr)){
+                $not_valid_status_id_arr[] = $status_id;
+            }
+        }
+        if(count($not_valid_status_id_arr) > 0){
+            $not_valid_status_id_str = implode(", ", $not_valid_status_id_arr);
+            throw new \Exception("status ids ($not_valid_status_id_str) not available or inactive", 412);
+        }
+    }
+    
+    private function _checkOrderBy($orderByKey, $permittedValues){
+        if(!in_array($orderByKey,$permittedValues)){
+            throw new \Exception("body.order_by value($orderByKey) is invalid",412);
+        }
+    }
+    
+    private function _checkOrderType($orderType){
+        if($orderType  !== 'asc' && $orderType !== 'desc'){
+            throw new \Exception("body.order_type value($orderType) is invalid",412);
         }
     }
 }
