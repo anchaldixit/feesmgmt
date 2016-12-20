@@ -5,7 +5,6 @@
  */
 $(document).ready(function(){
     
-    
     $('.flip').click(function(){
     $('.card').toggleClass('flipped');
     return false;

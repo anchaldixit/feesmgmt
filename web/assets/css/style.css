@@ -134,6 +134,12 @@ body {
 .red {
   color: #fa3576; }
 
+.validation_msg {
+  margin-top: 10px;
+  display: block;
+  font-size: 12px;
+  color: red; }
+
 .arrow-down {
   width: 0;
   height: 0;
