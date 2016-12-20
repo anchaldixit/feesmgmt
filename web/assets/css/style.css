@@ -134,11 +134,17 @@ body {
 .red {
   color: #fa3576; }
 
-.validation_msg {
+.validation_msg, .error_msg {
   margin-top: 10px;
   display: block;
   font-size: 12px;
   color: red; }
+
+.msg {
+  color: green;
+  margin-top: 10px;
+  display: block;
+  font-size: 12px; }
 
 .arrow-down {
   width: 0;
@@ -248,18 +254,48 @@ body {
       display: block; }
 
 .feature-list {
-  overflow: hidden; }
+  overflow: hidden;
+  position: relative;
+  height: 63px; }
+  .feature-list .prev {
+    position: absolute;
+    left: 0;
+    top: 0;
+    height: 63px;
+    z-index: 99;
+    width: 20px;
+    padding-left: 5px;
+    color: #393939;
+    cursor: pointer;
+    background-color: rgba(255, 255, 255, 0.6); }
+    .feature-list .prev .fa {
+      margin-top: 25px; }
+  .feature-list .next {
+    position: absolute;
+    right: 0;
+    top: 0;
+    height: 63px;
+    z-index: 99;
+    width: 20px;
+    padding-left: 5px;
+    color: #393939;
+    cursor: pointer;
+    background-color: rgba(255, 255, 255, 0.6); }
+    .feature-list .next .fa {
+      margin-top: 25px; }
   .feature-list ul {
     border-top: 1px solid #fff;
     background-color: #5aa3ff;
     overflow: hidden;
-    width: 1550px; }
+    position: absolute;
+    height: 63px;
+    width: 1550px;
+    padding: 0 20px; }
     .feature-list ul li {
       float: left;
       list-style: none;
-      padding: 10px;
-      margin: 0 10px;
-      cursur: pointer; }
+      padding: 10px 20px;
+      cursor: pointer; }
       .feature-list ul li a {
         color: #fff;
         text-decoration: none;
