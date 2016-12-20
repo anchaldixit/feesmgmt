@@ -40,18 +40,21 @@
             </div>
             <div class="login-form">
                 <p>Don't worry, It happens to everyone. We'll get you back into Aizan right away. </p>
-                <form>
+                
                     <ul>
                         <li>
-                            <input type="text" placeholder="username or email" name="username" value="" />
+                            <input type="text" placeholder="username or email" name="username" value="" id="forget_password_textbox" />
+                            <span class="validation_msg"></span>
                         </li>
 
                         <li>
-                            <input type="submit" value="Rest my Password" name="reset_password" />
+                            <input type="submit" value="Reset my Password" name="reset_password" id="forget_password_btn" />
+                            <p id="loader" style="display:none; text-align: right"><i class="fa fa-refresh fa-spin fa-1x fa-fw"></i></p>
                         </li>
                     </ul>
                     <p><a href="#" class="flip">Back to Sign In</a></p>
-                </form>
+                    <p id="valid_error"></p>
+                
             </div>
         </div>
 

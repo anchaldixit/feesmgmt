@@ -1,9 +1,391 @@
-{% extends 'truebase.html.twig' %}
+{% extends 'loggedtemplate.html.twig' %}
 
 {% block title %}
     <title>List of users</title>
 {% endblock %}
 
 {% block body %}
-    Users
+    <div class="user-filter">
+        <a class="b-btn" href="#"><i class="fa fa-times"></i>Remove User</a>
+        <a class="b-btn" href="#"><i class="fa fa-wrench"></i>Change Role</a>
+        <a class="b-btn" href="#"><i class="fa fa-envelope"></i>Send Invitation</a>
+        <a class="b-btn" href="#"><i class="fa fa-file-text"></i>Export All Users</a>
+    </div>
+    <div class="table-content user-table">
+                <table>
+                    <thead>
+                        <tr>
+                            <th><input type="checkbox" name="all-users"></th>
+                            <th>Name</th>
+                            <th>Role</th>
+                            <th>Status</th>
+                            <th>Last Visit</th>
+                            <th>Show in User pickers</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><input type="checkbox" name="user" /></td>
+                            <td><a href="#">Navit Kumar</a></td>
+                            <td>
+                                <select>
+                                    <option value="administrator" >Administrator</option>
+                                    <option value="team_member" >Team Member</option>
+                                    <option value="sales_agent" >Sales Agent</option>
+                                    <option value="client" >Client</option>
+                                    <option value="tsd" >TSD</option>
+                                    <option value="expertise" >Expertise</option>
+                                    <option value="none" >None</option>
+                                </select>
+                            </td>
+                            <td>Registered</td>
+                            <td>Dec 01, 2016 09:27 PM (PST)</td>
+                            <td><i class="fa fa-check green"></i></td>
+                            <td><a href="#"><i class="fa fa-times red"></i></a></td>
+                            
+                        </tr>
+                        <tr>
+                            <td><input type="checkbox" name="user" /></td>
+                            <td><a href="#">Navit Kumar</a></td>
+                            <td>
+                                <select>
+                                    <option value="administrator" >Administrator</option>
+                                    <option value="team_member" >Team Member</option>
+                                    <option value="sales_agent" >Sales Agent</option>
+                                    <option value="client" >Client</option>
+                                    <option value="tsd" >TSD</option>
+                                    <option value="expertise" >Expertise</option>
+                                    <option value="none" >None</option>
+                                </select>
+                            </td>
+                            <td>Registered</td>
+                            <td>Dec 01, 2016 09:27 PM (PST)</td>
+                            <td><i class="fa fa-check green"></i></td>
+                            <td><a href="#"><i class="fa fa-times red"></i></a></td>
+                            
+                        </tr>
+                        <tr>
+                            <td><input type="checkbox" name="user" /></td>
+                            <td><a href="#">Navit Kumar</a></td>
+                            <td>
+                                <select>
+                                    <option value="administrator" >Administrator</option>
+                                    <option value="team_member" >Team Member</option>
+                                    <option value="sales_agent" >Sales Agent</option>
+                                    <option value="client" >Client</option>
+                                    <option value="tsd" >TSD</option>
+                                    <option value="expertise" >Expertise</option>
+                                    <option value="none" >None</option>
+                                </select>
+                            </td>
+                            <td>Registered</td>
+                            <td>Dec 01, 2016 09:27 PM (PST)</td>
+                            <td><i class="fa fa-check green"></i></td>
+                            <td><a href="#"><i class="fa fa-times red"></i></a></td>
+                            
+                        </tr>
+                        <tr>
+                            <td><input type="checkbox" name="user" /></td>
+                            <td><a href="#">Navit Kumar</a></td>
+                            <td>
+                                <select>
+                                    <option value="administrator" >Administrator</option>
+                                    <option value="team_member" >Team Member</option>
+                                    <option value="sales_agent" >Sales Agent</option>
+                                    <option value="client" >Client</option>
+                                    <option value="tsd" >TSD</option>
+                                    <option value="expertise" >Expertise</option>
+                                    <option value="none" >None</option>
+                                </select>
+                            </td>
+                            <td>Registered</td>
+                            <td>Dec 01, 2016 09:27 PM (PST)</td>
+                            <td><i class="fa fa-check green"></i></td>
+                            <td><a href="#"><i class="fa fa-times red"></i></a></td>
+                            
+                        </tr>
+                        <tr>
+                            <td><input type="checkbox" name="user" /></td>
+                            <td><a href="#">Navit Kumar</a></td>
+                            <td>
+                                <select>
+                                    <option value="administrator" >Administrator</option>
+                                    <option value="team_member" >Team Member</option>
+                                    <option value="sales_agent" >Sales Agent</option>
+                                    <option value="client" >Client</option>
+                                    <option value="tsd" >TSD</option>
+                                    <option value="expertise" >Expertise</option>
+                                    <option value="none" >None</option>
+                                </select>
+                            </td>
+                            <td>Registered</td>
+                            <td>Dec 01, 2016 09:27 PM (PST)</td>
+                            <td><i class="fa fa-check green"></i></td>
+                            <td><a href="#"><i class="fa fa-times red"></i></a></td>
+                            
+                        </tr>
+                        <tr>
+                            <td><input type="checkbox" name="user" /></td>
+                            <td><a href="#">Navit Kumar</a></td>
+                            <td>
+                                <select>
+                                    <option value="administrator" >Administrator</option>
+                                    <option value="team_member" >Team Member</option>
+                                    <option value="sales_agent" >Sales Agent</option>
+                                    <option value="client" >Client</option>
+                                    <option value="tsd" >TSD</option>
+                                    <option value="expertise" >Expertise</option>
+                                    <option value="none" >None</option>
+                                </select>
+                            </td>
+                            <td>Registered</td>
+                            <td>Dec 01, 2016 09:27 PM (PST)</td>
+                            <td><i class="fa fa-check green"></i></td>
+                            <td><a href="#"><i class="fa fa-times red"></i></a></td>
+                            
+                        </tr>
+                        <tr>
+                            <td><input type="checkbox" name="user" /></td>
+                            <td><a href="#">Navit Kumar</a></td>
+                            <td>
+                                <select>
+                                    <option value="administrator" >Administrator</option>
+                                    <option value="team_member" >Team Member</option>
+                                    <option value="sales_agent" >Sales Agent</option>
+                                    <option value="client" >Client</option>
+                                    <option value="tsd" >TSD</option>
+                                    <option value="expertise" >Expertise</option>
+                                    <option value="none" >None</option>
+                                </select>
+                            </td>
+                            <td>Registered</td>
+                            <td>Dec 01, 2016 09:27 PM (PST)</td>
+                            <td><i class="fa fa-check green"></i></td>
+                            <td><a href="#"><i class="fa fa-times red"></i></a></td>
+                            
+                        </tr>
+                        <tr>
+                            <td><input type="checkbox" name="user" /></td>
+                            <td><a href="#">Navit Kumar</a></td>
+                            <td>
+                                <select>
+                                    <option value="administrator" >Administrator</option>
+                                    <option value="team_member" >Team Member</option>
+                                    <option value="sales_agent" >Sales Agent</option>
+                                    <option value="client" >Client</option>
+                                    <option value="tsd" >TSD</option>
+                                    <option value="expertise" >Expertise</option>
+                                    <option value="none" >None</option>
+                                </select>
+                            </td>
+                            <td>Registered</td>
+                            <td>Dec 01, 2016 09:27 PM (PST)</td>
+                            <td><i class="fa fa-check green"></i></td>
+                            <td><a href="#"><i class="fa fa-times red"></i></a></td>
+                            
+                        </tr>
+                        <tr>
+                            <td><input type="checkbox" name="user" /></td>
+                            <td><a href="#">Navit Kumar</a></td>
+                            <td>
+                                <select>
+                                    <option value="administrator" >Administrator</option>
+                                    <option value="team_member" >Team Member</option>
+                                    <option value="sales_agent" >Sales Agent</option>
+                                    <option value="client" >Client</option>
+                                    <option value="tsd" >TSD</option>
+                                    <option value="expertise" >Expertise</option>
+                                    <option value="none" >None</option>
+                                </select>
+                            </td>
+                            <td>Registered</td>
+                            <td>Dec 01, 2016 09:27 PM (PST)</td>
+                            <td><i class="fa fa-check green"></i></td>
+                            <td><a href="#"><i class="fa fa-times red"></i></a></td>
+                            
+                        </tr>
+                        <tr>
+                            <td><input type="checkbox" name="user" /></td>
+                            <td><a href="#">Navit Kumar</a></td>
+                            <td>
+                                <select>
+                                    <option value="administrator" >Administrator</option>
+                                    <option value="team_member" >Team Member</option>
+                                    <option value="sales_agent" >Sales Agent</option>
+                                    <option value="client" >Client</option>
+                                    <option value="tsd" >TSD</option>
+                                    <option value="expertise" >Expertise</option>
+                                    <option value="none" >None</option>
+                                </select>
+                            </td>
+                            <td>Registered</td>
+                            <td>Dec 01, 2016 09:27 PM (PST)</td>
+                            <td><i class="fa fa-check green"></i></td>
+                            <td><a href="#"><i class="fa fa-times red"></i></a></td>
+                            
+                        </tr>
+                        <tr>
+                            <td><input type="checkbox" name="user" /></td>
+                            <td><a href="#">Navit Kumar</a></td>
+                            <td>
+                                <select>
+                                    <option value="administrator" >Administrator</option>
+                                    <option value="team_member" >Team Member</option>
+                                    <option value="sales_agent" >Sales Agent</option>
+                                    <option value="client" >Client</option>
+                                    <option value="tsd" >TSD</option>
+                                    <option value="expertise" >Expertise</option>
+                                    <option value="none" >None</option>
+                                </select>
+                            </td>
+                            <td>Registered</td>
+                            <td>Dec 01, 2016 09:27 PM (PST)</td>
+                            <td><i class="fa fa-check green"></i></td>
+                            <td><a href="#"><i class="fa fa-times red"></i></a></td>
+                            
+                        </tr>
+                        <tr>
+                            <td><input type="checkbox" name="user" /></td>
+                            <td><a href="#">Navit Kumar</a></td>
+                            <td>
+                                <select>
+                                    <option value="administrator" >Administrator</option>
+                                    <option value="team_member" >Team Member</option>
+                                    <option value="sales_agent" >Sales Agent</option>
+                                    <option value="client" >Client</option>
+                                    <option value="tsd" >TSD</option>
+                                    <option value="expertise" >Expertise</option>
+                                    <option value="none" >None</option>
+                                </select>
+                            </td>
+                            <td>Registered</td>
+                            <td>Dec 01, 2016 09:27 PM (PST)</td>
+                            <td><i class="fa fa-check green"></i></td>
+                            <td><a href="#"><i class="fa fa-times red"></i></a></td>
+                            
+                        </tr>
+                        <tr>
+                            <td><input type="checkbox" name="user" /></td>
+                            <td><a href="#">Navit Kumar</a></td>
+                            <td>
+                                <select>
+                                    <option value="administrator" >Administrator</option>
+                                    <option value="team_member" >Team Member</option>
+                                    <option value="sales_agent" >Sales Agent</option>
+                                    <option value="client" >Client</option>
+                                    <option value="tsd" >TSD</option>
+                                    <option value="expertise" >Expertise</option>
+                                    <option value="none" >None</option>
+                                </select>
+                            </td>
+                            <td>Registered</td>
+                            <td>Dec 01, 2016 09:27 PM (PST)</td>
+                            <td><i class="fa fa-check green"></i></td>
+                            <td><a href="#"><i class="fa fa-times red"></i></a></td>
+                            
+                        </tr>
+                        <tr>
+                            <td><input type="checkbox" name="user" /></td>
+                            <td><a href="#">Navit Kumar</a></td>
+                            <td>
+                                <select>
+                                    <option value="administrator" >Administrator</option>
+                                    <option value="team_member" >Team Member</option>
+                                    <option value="sales_agent" >Sales Agent</option>
+                                    <option value="client" >Client</option>
+                                    <option value="tsd" >TSD</option>
+                                    <option value="expertise" >Expertise</option>
+                                    <option value="none" >None</option>
+                                </select>
+                            </td>
+                            <td>Registered</td>
+                            <td>Dec 01, 2016 09:27 PM (PST)</td>
+                            <td><i class="fa fa-check green"></i></td>
+                            <td><a href="#"><i class="fa fa-times red"></i></a></td>
+                            
+                        </tr>
+                        <tr>
+                            <td><input type="checkbox" name="user" /></td>
+                            <td><a href="#">Navit Kumar</a></td>
+                            <td>
+                                <select>
+                                    <option value="administrator" >Administrator</option>
+                                    <option value="team_member" >Team Member</option>
+                                    <option value="sales_agent" >Sales Agent</option>
+                                    <option value="client" >Client</option>
+                                    <option value="tsd" >TSD</option>
+                                    <option value="expertise" >Expertise</option>
+                                    <option value="none" >None</option>
+                                </select>
+                            </td>
+                            <td>Registered</td>
+                            <td>Dec 01, 2016 09:27 PM (PST)</td>
+                            <td><i class="fa fa-check green"></i></td>
+                            <td><a href="#"><i class="fa fa-times red"></i></a></td>
+                            
+                        </tr>
+                        <tr>
+                            <td><input type="checkbox" name="user" /></td>
+                            <td><a href="#">Navit Kumar</a></td>
+                            <td>
+                                <select>
+                                    <option value="administrator" >Administrator</option>
+                                    <option value="team_member" >Team Member</option>
+                                    <option value="sales_agent" >Sales Agent</option>
+                                    <option value="client" >Client</option>
+                                    <option value="tsd" >TSD</option>
+                                    <option value="expertise" >Expertise</option>
+                                    <option value="none" >None</option>
+                                </select>
+                            </td>
+                            <td>Registered</td>
+                            <td>Dec 01, 2016 09:27 PM (PST)</td>
+                            <td><i class="fa fa-check green"></i></td>
+                            <td><a href="#"><i class="fa fa-times red"></i></a></td>
+                            
+                        </tr>
+                        <tr>
+                            <td><input type="checkbox" name="user" /></td>
+                            <td><a href="#">Navit Kumar</a></td>
+                            <td>
+                                <select>
+                                    <option value="administrator" >Administrator</option>
+                                    <option value="team_member" >Team Member</option>
+                                    <option value="sales_agent" >Sales Agent</option>
+                                    <option value="client" >Client</option>
+                                    <option value="tsd" >TSD</option>
+                                    <option value="expertise" >Expertise</option>
+                                    <option value="none" >None</option>
+                                </select>
+                            </td>
+                            <td>Registered</td>
+                            <td>Dec 01, 2016 09:27 PM (PST)</td>
+                            <td><i class="fa fa-check green"></i></td>
+                            <td><a href="#"><i class="fa fa-times red"></i></a></td>
+                            
+                        </tr>
+                        <tr>
+                            <td><input type="checkbox" name="user" /></td>
+                            <td><a href="#">Navit Kumar</a></td>
+                            <td>
+                                <select>
+                                    <option value="administrator" >Administrator</option>
+                                    <option value="team_member" >Team Member</option>
+                                    <option value="sales_agent" >Sales Agent</option>
+                                    <option value="client" >Client</option>
+                                    <option value="tsd" >TSD</option>
+                                    <option value="expertise" >Expertise</option>
+                                    <option value="none" >None</option>
+                                </select>
+                            </td>
+                            <td>Registered</td>
+                            <td>Dec 01, 2016 09:27 PM (PST)</td>
+                            <td><i class="fa fa-check green"></i></td>
+                            <td><a href="#"><i class="fa fa-times red"></i></a></td>
+                            
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
 {% endblock %}
