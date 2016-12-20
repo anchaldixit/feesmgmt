@@ -49,7 +49,7 @@
                     $("#filter_form input[name='filter[text][" + filter + "]'").val('')
                 } else {
                     $("#filter_form input[name='filter[match][" + filter + "]'").prop('checked', false);
-                    
+
                 }
                 $(this).parent().remove();
                 $("#filter_form").submit();
@@ -61,46 +61,70 @@
 {% endblock %}
 {% block body %}
 
-    <h1>Module Settings</h1>
-    <a href="/app_dev.php/settings/edit/new">New</a>
-    <div class="full-container">
-        <div class="left-container">
+    <div class="bottom-sec">
+        <div class="bread-crumb">
+            <span>Module Settings</span>
+            <i class="fa fa-long-arrow-right"></i>
+            <span>View</span>
+        </div>
+        <div class="custom-feature">
+            <a href="/app_dev.php/settings/edit/new"><i class="fa "></i>New</a>
+        </div>
+    </div>
+    <div class="full-container content-table">
+        <div class="left-container left-sidebar">
             <form method='GET' id="filter_form">
-                <h3>Sort</h3>
-                <select name="sort">
-                    <option value="">Sort By</option>
-                    <option value="module|asc"  {{selected_filters.sort is defined and selected_filters.sort == 'module|asc'? 'SELECTED':'' }}>Module(asc)</option>
-                    <option value="module|desc" {{selected_filters.sort is defined and selected_filters.sort == 'module|desc'? 'SELECTED':'' }}>Module(desc)</option>
-                    <option value="module_field_display_name|asc" {{selected_filters.sort is defined and selected_filters.sort == 'module_field_display_name|asc'? 'SELECTED':'' }}>Field Name(asc)</option>
-                    <option value="module_field_display_name|desc" {{selected_filters.sort is defined and selected_filters.sort == 'module_field_display_name|desc'? 'SELECTED':'' }}>Field Name(desc)</option>
-                    <option value="module_field_datatype|asc" {{selected_filters.sort is defined and selected_filters.sort == 'module_field_datatype|asc'? 'SELECTED':'' }}>Datatype(asc)</option>
-                    <option value="module_field_datatype|desc" {{selected_filters.sort is defined and selected_filters.sort == 'module_field_datatype|desc'? 'SELECTED':'' }}>Datatype(desc)</option>
+                <div class="filter-box">
+                    <h6><a href="#"><i class="fa fa-caret-down"></i>Sort</a></h6>
+                    <ul>
+                        <li>
+                            <select name="sort">
+                                <option value="">Sort By</option>
+                                <option value="module|asc"  {{selected_filters.sort is defined and selected_filters.sort == 'module|asc'? 'SELECTED':'' }}>Module(asc)</option>
+                                <option value="module|desc" {{selected_filters.sort is defined and selected_filters.sort == 'module|desc'? 'SELECTED':'' }}>Module(desc)</option>
+                                <option value="module_field_display_name|asc" {{selected_filters.sort is defined and selected_filters.sort == 'module_field_display_name|asc'? 'SELECTED':'' }}>Field Name(asc)</option>
+                                <option value="module_field_display_name|desc" {{selected_filters.sort is defined and selected_filters.sort == 'module_field_display_name|desc'? 'SELECTED':'' }}>Field Name(desc)</option>
+                                <option value="module_field_datatype|asc" {{selected_filters.sort is defined and selected_filters.sort == 'module_field_datatype|asc'? 'SELECTED':'' }}>Datatype(asc)</option>
+                                <option value="module_field_datatype|desc" {{selected_filters.sort is defined and selected_filters.sort == 'module_field_datatype|desc'? 'SELECTED':'' }}>Datatype(desc)</option>
 
-                </select>
-                <h3>Filters</h3>
-                <b>Field Name</b><br>
-                <input name="filter[text][module_field_display_name]" type="text" placeholder="Text search" value="{{selected_filters.filter.text.module_field_display_name is defined and selected_filters.filter.text.module_field_display_name is not empty ? selected_filters.filter.text.module_field_display_name | trim:'' }}">
-                <input type='submit' value=">>">
+                            </select>
+                        </li>
+                    </ul>
+                </div>
+                <div class="filter-box">
+                    <h6><a href="#"><i class="fa fa-caret-down"></i>Field Name</a></h6>
+                    <ul>
+                        <li>
+                            <input name="filter[text][module_field_display_name]" type="text" placeholder="Text search" value="{{selected_filters.filter.text.module_field_display_name is defined and selected_filters.filter.text.module_field_display_name is not empty ? selected_filters.filter.text.module_field_display_name | trim:'' }}">
+                            <input type='submit' value=">>">
+                        </li>
+                    </ul>
+                </div>
+                <div class="filter-box">
+                    <h6><a href="#"><i class="fa fa-caret-down"></i>Modules</a></h6>
+                    <ul>
+                        {% for keyname, module in modules %}
+                            <li><input type="radio" name="filter[match][module]"  value="{{keyname}}"
+                                       {{selected_filters.filter.match.module is defined and selected_filters.filter.match.module == keyname? 'CHECKED':'' }}><label>{{module}}</label> </li>
+                                {% endfor %}
 
-                <br>
-                <br>
-                <b>Modules</b><br>
-                {% for keyname, module in modules %}
-                    <input type="radio" name="filter[match][module]"  value="{{keyname}}"
-                           {{selected_filters.filter.match.module is defined and selected_filters.filter.match.module == keyname? 'CHECKED':'' }}>{{module}}<br>
-                {% endfor %}
-                <br>
-                <b>Datatype</b><br>
-                {% for keyname, datatype in datatypes %}
-                    <input type="radio" name="filter[match][module_field_datatype]" value="{{keyname}}"
-                           {{selected_filters.filter.match.module_field_datatype is defined and selected_filters.filter.match.module_field_datatype == keyname? 'CHECKED':'' }}> {{datatype}}<br>
-                {% endfor %}
+                    </ul>
+                </div>
+                <div class="filter-box">
+                    <h6><a href="#"><i class="fa fa-caret-down"></i>Datatype</a></h6>
+                    <ul>
+                        {% for keyname, datatype in datatypes %}
+                            <li><input type="radio" name="filter[match][module_field_datatype]" value="{{keyname}}"
+                                       {{selected_filters.filter.match.module_field_datatype is defined and selected_filters.filter.match.module_field_datatype == keyname? 'CHECKED':'' }}> <label>{{datatype}}</label></li>
+                            {% endfor %}
+                    </ul>
+                </div>
             </form>
 
         </div>
-        <div class="right-container">
+        <div class="right-container table-content">
             <div class="selected_fitlers_container">
-                
+
                 {% if selected_filters.filter.text.module_field_display_name is defined and  selected_filters.filter.text.module_field_display_name is not empty%}
                     <div class="selected_filter">
                         Field name like {{selected_filters.filter.text.module_field_display_name}} <span data-resetfilter="module_field_display_name">X</span> 
@@ -123,14 +147,16 @@
                 {% endif %}
             </div>
             <table>
-                <tr>
-                    <td>Module</td>
-                    <td>Field Name</td>
-                    <td>Data Type</td>
-                    <td>Filtered Enable<td>
-                    <td>Last Modified<td>
-                    <td>Action<td>
-                </tr>
+                <thead>
+                    <tr>
+                        <th>Module</th>
+                        <th>Field Name</th>
+                        <th>Data Type</th>
+                        <th>Filtered Enable<th>
+                        <th>Last Modified<th>
+                        <th>Action<th>
+                    </tr>
+                </thead>
 
                 {% for row in rows %}
                     <tr>
