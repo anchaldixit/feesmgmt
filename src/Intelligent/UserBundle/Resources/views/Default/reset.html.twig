@@ -1,0 +1,14 @@
+{% extends 'truebase.html.twig' %}
+
+{% block title %}
+    <title>Reset Password</title>
+{% endblock %}
+
+{% block body %}
+    Reset Password
+{% endblock %}
+{% block inlinejs %}
+    <script>
+        var resetId = '{{resetPasswordId}}';
+    </script>
+{% endblock %}    

@@ -226,6 +226,11 @@ class Settings {
         } else {
             $data['show_in_grid'] = $post_data['show_in_grid'];
         }
+        if (empty($post_data['required_field'])) {
+            $error[] = "Required field cannot be empty";
+        } else {
+            $data['required_field'] = $post_data['required_field'];
+        }
         if ($type == 'save') {//Edit not allowed on this field, set it only for new row
             $data['relationship_module'] = $post_data['relationship_module'];
         }
