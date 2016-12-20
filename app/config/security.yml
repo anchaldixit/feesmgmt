@@ -31,12 +31,14 @@ security:
             anonymous: ~
         secured_area:
             pattern: ^/
+            entry_point: entry_point.user_login
             form_login: 
                 login_path: login
                 check_path: login_check
             logout:
                 path: /logout
                 target: /login
+            
                 
                 
     encoders:
