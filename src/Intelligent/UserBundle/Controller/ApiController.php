@@ -29,7 +29,8 @@ class ApiController extends Controller {
         # if the function no not exists the throw exception
         # if the function exists then call that function and get the result.
         # if the function throws exception then deliver error response
-        # If the function dont throw exception then deliver success responce
+        # If the function dont throw exception then deliver success responce.
+        
         try {
             if ($request->isMethod('POST')) {
                 $request_json = $request->getContent();
@@ -40,10 +41,14 @@ class ApiController extends Controller {
                     if (isset($parsed_request_json->head) && isset($parsed_request_json->body)) {
                         if (isset($parsed_request_json->head->action) && !empty($parsed_request_json->head->action)) {
                             $request_action = $parsed_request_json->head->action;
-                            if (method_exists($this, $request_action)) {
-                                return $this->{$request_action}($request, $parsed_request_json);
-                            } else {
-                                throw new \Exception("Method '$request_action' do not exists in the api", 405);
+                            if($this->_isAllowed($request_action)){
+                                if (method_exists($this, $request_action)) {
+                                    return $this->{$request_action}($request, $parsed_request_json);
+                                } else {
+                                    throw new \Exception("Method '$request_action' do not exists in the api", 405);
+                                }
+                            }else{
+                                throw new \Exception("User not allowed to access api without login", 401);
                             }
                         } else {
                             throw new \Exception("head.action is not available in the request json", 400);
@@ -59,7 +64,7 @@ class ApiController extends Controller {
             return $this->_handleException($e);
         }
     }
-
+    
     /**
      * This function will reset the password for a user and send 
      * a mail to him with reset email
@@ -203,6 +208,55 @@ class ApiController extends Controller {
         $user = $this->getUser();
     }
     
+    private function disableUser(Request $request, $json){
+        $user_permissions = $this->get('user_permissions');
+        if($user_permissions){
+            if(isset($json->body->user_id)){
+                $em = $this->getDoctrine()->getManager();
+                $user = $em->getRepository("IntelligentUserBundle:User")->find($json->body->user_id);
+                if($user){
+                    $user->setStatus(4)->setUpdateDatetime(new \DateTime());
+                    $em->flush();
+                    return $this->_handleSuccessfulRequest();
+                }else{
+                    throw new \Exception("User with this user_id not found",404);
+                }
+            }else{
+                throw new \Exception("user_id is not set in the request json",400);
+            }
+        }else{
+            throw new \Exception("Current user has no access to change user role", 403);
+        }
+    }
+    
+    private function changeRole(Request $request, $json){
+        $user_permissions = $this->get('user_permissions');
+        if($user_permissions){
+            if(isset($json->body->user_id) && isset($json->body->new_role_id)){
+                $em = $this->getDoctrine()->getManager();
+                // Get user
+                $user = $em->getRepository("IntelligentUserBundle:User")->find($json->body->user_id);
+                if($user){
+                    // Now get role 
+                    $role = $em->getRepository("IntelligentUserBundle:Role")->find($json->body->new_role_id);
+                    if($role){
+                        $user->setRole($role)->setUpdateDatetime(new \DateTime());
+                        $em->flush();
+                        return $this->_handleSuccessfulRequest();
+                    }else{
+                        throw new \Exception("Role with this new_role_id not found",404);
+                    }
+                }else{
+                    throw new \Exception("User with this user_id not found",404);
+                }
+            }else{
+                throw new \Exception("user_id or new_role_id is not set in the request json",400);
+            }
+        }else{
+            throw new \Exception("Current user has no access to change user role", 403);
+        }
+    }
+    
     /**
      * This function will convert the exception into a response object 
      * 
@@ -284,5 +338,23 @@ class ApiController extends Controller {
                 ->setBody($body, "text/html");
         $this->get('mailer')->send($message);
     }
-
+    
+    /**
+     * This method determine which api actions could be
+     * called without login
+     * 
+     * @param type $actionName
+     * @return boolean
+     */
+    private function _isAllowed($actionName){
+        if(in_array($actionName,array("forgetPassword","resetPassword"))){
+            return true;
+        }else{
+            if($this->getUser()){
+                return true;
+            }else{
+                return false;
+            }
+        }
+    }
 }
