@@ -68,7 +68,7 @@
             <span>View</span>
         </div>
         <div class="custom-feature">
-            <a href="/app_dev.php/settings/edit/new"><i class="fa "></i>New</a>
+            <a href="{{ path('intelligent_setting_edit', {'edit_id': 'new'}) }}"><i class="fa "></i>New</a>
         </div>
     </div>
     <div class="full-container content-table">
@@ -165,15 +165,14 @@
                         <td>{{attribute(datatypes,row.module_field_datatype)}}</td>
                         <td>{{row.enable_filter}}<td>
                         <td>{{row.modified_datetime}}<td>
-                        <td><a href="/app_dev.php/settings/edit/{{row.id}}">view</a> | <a href="/app_dev.php/settings/edit/{{row.id}}">edit</a> | <a href="/app_dev.php/settings/delete/{{row.id}}">delete</a><td>
+                        <td><a href="{{ path('intelligent_setting_edit', {'edit_id': row.id}) }}">view</a> | <a href="{{ path('intelligent_setting_edit', {'edit_id': row.id}) }}">edit</a> | <a href="{{ path('intelligent_setting_delete', {'delete_id': row.id}) }}">delete</a><td>
                     </tr>
                 {% endfor %}
 
             </table>
 
+            {{ include('IntelligentSettingBundle:Default:pagination.html.twig', { 'pagination': pagination }) }}
         </div>
-
-
 
     </div>
 {% endblock %}

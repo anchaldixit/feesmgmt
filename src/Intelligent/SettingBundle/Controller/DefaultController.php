@@ -22,7 +22,6 @@ class DefaultController extends Controller {
         //$columns = $settings->fetch(array('module'=>'marketing_projects'));
 
 
-
         $request = Request::createFromGlobals();
         $id = null;
 
@@ -87,7 +86,7 @@ class DefaultController extends Controller {
         return $this->render('IntelligentSettingBundle:Default:edit.html.twig', $parameters);
     }
 
-    public function viewAction() {
+    public function viewAction($page_no) {
 
         $conn = $this->get('database_connection');
 
@@ -120,7 +119,16 @@ class DefaultController extends Controller {
             $sort[$arr_sort[0]] = $arr_sort[1];
         }
         //Fetch the data
-        $row = $settings->fetch($params, $sort);
+        if($page_no>0){
+            $limit = 10;
+            $offset = ($page_no-1)*$limit;
+            $limit_plus_offset="$offset,$limit";
+        }
+        $row = $settings->fetch($params, $sort, $limit_plus_offset);
+        
+        $count = $settings->totalCountOfLastFetch();
+        $total_page_count = ceil($count / $limit );
+        $pagination = array('active' => $page_no, 'total_count' => $total_page_count);
 
 
         $modules = $settings->getModule();
@@ -131,7 +139,8 @@ class DefaultController extends Controller {
         $parameters = array('rows' => $row,
             'modules' => $modules,
             'datatypes' => $datatypes,
-            'selected_filters' => $filters
+            'selected_filters' => $filters,
+            'pagination' => $pagination
         );
         return $this->render('IntelligentSettingBundle:Default:view.html.twig', $parameters);
     }
