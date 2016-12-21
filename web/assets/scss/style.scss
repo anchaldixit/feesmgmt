@@ -178,7 +178,8 @@ body{font-family: helvetica; font-weight: 300;}
 .header{
     padding: 10px 15px; 
     background-color: #393939;
-    overflow:hidden;
+    display:inline-block;
+    width:98%;
     .header-inner{
         width:100%;
         text-align: right;
@@ -216,6 +217,7 @@ body{font-family: helvetica; font-weight: 300;}
     border-radius:3px;
     box-shadow: 0px 0px 4px #343434;
     display:none;
+    z-index:99;
     ul{
         background-color: #fafafa;
         li{
@@ -409,8 +411,8 @@ body{font-family: helvetica; font-weight: 300;}
 .user-filter{
 
     overflow: hidden;
-    padding:0 15px;
-    margin-top: 20px;
+    
+    margin: 20px 0 10px 0;
     a{
         float: left;
         .fa{

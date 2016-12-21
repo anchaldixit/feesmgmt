@@ -39,6 +39,7 @@ $.extend(Login.prototype, {
         that.bindForgetPasswordAction();
         that.flipForm();
         that.featureSlider();
+        that.openMenu();
     },
     bindForgetPasswordAction: function () {
         var that = this;
@@ -164,6 +165,15 @@ $.extend(Login.prototype, {
         if ($('.flip').length) {
             $('.flip').click(function () {
                 $('.card').toggleClass('flipped');
+                return false;
+            });
+        }
+    },
+    openMenu: function(){
+        if($('.open-menu').length){
+            $('.open-menu').click(function(){
+                var id = $(this).attr('href');
+                $(id).slideToggle();
                 return false;
             });
         }
