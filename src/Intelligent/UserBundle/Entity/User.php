@@ -67,11 +67,18 @@ class User implements AdvancedUserInterface, \Serializable
     private $passwordResetId;
 
     /**
-     * @var boolean
+     * @var integer
      *
      * @ORM\Column(name="status", type="integer", nullable=false)
      */
     private $status;
+    
+    /**
+     * @var integer
+     *
+     * @ORM\Column(name="before_disable_status", type="integer", nullable=true)
+     */
+    private $beforeDisableStatus;
 
     /**
      * @var Role
@@ -307,7 +314,7 @@ class User implements AdvancedUserInterface, \Serializable
     /**
      * Set status
      *
-     * @param boolean $status
+     * @param integer $status
      * @return User
      */
     public function setStatus($status)
@@ -320,13 +327,35 @@ class User implements AdvancedUserInterface, \Serializable
     /**
      * Get status
      *
-     * @return boolean 
+     * @return integer 
      */
     public function getStatus()
     {
         return $this->status;
     }
 
+    /**
+     * Set beforeDisableStatus
+     *
+     * @param integer $beforeDisableStatus
+     * @return User
+     */
+    public function setBeforeDisableStatus($beforeDisableStatus)
+    {
+        $this->beforeDisableStatus = $beforeDisableStatus;
+
+        return $this;
+    }
+
+    /**
+     * Get beforeDisableStatus
+     *
+     * @return integer 
+     */
+    public function getBeforeDisableStatus()
+    {
+        return $this->beforeDisableStatus;
+    }
     
 
     /**
