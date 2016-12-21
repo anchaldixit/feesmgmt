@@ -153,7 +153,7 @@ body{font-family: helvetica; font-weight: 300;}
 .red{
     color: #fa3576;
 }
-.validation_msg,.error_msg{
+.validation_msg,.error_msg,.validation_msg2{
     margin-top: 10px;
     display: block;
     font-size: 12px;
@@ -164,6 +164,12 @@ body{font-family: helvetica; font-weight: 300;}
     margin-top: 10px;
     display: block;
     font-size: 12px;
+}
+#valid_error{
+    .msg,.error_msg{
+        display: block;
+        margin: 0 0 20px 20px;
+    }
 }
 .arrow-down {
     width: 0; 
@@ -915,16 +921,18 @@ body{font-family: helvetica; font-weight: 300;}
                 overflow: hidden;
                 label{
                     float: left;
-                    width: 160px;
+                    width: 175px;
                     font-size: 16px;
                     font-weight: 400;
                     line-height: 20px;
                     padding-top: 8px;
                 }
                 .field-wrap{
-                    input[type="text"],input[type="email"]{
-                        width: 325px;
-                        float: left;
+                    float:left;
+                    
+                    input[type="text"],input[type="email"],input[type="password"]{
+                        width: 315px;
+                        
                         padding: 8px 2%;
                         border: 1px solid #dadbdd;
                         font-size: 16px;

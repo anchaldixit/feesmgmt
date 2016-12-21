@@ -134,7 +134,7 @@ body {
 .red {
   color: #fa3576; }
 
-.validation_msg, .error_msg {
+.validation_msg, .error_msg, .validation_msg2 {
   margin-top: 10px;
   display: block;
   font-size: 12px;
@@ -145,6 +145,10 @@ body {
   margin-top: 10px;
   display: block;
   font-size: 12px; }
+
+#valid_error .msg, #valid_error .error_msg {
+  display: block;
+  margin: 0 0 20px 20px; }
 
 .arrow-down {
   width: 0;
@@ -726,38 +730,39 @@ body {
         overflow: hidden; }
         .my-preferences-outer .my-preferences ul li label {
           float: left;
-          width: 160px;
+          width: 175px;
           font-size: 16px;
           font-weight: 400;
           line-height: 20px;
           padding-top: 8px; }
-        .my-preferences-outer .my-preferences ul li .field-wrap input[type="text"], .my-preferences-outer .my-preferences ul li .field-wrap input[type="email"] {
-          width: 325px;
-          float: left;
-          padding: 8px 2%;
-          border: 1px solid #dadbdd;
-          font-size: 16px;
-          line-height: 20px; }
-          .my-preferences-outer .my-preferences ul li .field-wrap input[type="text"]:focus, .my-preferences-outer .my-preferences ul li .field-wrap input[type="email"]:focus {
-            outline: none;
-            border: 1px solid #5aa3ff; }
-          .my-preferences-outer .my-preferences ul li .field-wrap input[type="text"]:hover, .my-preferences-outer .my-preferences ul li .field-wrap input[type="email"]:hover {
-            border: 1px solid #5aa3ff; }
-        .my-preferences-outer .my-preferences ul li .field-wrap input[type="submit"], .my-preferences-outer .my-preferences ul li .field-wrap input[type="button"] {
-          background-color: #5aa3ff;
-          color: #fff;
-          font-size: 16px;
-          font-weight: 400;
-          border: 0px solid transparent;
-          padding: 10px 20px;
-          margin-top: 10px; }
-        .my-preferences-outer .my-preferences ul li .field-wrap em, .my-preferences-outer .my-preferences ul li .field-wrap a {
-          padding-top: 10px;
-          display: inline-block; }
-        .my-preferences-outer .my-preferences ul li .field-wrap a {
-          text-decoration: none; }
-          .my-preferences-outer .my-preferences ul li .field-wrap a:hover {
-            color: #1fa67a; }
+        .my-preferences-outer .my-preferences ul li .field-wrap {
+          float: left; }
+          .my-preferences-outer .my-preferences ul li .field-wrap input[type="text"], .my-preferences-outer .my-preferences ul li .field-wrap input[type="email"], .my-preferences-outer .my-preferences ul li .field-wrap input[type="password"] {
+            width: 315px;
+            padding: 8px 2%;
+            border: 1px solid #dadbdd;
+            font-size: 16px;
+            line-height: 20px; }
+            .my-preferences-outer .my-preferences ul li .field-wrap input[type="text"]:focus, .my-preferences-outer .my-preferences ul li .field-wrap input[type="email"]:focus, .my-preferences-outer .my-preferences ul li .field-wrap input[type="password"]:focus {
+              outline: none;
+              border: 1px solid #5aa3ff; }
+            .my-preferences-outer .my-preferences ul li .field-wrap input[type="text"]:hover, .my-preferences-outer .my-preferences ul li .field-wrap input[type="email"]:hover, .my-preferences-outer .my-preferences ul li .field-wrap input[type="password"]:hover {
+              border: 1px solid #5aa3ff; }
+          .my-preferences-outer .my-preferences ul li .field-wrap input[type="submit"], .my-preferences-outer .my-preferences ul li .field-wrap input[type="button"] {
+            background-color: #5aa3ff;
+            color: #fff;
+            font-size: 16px;
+            font-weight: 400;
+            border: 0px solid transparent;
+            padding: 10px 20px;
+            margin-top: 10px; }
+          .my-preferences-outer .my-preferences ul li .field-wrap em, .my-preferences-outer .my-preferences ul li .field-wrap a {
+            padding-top: 10px;
+            display: inline-block; }
+          .my-preferences-outer .my-preferences ul li .field-wrap a {
+            text-decoration: none; }
+            .my-preferences-outer .my-preferences ul li .field-wrap a:hover {
+              color: #1fa67a; }
 
 .tab-outer .tab {
   padding: 15px; }
