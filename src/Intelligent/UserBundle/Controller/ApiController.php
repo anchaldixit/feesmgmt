@@ -198,7 +198,7 @@ class ApiController extends Controller {
         $user = $this->getUser();
         if(isset($json->body->name)){
             $em = $this->getDoctrine()->getManager();
-            $user->setName($json->name)
+            $user->setName($json->body->name)
                     ->setUpdateDatetime(new \DateTime());
             
             $em->persist($user);
