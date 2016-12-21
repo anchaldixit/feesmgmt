@@ -23,9 +23,9 @@ class Settings {
         'campaign_contacts' => 'Campanigns Contact',
         'psuedo_email_accounts' => 'Psuedo Email Accounts',
         'assign_psuedo' => 'Assign Psuedo'
-);
+    );
     var $module_datatypes = array(
-        'varchar'=>'Limited Char',
+        'varchar' => 'Limited Character',
         'text' => 'Long Text',
         'currency' => 'Currency',
         'decimal' => 'Decimal',
@@ -35,6 +35,11 @@ class Settings {
         'date' => 'Date',
         'datetime' => 'Datetime'
     );
+    private $last_insert_id; //initilized after new field created
+    
+    private $last_sql_withoutlimit;//sql will be store in case total number of count need to be fetched
+    
+    private $last_sql_withoutlimit_params;//store the parameters for $last_sql_withoutlimit variable sql
 
     public function __construct($db) {
 
@@ -65,51 +70,48 @@ class Settings {
         return $result;
     }
 
-    public function fetch($nd_condition = array('field-name' => 'value'),$sort=array('field-name' => 'ASC')) {
+    public function fetch($nd_condition = array('field-name' => 'value'), $sort = array('field-name' => 'ASC'),$limit='1000') {
 
         $extended_where = '';
-        $order_by='';
-        $params=array();
+        $order_by = '';
+        $params = array();
         if (!isset($nd_condition['field-name']) and is_array($nd_condition) and count($nd_condition)) {
             //Parameter is not default, create the where clause
 
             $arr_where = array();
             foreach ($nd_condition as $column => $value) {
-                if(is_array($value) and isset($value['like'])){
+                if (is_array($value) and isset($value['like'])) {
                     //$arr_where[]= " $column like '{$value['like']}'";
-                    $arr_where[]= " $column like ?";
+                    $arr_where[] = " $column like ?";
                     $params[] = "%{$value['like']}%";
-                }else{
+                } else {
                     $arr_where[] = " $column=?";
                     $params[] = $value;
-                    
                 }
-                
-                
             }
             $extended_where = 'where ' . implode(' and ', $arr_where);
         }
         if (!isset($sort['field-name']) and is_array($sort)) {
-            
+
             $arr_orderby = array();
             foreach ($sort as $column => $type) {
                 $arr_orderby[] = " $column $type";
             }
             $order_by = 'ORDER BY ' . implode(' , ', $arr_orderby);
-            
         }
-        
-        $sql = "SELECT * FROM {$this->table} $extended_where $order_by";
-        $result = $this->db->fetchAll($sql,$params);
+
+        $sql = "SELECT * FROM {$this->table} $extended_where $order_by limit $limit";
+        $this->last_sql_withoutlimit = "SELECT count(*) FROM {$this->table} $extended_where ";
+        $this->last_sql_withoutlimit_params = $params;
+        $result = $this->db->fetchAll($sql, $params);
         return $result;
     }
-    
 
     public function save($post_data) {
 
         $data = $this->validateAndSet($post_data, 'save');
 
-        $data['modified_datetime'] = date("Y-m-s H:i:s");
+        $data['modified_datetime'] = date("Y-m-d H:i:s");
 
         $this->db->insert(
                 $this->table, $data
@@ -118,10 +120,17 @@ class Settings {
 
             throw new \Exception($this->db->errorInfo(), '001');
         }
-        
-        $new_id = $this->db->lastInsertId();
 
-        $this->afterSave($data);
+        $this->last_insert_id = $new_id = $this->db->lastInsertId();
+
+        try {
+            $this->afterSave($data);
+        } catch (\Exception $ex) {
+            //rollback the first insert of setting module
+            $this->delete($new_id);
+            throw $ex;
+        }
+
 
         return $new_id;
     }
@@ -136,9 +145,9 @@ class Settings {
 
         if (!empty($post_data['id'])) {
             $data = $this->validateAndSet($post_data, 'update');
-            
-            
-            $data['modified_datetime'] = date("Y-m-s H:i:s");
+
+
+            $data['modified_datetime'] = date("Y-m-d H:i:s");
 
 
             $this->db->update(
@@ -209,23 +218,48 @@ class Settings {
         } else {
             $data['link_text'] = $post_data['link_text'];
         }
+
         if ($post_data['module_field_datatype'] == 'enum' and empty($post_data['value'])) {
             $error[] = "Value set can be empty for selected datatype";
+        } elseif ($post_data['module_field_datatype'] != 'enum') {
+            //value should be empty
+            //do not set anything
+            //$data['value'] ='';
         } else {
             $data['value'] = $post_data['value'];
         }
 
+        if ($type == 'save') {//Edit not allowed on this field, set it only for new row
+            if ($post_data['module_field_datatype'] == 'varchar' and empty($post_data['varchar_limit'])) {
+                $error[] = "Limited Character field cannot be empty";
+            } elseif ($post_data['module_field_datatype'] != 'varchar') {
+                //value should be empty
+                //Do not set the data
+                //$data['varchar_limit'] =null';
+            } else {
+                $data['varchar_limit'] = $post_data['varchar_limit'];
+            }
+        }
 
         if (empty($post_data['enable_filter'])) {
             $error[] = "Enable filter field cannot be empty";
         } else {
             $data['enable_filter'] = $post_data['enable_filter'];
         }
+
         if (empty($post_data['show_in_grid'])) {
             $error[] = "Show in Grid field cannot be empty";
         } else {
             $data['show_in_grid'] = $post_data['show_in_grid'];
         }
+        if ($type == 'save') {//Edit not allowed on this field, set it only for new row
+            if (empty($post_data['unique_field'])) {
+                $error[] = "Unique field cannot be empty";
+            } else {
+                $data['unique_field'] = $post_data['unique_field'];
+            }
+        }
+
         if (empty($post_data['required_field'])) {
             $error[] = "Required field cannot be empty";
         } else {
@@ -243,25 +277,39 @@ class Settings {
 
     public function afterSave($data) {
 
-        $this->createModuleField($data['module'], $data['module_field_name'], $data['module_field_datatype'], $data['enable_filter'] == 'Y' ? true : false);
+        $other_details = '';
+        if ($data['module_field_datatype'] == 'varchar') {
+            $other_details = $data['varchar_limit'];
+        }
+        if ($data['unique_field'] == 'Y') {
+            $index_type = 'UNIQUE';
+        } elseif ($data['enable_filter'] == 'Y') {
+            $index_type = 'INDEX';
+        } else {
+            $index_type = '';
+        }
+
+        $this->createModuleField($data['module'], $data['module_field_name'], $data['module_field_datatype'], $index_type, $other_details);
     }
 
     public function afterDelete() {
         
     }
 
-    public function createModuleField($table, $field_name, $datatype, $is_indexed) {
+    public function createModuleField($table, $field_name, $datatype, $index_type, $other_details) {
 
         $index = '';
-        if ($is_indexed) {
-            $index = ", ADD INDEX `$field_name` (`$field_name` ASC)";
+        if (!empty($index_type)) {
+            $index = ", ADD $index_type `$field_name` (`$field_name` ASC)";
         }
         $type = '';
-        if (in_array($datatype, array('varchar', 'enum'))) {
-            $type = 'varchar(400)';
+        if (in_array($datatype, array('varchar'))) {
+            $type = "varchar($other_details)";
+        } elseif (in_array($datatype, array('enum'))) {
+            $type = 'varchar(200)';
         } elseif ($datatype == 'text') {
             $type = 'text';
-        }elseif ($datatype == 'link') {
+        } elseif ($datatype == 'link') {
             $type = 'varchar(400)';
         } else if (in_array($datatype, array('integer', 'user'))) {
             $type = 'int(11)';
@@ -283,6 +331,22 @@ class Settings {
 
             throw new \Exception($this->db->errorInfo(), '002');
         }
+    }
+    
+    function totalCountOfLastFetch() {
+        
+        if(!empty($this->last_sql_withoutlimit)){
+            $result = $this->db->fetchAll($this->last_sql_withoutlimit, $this->last_sql_withoutlimit_params);
+            if ($this->db->errorCode() != 0) {
+
+            throw new \Exception($this->db->errorInfo(), '002');
+        }
+        }else{
+            throw new \Exception('last_sql_withoutlimit is empty', '002');
+        }
+        
+        return $result[0]['count(*)'];
+        
     }
 
 }

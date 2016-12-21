@@ -1,5 +1,9 @@
-{# Genraral base template file #}
 <!DOCTYPE html>
+<!--
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+-->
 <html>
     <head>
         {% block title %}
@@ -19,11 +23,11 @@
         {% endblock %}
     </head>
     <body>
-        <div class="wrapper login-bg">
+        <div class="wrapper">
             {% block header %}
-                {{include('shared/header.html.twig')}}
+                {{include('shared/loginheader.html.twig')}}
             {% endblock %}
-            {% block body %}{% endblock %}                    
+            {% block body %}{% endblock %}
             {% block footer %}
                 {{include("shared/footer.html.twig")}}
             {% endblock %}

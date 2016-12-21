@@ -1,9 +1,80 @@
-{% extends 'truebase.html.twig' %}
+{% extends 'loggedtemplate.html.twig' %}
 
 {% block title %}
     <title>List of roles</title>
 {% endblock %}
 
 {% block body %}
-    Roles
+    <div class="user-filter">
+        <a class="b-btn" href="#"><i class="fa fa-times"></i>Delete</a>
+        <a class="b-btn" href="#"><i class="fa fa-wrench"></i>Set as Default</a>
+        <div class="search-box">
+            <div class="search">
+                <input type="text" name="role-search" placeholder="Search Role" />
+                <i class="fa fa-search"></i>
+            </div>
+        </div>
+        <div class="display-result">
+            <p>Displaying <span class="curr-result" > 6 </span> out of <span class="total-result">6</span> Roles</p>
+        </div>
+    </div>
+    <div class="table-content user-table">
+        <table>
+            <thead>
+                <tr>
+                    <th><input type="checkbox" name="all-users"></th>
+                    <th>Role</th>
+                    <th>App Level Permissions</th>
+                    <th>Home Page</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><input type="checkbox" name="user" /></td>
+                    <td><a href="#">Administrator</a><i class="fa fa-check"></i></td>
+                    <td>Admin, Sharing</td>
+                    <td>Administrator</td>
+                    <td></td>
+
+                </tr>
+                <tr>
+                    <td><input type="checkbox" name="user" /></td>
+                    <td><a href="#">Team Member</a></td>
+                    <td>Basic, Sharing</td>
+                    <td>Sales Team</td>
+                    <td><a href="#"><i class="fa fa-times red"></i></a></td>
+                </tr>
+                <tr>
+                    <td><input type="checkbox" name="user" /></td>
+                    <td><a href="#">Sales Agent</a></td>
+                    <td>Basic</td>
+                    <td>Sales Team</td>
+                    <td><a href="#"><i class="fa fa-times red"></i></a></td>
+                </tr>
+                <tr>
+                    <td><input type="checkbox" name="user" /></td>
+                    <td><a href="#">Client</a></td>
+                    <td>Basic</td>
+                    <td>Administrator</td>
+                    <td><a href="#"><i class="fa fa-times red"></i></a></td>
+                </tr>
+                <tr>
+                    <td><input type="checkbox" name="user" /></td>
+                    <td><a href="#">TSD</a></td>
+                    <td>Basic</td>
+                    <td>Administrator</td>
+                    <td><a href="#"><i class="fa fa-times red"></i></a></td>
+                </tr>
+                <tr>
+                    <td><input type="checkbox" name="user" /></td>
+                    <td><a href="#">Expertise</a></td>
+                    <td>Basic</td>
+                    <td>Expertise</td>
+                    <td><a href="#"><i class="fa fa-times red"></i></a></td>
+                </tr>
+
+            </tbody>
+        </table>
+    </div>
 {% endblock %}

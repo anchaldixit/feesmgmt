@@ -8,5 +8,6 @@ intelligent_setting_delete:
     path:     /settings/delete/{delete_id}
     defaults: { _controller: IntelligentSettingBundle:Default:delete }
 intelligent_setting_view:
-    path:     /settings/view/
-    defaults: { _controller: IntelligentSettingBundle:Default:view }
+    path:     /settings/view/{page_no}
+    defaults: { _controller: IntelligentSettingBundle:Default:view , page_no: 1 }
+    
