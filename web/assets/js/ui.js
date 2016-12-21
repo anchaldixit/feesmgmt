@@ -47,6 +47,9 @@ $.extend(Login.prototype, {
         if($('#change_password').length){
             that.changePassword();
         }
+        if($('#userList').length){
+            that.createUserPage();
+        }
     },
     bindForgetPasswordAction: function () {
         var that = this;
@@ -262,6 +265,77 @@ $.extend(Login.prototype, {
             
             
         });
+    },
+    createUserPage: function(){
+        var that = this;
+        var obj = {
+                head:{
+                    action:"getUsers"
+                },
+                body:{
+                    where:{
+                        name: "",
+                        role: [],
+                        status: []
+                    },
+                    order_by: "name",
+                    order_type: "asc"
+                }
+            }
+        var _str = JSON.stringify(obj);
+        that.getUserList(_str);
+    },
+    getUserList: function (_obj){
+        $.ajax({
+            url: Login.ajaxLink2,
+            method: 'post',
+            dataType: 'json',
+            data: _obj,
+            beforeSend: function () {
+                $('#loader').show();
+            },
+            success: function(res){
+                var html = '';
+                var data = res.body.data;
+                if(data.length > 0){
+                    $.each(data,function(index){
+                        html += '<tr>';
+                        html += '<td><a href="#">'+data[index].name+'</a></td>';
+                        html += '<td>';
+                        html += '<select>';
+                        html += '<option value="administrator" >Administrator</option>';
+                        html += '<option value="team_member" >Team Member</option>';
+                        html += '<option value="sales_agent" >Sales Agent</option>';
+                        html += '<option value="client" >Client</option>';
+                        html += '<option value="tsd" >TSD</option>';
+                        html += '<option value="expertise" >Expertise</option>';
+                        html += '<option value="none" >None</option>';
+                        html += '</select>';
+                        html += '</td>';
+                        html += '<td>Registered</td>';
+                        html += '<td>'+data[index].last_login+'</td>'
+                        html += '<td><a href="#"><i class="fa fa-times red"></i></a></td>'
+                        html += '</tr>';
+                    });
+                }
+            else{
+                html += '<tr>';
+                html += '<td colspan="5" >No Data is Found</td>';
+                html += '</tr>';
+            }
+                $('#userList tbody').html('');
+                $('#userList tbody').html(html);
+                $('#userList').show();
+                
+            },
+            error: function(err){
+                obj = jQuery.parseJSON(err.responseText);
+                if (obj.head.status === 'error') {
+                            alert( obj.body.error_msg);
+                        }
+            }
+        });
+        
     },
     fieldValidate: function (valobj, field) {
 
