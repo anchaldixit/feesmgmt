@@ -63,7 +63,7 @@ class Role
     /**
      * @var RoleGlobalPermission
      *
-     * @ORM\OneToOne(targetEntity="RoleGlobalPermission", mappedBy="role")
+     * @ORM\OneToOne(targetEntity="RoleGlobalPermission", mappedBy="role" , cascade={"persist"})
      */
     private $globalPermission;
 

@@ -7,6 +7,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Intelligent\UserBundle\Entity\User;
 use Intelligent\UserBundle\Entity\Role;
+use Intelligent\UserBundle\Entity\RoleGlobalPermission;
 use Symfony\Component\Security\Core\Util\StringUtils;
 
 class ApiController extends Controller {
@@ -195,10 +196,9 @@ class ApiController extends Controller {
      */
     private function changePreference(Request $request, $json){
         $user = $this->getUser();
-        if(isset($json->body->first_name) && isset($json->body->last_name)){
+        if(isset($json->body->name)){
             $em = $this->getDoctrine()->getManager();
-            $user->setFirstName($json->body->first_name)
-                    ->setLastName($json->body->last_name)
+            $user->setFirstName($json->name)
                     ->setUpdateDatetime(new \DateTime());
             
             $em->persist($user);
@@ -252,7 +252,7 @@ class ApiController extends Controller {
                             ->join("u.role","r");
                             
                     if($where->name){
-                        $query->andWhere($query->expr()->like("u.name","%" . $where->name));
+                        $query->andWhere($query->expr()->like("u.name",$query->expr()->literal($where->name . "%")));
                     }
                         
                     if($where->role){
@@ -460,11 +460,11 @@ class ApiController extends Controller {
                 
                 #Add where clauses;
                 if(isset($body->where) && isset($body->where->name)){
-                    $query->where($query->expr()->like("r.name", $body->where->name));
+                    $query->where($query->expr()->like("r.name", $query->expr()->literal($body->where->name . '%')));
                 }
                 # Always order by name
                 $query->orderBy("r.name","asc");
-                echo $query->getQuery()->getSql();exit;
+                # Get result
                 $roles = $query->getQuery()->getResult();
                 $roles_result = array();
                 foreach($roles as $role){
@@ -484,6 +484,46 @@ class ApiController extends Controller {
             throw new \Exception("Current user has no access to list roles", 403);
         }
     }
+    
+    private function createRole(Request $request, $json){
+        $user_permissions = $this->get('user_permissions');
+        if($user_permissions->getManageUserAndShareAppPermission()){
+            $body = $json->body;
+            if(isset($body->name) && isset($body->description)){
+                $em = $this->getDoctrine()->getManager();
+                $repo = $em->getRepository("IntelligentUserBundle:Role");
+                $present_role = $repo->findOneBy(array('name' => $body->name));
+                if($present_role){
+                    throw new \Exception("Role with name($body->name) is already present",412);
+                }else{
+                    # Create role
+                    $new_role = new Role();
+                    $new_role->setName($body->name);
+                    $new_role->setDescription($body->description);
+                    $new_role->setStatus(Role::ACTIVE);
+                    $new_role->setCreateDatetime(new \DateTime());
+                    $new_role->setUpdateDatetime(new \DateTime());
+                    
+                    # Create global role permission
+                    $new_role_global_premission = new RoleGlobalPermission();
+                    $new_role_global_premission->setEditAppStructurePermission(FALSE);
+                    $new_role_global_premission->setManageUserAppPermission(FALSE);
+                    
+                    # bind them two
+                    $new_role_global_premission->setRole($new_role);
+                    
+                    $em->persist($new_role);
+                    $em->persist($new_role_global_premission);
+                    $em->flush();
+                    return $this->_handleSuccessfulRequest(array('role_id' => $new_role->getId()));
+                }
+            }else{
+                throw new \Exception("name or description is not set in the request json",400);
+            }
+        }else{
+            throw new \Exception("Current user has no access to create roles", 403);
+        }
+    } 
     
     /**
      * This function will convert the exception into a response object 
