@@ -15,6 +15,9 @@ login_check:
 reset_password:
     path: /resetPassword/{resetPasswordId}
     defaults: { _controller: IntelligentUserBundle:Default:resetPassword }
+change_password:
+    path: /changePassword
+    defaults: { _controller: IntelligentUserBundle:Default:changePassword }
     
 intelligent_api_v1_genaral:
     path: /api/v1/general
@@ -31,3 +34,7 @@ intelligent_users:
 intelligent_roles:
     path: /roles
     defaults: { _controller: IntelligentUserBundle:Default:roles }
+
+intelligent_my_preferences:
+    path: /myPreferences
+    defaults: { _controller: IntelligentUserBundle:Default:mypreferences }

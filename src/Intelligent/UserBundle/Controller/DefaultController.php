@@ -43,6 +43,9 @@ class DefaultController extends Controller {
             'resetPasswordId' => $resetPasswordId
         ));
     }
+    public function changePasswordAction(Request $request){
+        return $this->render('IntelligentUserBundle:Default:changepassword.html.twig', array());
+    }
     
     public function usersAction(Request $request){
         return $this->render('IntelligentUserBundle:Default:users.html.twig', array());
@@ -50,6 +53,11 @@ class DefaultController extends Controller {
     
     public function rolesAction(Request $request){
         return $this->render('IntelligentUserBundle:Default:roles.html.twig', array());
+    }
+    
+    public function mypreferencesAction(Request $request){
+        
+        return $this->render('IntelligentUserBundle:Default:mypreferences.html.twig', array());
     }
 
 }
