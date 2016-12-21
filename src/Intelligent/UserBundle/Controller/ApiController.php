@@ -38,7 +38,7 @@ class ApiController extends Controller {
                 $request_json = $request->getContent();
                 $parsed_request_json = json_decode($request_json);
                 if (is_null($parsed_request_json)) {
-                    throw new \Exception("Request json is parseable", 400);
+                    throw new \Exception("Request json is not parseable", 400);
                 } else {
                     if (isset($parsed_request_json->head) && isset($parsed_request_json->body)) {
                         if (isset($parsed_request_json->head->action) && !empty($parsed_request_json->head->action)) {
@@ -198,7 +198,7 @@ class ApiController extends Controller {
         $user = $this->getUser();
         if(isset($json->body->name)){
             $em = $this->getDoctrine()->getManager();
-            $user->setFirstName($json->name)
+            $user->setName($json->name)
                     ->setUpdateDatetime(new \DateTime());
             
             $em->persist($user);
@@ -304,7 +304,15 @@ class ApiController extends Controller {
             throw new \Exception("Current user has no access to user data", 403);
         }
     }
-    
+    /**
+     * This function will create and invite users by sending them
+     * verification links in email
+     * 
+     * @param Request $request
+     * @param type $json
+     * @return type
+     * @throws \Exception
+     */
     private function inviteUsers(Request $request, $json){
         $user_permissions = $this->get('user_permissions');
         if($user_permissions->getManageUserAndShareAppPermission()){
@@ -356,6 +364,15 @@ class ApiController extends Controller {
         }
     }
     
+    /**
+     * This function will register users after verifying them and 
+     * recieving parameters like name and password
+     * 
+     * @param Request $request
+     * @param type $json
+     * @return type
+     * @throws \Exception
+     */
     private function registerUser(Request $request, $json){
         $body = $json->body;
         if($isset($body->verification_id) && $isset($body->name) && $isset($body->password)){
@@ -391,10 +408,15 @@ class ApiController extends Controller {
                 $em = $this->getDoctrine()->getManager();
                 $user = $em->getRepository("IntelligentUserBundle:User")->find($json->body->user_id);
                 if($user){
-                    // If user is available then disable it
-                    $user->setStatus(User::DEACTIVATED)->setUpdateDatetime(new \DateTime());
-                    $em->flush();
-                    return $this->_handleSuccessfulRequest();
+                    if($user->getStatus() == User::DEACTIVATED){
+                        throw new \Exception("User is already disabled",412);
+                    }else{
+                        // If user is available then disable it
+                        $user->setBeforeDisableStatus($user->getStatus());
+                        $user->setStatus(User::DEACTIVATED)->setUpdateDatetime(new \DateTime());
+                        $em->flush();
+                        return $this->_handleSuccessfulRequest();
+                    }
                 }else{
                     throw new \Exception("User with this user_id not found",404);
                 }
@@ -406,7 +428,43 @@ class ApiController extends Controller {
         }
     }
     
-    
+    /**
+     * This method will enable the disabled user again
+     * 
+     * @param Request $request
+     * @param type $json
+     * @return type
+     * @throws \Exception
+     */
+    private function enableUser(Request $request, $json){
+        $user_permissions = $this->get('user_permissions');
+        if($user_permissions->getManageUserAndShareAppPermission()){
+            if(isset($json->body->user_id)){
+                $em = $this->getDoctrine()->getManager();
+                $user = $em->getRepository("IntelligentUserBundle:User")->find($json->body->user_id);
+                if($user){
+                    if($user->getStatus() !== User::DEACTIVATED){
+                        throw new \Exception("User is not disabled so it cannot be enabled",412);
+                    }else{
+                        if(is_null($user->getBeforeDisableStatus())){
+                            throw new \Exception("Previous state of user is not known, so it cannot be enabled",500);
+                        }else{
+                            // If user is available then disable it
+                            $user->setStatus($user->getBeforeDisableStatus())->setUpdateDatetime(new \DateTime());
+                            $em->flush();
+                            return $this->_handleSuccessfulRequest();
+                        }
+                    }
+                }else{
+                    throw new \Exception("User with this user_id not found",404);
+                }
+            }else{
+                throw new \Exception("user_id is not set in the request json",400);
+            }
+        }else{
+            throw new \Exception("Current user has no access to change user role", 403);
+        }
+    }
     /**
      * This api action will be used to change role of the user 
      * 
@@ -444,6 +502,14 @@ class ApiController extends Controller {
         }
     }
     
+    /**
+     * This method will get the list of roles
+     * 
+     * @param Request $request
+     * @param type $json
+     * @return type
+     * @throws \Exception
+     */
     private function getRoles(Request $request, $json){
         $user_permissions = $this->get('user_permissions');
         if($user_permissions->getManageUserAndShareAppPermission()){
@@ -485,6 +551,14 @@ class ApiController extends Controller {
         }
     }
     
+    /**
+     * This method will create a role
+     * 
+     * @param Request $request
+     * @param type $json
+     * @return type
+     * @throws \Exception
+     */
     private function createRole(Request $request, $json){
         $user_permissions = $this->get('user_permissions');
         if($user_permissions->getManageUserAndShareAppPermission()){
@@ -524,6 +598,75 @@ class ApiController extends Controller {
             throw new \Exception("Current user has no access to create roles", 403);
         }
     } 
+    
+    /**
+     * This method will disable a role
+     * 
+     * @param Request $request
+     * @param type $json
+     * @return type
+     * @throws \Exception
+     */
+    private function disableRole(Request $request, $json){
+        $user_permissions = $this->get('user_permissions');
+        if($user_permissions->getManageUserAndShareAppPermission()){
+            $body = $json->body;
+            if(isset($body->role_id)){
+                $em = $this->getDoctrine()->getManager();
+                $role = $em->getRepository("IntelligentUserBundle:Role")->find($json->role_id);
+                if($role){
+                    if($role->getStatus() == Role::DEACTIVE){
+                        throw new \Exception("Role is already disabled");
+                    }else{
+                        $role->setStatus(Role::DEACTIVE);
+                        $em->flush();
+                        return $this->_handleSuccessfulRequest();
+                    }
+                }else{
+                    throw new \Exception("Role with this role_id #$body->role_id not found",404);
+                }
+            }else{
+                throw new \Exception("role_id not set in the request json");
+            }
+        }else{
+            throw new \Exception("Current user has no access to disable roles", 403);
+        }
+            
+    }
+    
+    /**
+     * This method will enable a disable role
+     * 
+     * @param Request $request
+     * @param type $json
+     * @return type
+     * @throws \Exception
+     */
+    private function enableRole(Request $request, $json){
+        $user_permissions = $this->get('user_permissions');
+        if($user_permissions->getManageUserAndShareAppPermission()){
+            $body = $json->body;
+            if(isset($body->role_id)){
+                $em = $this->getDoctrine()->getManager();
+                $role = $em->getRepository("IntelligentUserBundle:Role")->find($json->role_id);
+                if($role){
+                    if($role->getStatus() == Role::ACTIVE){
+                        throw new \Exception("Role is already enabled");
+                    }else{
+                        $role->setStatus(Role::ACTIVE);
+                        $em->flush();
+                        return $this->_handleSuccessfulRequest();
+                    }
+                }else{
+                    throw new \Exception("Role with this role_id #$body->role_id not found",404);
+                }
+            }else{
+                throw new \Exception("role_id not set in the request json");
+            }
+        }else{
+            throw new \Exception("Current user has no access to disable roles", 403);
+        }
+    }
     
     /**
      * This function will convert the exception into a response object 
