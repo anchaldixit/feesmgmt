@@ -256,11 +256,11 @@ class ApiController extends Controller {
                     }
                         
                     if($where->role){
-                        $query->andWhere($query->expr()->eq("r.id", $where->role));
+                        $query->andWhere($query->expr()->in("r.id", $where->role));
                     }
                         
                     if($where->status){
-                        $query->andWhere($query->expr()->eq("u.status", $where->status));
+                        $query->andWhere($query->expr()->in("u.status", $where->status));
                     }
                     
                     // Get order by clause
