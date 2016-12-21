@@ -14,16 +14,29 @@
 
                 if ($(this).val() == 'enum') {
                     $('#value_row').slideDown('slow')
-
                 } else {
                     $('#value_row').slideUp('slow')
-
                 }
                 if ($(this).val() == 'link') {
                     $('#link_text_row').slideDown('slow')
-
                 } else {
                     $('#link_text_row').slideUp('slow')
+                }
+                if ($(this).val() == 'varchar') {
+                    $('#varchar_limit_row').slideDown('slow')
+                } else {
+                    $('#varchar_limit_row').slideUp('slow')
+                }
+                if ($(this).val() == 'text') {
+                    jQuery("#enable_filter").val('N')
+                    $('#enable_filter_row').slideUp('slow')
+                } else {
+                    $('#enable_filter_row').slideDown('slow')
+                }
+                if ($(this).val() == 'varchar' || $(this).val() == 'number' ) {
+                    $('#unique_field_row').slideDown('slow')
+                } else {
+                    $('#unique_field_row').slideUp('slow')
                 }
             }).trigger('change');
 
@@ -31,7 +44,6 @@
 
                 if ($(this).val() == 'Y') {
                     $('#relationship_module_row').slideDown('slow');
-
                 } else {
                     $('#relationship_module_row').slideUp('slow');
                 }
@@ -43,6 +55,8 @@
                 $('#module').attr('DISABLED', true);
                 $('#relationship_module').attr('DISABLED', true);
                 $('#field_has_relationship').attr('DISABLED', true);
+                $('#varchar_limit').attr('DISABLED', true);
+                $('#unique_field').attr('DISABLED', true);
 
                 $('#fieldname_edit').hide();
 
@@ -65,8 +79,8 @@
             <span>Edit</span>
         </div>
         <div class="custom-feature">
-            <a href="/app_dev.php/settings/edit/new"><i class="fa"></i>New</a>
-            <a href="/app_dev.php/settings/view"><i class="fa"></i>Back</a>
+            <a href="{{ path('intelligent_setting_edit', {'edit_id': 'new'}) }}"><i class="fa"></i>New</a>
+            <a href="{{ path('intelligent_setting_view') }}"><i class="fa"></i>Back</a>
         </div>
     </div>
 
@@ -119,7 +133,12 @@
                                 </div>
                             </div>
                         </li>
-                        <li id="value_row">
+                        <li id="varchar_limit_row">
+                            <label>Max Character Limit:</label> 
+                            <div class="field-wrap">
+                                <input name="varchar_limit" id="varchar_limit" value="{{config.varchar_limit is defined ? config.varchar_limit : '64'}}" type="text"><br>
+                            </div>
+                        </li><li id="value_row">
                             <label>Value Set:</label> 
                             <div class="field-wrap">
                                 <input name="value" id="value" value="{{config.value is defined ? config.value : 'value1|value2|value3'}}" type="text"><br>
@@ -129,6 +148,17 @@
                             <label>Link Text:</label> 
                             <div class="field-wrap">
                                 <input name="link_text" id="link_text" value="{{config.link_text is defined ? config.link_text : ''}}" type="text"><br>
+                            </div>
+                        </li>
+                        <li id="unique_field_row">
+                            <label>Unique Field:</label> 
+                            <div class="field-wrap">
+                                <div class="dropdown">
+                                    <select name="unique_field" id="unique_field"  class="selectbox" >
+                                        <option value="N" {{config.unique_field is defined and config.unique_field == 'N' ? 'SELECTED': ''}}>No</option>
+                                        <option value="Y" {{config.unique_field is defined and config.unique_field == 'Y' ? 'SELECTED': ''}}>Yes</option>
+                                    </select><br>
+                                </div>
                             </div>
                         </li>
                         <li id="enable_filter_row">

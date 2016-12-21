@@ -1,0 +1,8 @@
+{# empty Twig template #}
+{% for i in 1..pagination.total_count %}
+    {% if i== pagination.active %}
+        {{i}} 
+    {% else %}
+        <a href="{{ path('intelligent_setting_view', {'page_no': i}) }}">{{i}}</a>
+    {% endif %}
+{% endfor %}

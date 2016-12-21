@@ -30,6 +30,10 @@ intelligent_api_v1:
 intelligent_users:
     path: /users
     defaults: { _controller: IntelligentUserBundle:Default:users }
+  
+intelligent_invite_user:
+    path: /inviteUser/{emailVerifyId}
+    defaults: { _controller: IntelligentUserBundle:Default:inviteUser }
     
 intelligent_roles:
     path: /roles
