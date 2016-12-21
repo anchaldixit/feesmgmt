@@ -3,7 +3,7 @@
 namespace Intelligent\UserBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Security\Core\User\AdvancedUserInterface;
 use Intelligent\UserBundle\Entity\Role;
 
 /**
@@ -12,7 +12,7 @@ use Intelligent\UserBundle\Entity\Role;
  * @ORM\Table(name="`user`")
  * @ORM\Entity
  */
-class User implements UserInterface, \Serializable
+class User implements AdvancedUserInterface, \Serializable
 {
     const REGISTERED = 1;
     const UNREGISTERED = 2;
@@ -48,16 +48,9 @@ class User implements UserInterface, \Serializable
     /**
      * @var string
      *
-     * @ORM\Column(name="first_name", type="string", length=100, nullable=true)
+     * @ORM\Column(name="name", type="string", length=100, nullable=true)
      */
-    private $firstName;
-
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="last_name", type="string", length=100, nullable=true)
-     */
-    private $lastName;
+    private $name;
 
     /**
      * @var string
@@ -114,6 +107,26 @@ class User implements UserInterface, \Serializable
      */
     public function getSalt(){
         return null;
+    }
+    
+    public function isEnabled() {
+        if($this->status == User::REGISTERED){
+            return true;
+        }else{
+            return false;
+        }
+    }
+    
+    public function isAccountNonExpired() {
+        return true;
+    }
+    
+    public function isAccountNonLocked() {
+        return true;;
+    }
+    
+    public function isCredentialsNonExpired() {
+        return true;
     }
     
     /**
@@ -223,49 +236,26 @@ class User implements UserInterface, \Serializable
     }
     
     /**
-     * Set firstName
+     * Set Name
      *
-     * @param string $firstName
+     * @param string $name
      * @return User
      */
-    public function setFirstName($firstName)
+    public function setName($name)
     {
-        $this->firstName = $firstName;
+        $this->name = $name;
 
         return $this;
     }
 
     /**
-     * Get firstName
+     * Get Name
      *
      * @return string 
      */
-    public function getFirstName()
+    public function getName()
     {
-        return $this->firstName;
-    }
-
-    /**
-     * Set lastName
-     *
-     * @param string $lastName
-     * @return User
-     */
-    public function setLastName($lastName)
-    {
-        $this->lastName = $lastName;
-
-        return $this;
-    }
-
-    /**
-     * Get lastName
-     *
-     * @return string 
-     */
-    public function getLastName()
-    {
-        return $this->lastName;
+        return $this->name;
     }
 
     /**

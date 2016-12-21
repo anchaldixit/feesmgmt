@@ -10,7 +10,7 @@ use Intelligent\UserBundle\Entity\Role;
 use Symfony\Component\Security\Core\Util\StringUtils;
 
 class ApiController extends Controller {
-
+    private static $DEBUG = true;
     /**
      * This is a api end for all the api requests. This will 
      * parse the json request and call the appropriate method
@@ -62,7 +62,11 @@ class ApiController extends Controller {
                 throw new \Exception("Any method other than POST is not allowed", 400);
             }
         } catch (\Exception $e) {
-            return $this->_handleException($e);
+            if(self::$DEBUG){
+                return $this->_handleException($e,$e->getTrace());
+            }else{
+                return $this->_handleException($e);
+            }
         }
     }
     
@@ -239,9 +243,61 @@ class ApiController extends Controller {
                     $this->_checkOrderBy($body->order_by, array("name", "role", "status", "last_login"));
                     $this->_checkOrderType($body->order_type);
                     
+                    // Fetch results 
+                    $em = $this->getDoctrine()->getManager();
+                    $query = $em->createQueryBuilder();
+                    $query->select("u")
+                            ->addSelect("r")
+                            ->from("IntelligentUserBundle:User","u")
+                            ->join("u.role","r");
+                            
+                    if($where->name){
+                        $query->andWhere($query->expr()->like("u.name","%" . $where->name));
+                    }
+                        
+                    if($where->role){
+                        $query->andWhere($query->expr()->eq("r.id", $where->role));
+                    }
+                        
+                    if($where->status){
+                        $query->andWhere($query->expr()->eq("u.status", $where->status));
+                    }
                     
-                    // So all data is checked now so get the data;
-                    $dql = "SELECT u from IntelligentUserBundle:User where ";
+                    // Get order by clause
+                    switch($body->order_by){
+                        case "name":
+                            $order_by = "u.name";
+                            break;
+                        case "role":
+                            $order_by = "r.id";
+                            break;
+                        case "status":
+                            $order_by = "u.status";
+                            break;
+                        default:
+                            $order_by = "u.name";
+                            $body->order_by = 'name';
+                    }
+                    $body->order_type = ($body->order_type?$body->order_type:"asc");
+                    $query->orderBy($order_by,$body->order_type);
+                    
+                    $dql = $query->getQuery();
+                    $results = $dql->getResult();
+                    
+                    $users = array();
+                    foreach($results as $user){
+                        $users[] = array(
+                            'id' => $user->getId(),
+                            'name' => $user->getName(),
+                            'role' => array(
+                                'id' => $user->getRole()->getId(), 
+                                'name' => $user->getRole()->getName()
+                            ),
+                            'status' => $user->getStatus(),
+                            'last_login' => (!is_null($user->getLastLogin())? $user->getLastLogin()->format("m/d/Y H:i:s") : "Not loggedin yet")
+                        );
+                    }
+                    return $this->_handleSuccessfulRequest(array('data' => $users,"order_by" => $body->order_by, "order_type" => $body->order_type));
                 }
             }
         }else{
@@ -249,6 +305,77 @@ class ApiController extends Controller {
         }
     }
     
+    private function inviteUsers(Request $request, $json){
+        $user_permissions = $this->get('user_permissions');
+        if($user_permissions->getManageUserAndShareAppPermission()){
+            $body = $json->body;
+            if(is_array($body)){
+                $new_user_arr = array();
+                foreach($body as $index => $new_user){
+                    if(isset($new_user->email) && isset($new_user->new_role)){
+                        $em = $this->getDoctrine()->getManager();
+                        # check for already existing email/username
+                        $already_existing_user = $em->getRepository("IntelligentUserBundle:User")
+                                ->findOneBy(array("email" => $new_user->email));
+                        if($already_existing_user){
+                            throw new \Exception("Email ($new_user->email) already exists as user",412);
+                        }
+                        # Check the role
+                        $attached_role = $em->getRepository("IntelligentUserBundle:Role")->find($new_user->new_role);
+                        if(!$attached_role){
+                            throw new \Exception("new_role ($new_user->new_role) is not valid",412);
+                        }
+                        $newUser = new User();
+                        $newUser->setEmail($new_user->email);
+                        $newUser->setRole($attached_role);
+                        $newUser->setStatus(User::UNVERIFIED);
+                        $newUser->setVerificationId(uniqid());
+                        $newUser->setCreateDatetime(new \DateTime());
+                        $newUser->setUpdateDatetime(new \DateTime());
+                        $new_user_arr[] = $newUser;
+                        
+                    }else{
+                        throw new \Exception("Email or new role_id is not set in json at index #$index",400);
+                    }
+                    foreach($new_user_arr as $new_user_final){
+                        // Send email
+                        $email_body = $this->_getEmailBody("inviteUser.html.twig", array('emailVerifyId' => $new_user_final->getVerificationId()));
+                        $this->_sendEmail($new_user_final->getEmail(), "Verify your email", $email_body);
+                        // Persist user
+                        $em->persist($new_user_final);
+                    }
+                    # Now finish by sending email and saving new users 
+                    $em->flush();
+                    return $this->_handleSuccessfulRequest();
+                }
+            }else{
+                throw new \Exception("Body should be array in the request json",400);
+            }
+        }else{
+            throw new \Exception("Current user has no access to user data", 403);
+        }
+    }
+    
+    private function registerUser(Request $request, $json){
+        $body = $json->body;
+        if($isset($body->verification_id) && $isset($body->name) && $isset($body->password)){
+            $em = $this->getDoctrine()->getManager();
+            $new_user = $em->getRepository("IntelligentUserBundle:User")->findOneBy(array("verificationId" => $body->verification_id));
+            $status = $new_user->getStatus();
+            if($status == User::UNVERIFIED){
+                $new_user->setName($body->name);
+                $new_user->setStatus(User::REGISTERED);
+                $new_user->setPassword($body->password);
+                $new_user->setUpdateDateTime(new \DateTime());
+                $em->flush();
+                return $this->_handleSuccessfulRequest();
+            }else{
+                throw new \Exception("verification_id is not valid",412);
+            }
+        }else{
+            throw new \Exception("verification_id or first_name or last_name or password is not set in the request json",400);
+        }
+    }
     /**
      * This api action will be used to disable users
      * 
@@ -317,6 +444,47 @@ class ApiController extends Controller {
         }
     }
     
+    private function getRoles(Request $request, $json){
+        $user_permissions = $this->get('user_permissions');
+        if($user_permissions->getManageUserAndShareAppPermission()){
+            $body = $json->body;
+            if(isset($body->where) && !isset($body->where->name)){
+                throw new \Exception("where.name is not set in the request json",400);
+            }else{
+                $em = $this->getDoctrine()->getManager();
+                $query = $em->createQueryBuilder();
+                $query->select("r")
+                        ->addSelect("p")
+                        ->from("IntelligentUserBundle:Role","r")
+                        ->join("r.globalPermission","p");
+                
+                #Add where clauses;
+                if(isset($body->where) && isset($body->where->name)){
+                    $query->where($query->expr()->like("r.name", $body->where->name));
+                }
+                # Always order by name
+                $query->orderBy("r.name","asc");
+                echo $query->getQuery()->getSql();exit;
+                $roles = $query->getQuery()->getResult();
+                $roles_result = array();
+                foreach($roles as $role){
+                    $roles_result[] = array(
+                        'id' => $role->getId(),
+                        'name' => $role->getName(),
+                        'app_permissions' => array(
+                            'user' => ($role->getGlobalPermission()? $role->getGlobalPermission()->getManageUserAppPermission():false),
+                            'app'  => ($role->getGlobalPermission()? $role->getGlobalPermission()->getEditAppStructurePermission():false)
+                        ),
+                        "is_active" => $role->getStatus()
+                    );
+                }
+                return $this->_handleSuccessfulRequest(array('data' => $roles_result));
+            }
+        }else{
+            throw new \Exception("Current user has no access to list roles", 403);
+        }
+    }
+    
     /**
      * This function will convert the exception into a response object 
      * 
@@ -324,15 +492,19 @@ class ApiController extends Controller {
      * @param type $responseCode
      * @return Response
      */
-    private function _handleException(\Exception $exception) {
-        $response = new Response(json_encode(array(
-                    'head' => array(
-                        'status' => 'error'
-                    ),
-                    'body' => array(
-                        'error_msg' => $exception->getMessage()
-                    )
-        )));
+    private function _handleException(\Exception $exception, $trace=null) {
+        $error_response_arr = array(
+            'head' => array(
+                'status' => 'error'
+            ),
+            'body' => array(
+                'error_msg' => $exception->getMessage()
+            )
+        );
+        if(!is_null($trace)){
+            $error_response_arr['body']['trace'] = $trace;
+        }
+        $response = new Response(json_encode($error_response_arr));
         $http_code = $exception->getCode()? $exception->getCode() :500;
         $response->setStatusCode($http_code);
         $response->headers->set("Content-Type", "application/json");
@@ -407,7 +579,7 @@ class ApiController extends Controller {
      * @return boolean
      */
     private function _isAllowed($actionName){
-        if(in_array($actionName,array("forgetPassword","resetPassword"))){
+        if(in_array($actionName,array("forgetPassword","resetPassword","registerUser"))){
             return true;
         }else{
             if($this->getUser()){

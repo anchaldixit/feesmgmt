@@ -38,6 +38,15 @@ class DefaultController extends Controller {
         ));
     }
     
+    public function inviteUserAction($emailVerifyId){
+        /**
+         * @TODO create this page
+         */
+        return $this->render('IntelligentUserBundle:Default:inviteUser.html.twig', array(
+            'emailVerifyId' => $emailVerifyId
+        ));
+    }
+    
     public function resetPasswordAction($resetPasswordId){
         return $this->render('IntelligentUserBundle:Default:reset.html.twig', array(
             'resetPasswordId' => $resetPasswordId

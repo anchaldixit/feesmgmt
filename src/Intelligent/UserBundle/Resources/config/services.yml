@@ -8,4 +8,7 @@ services:
         arguments: ["@security.token_storage","@doctrine"]
     entry_point.user_login:
         class: Intelligent\UserBundle\Services\LoginEntryPoint
-        arguments: [ @router ]
+        arguments: ["@router"]
+    success.user_login:
+        class: Intelligent\UserBundle\Services\LoginSuccessHandler
+        arguments: ["@security.http_utils","@doctrine.orm.entity_manager"]
