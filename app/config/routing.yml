@@ -1,3 +1,7 @@
+intelligent_module:
+    resource: "@IntelligentModuleBundle/Resources/config/routing.yml"
+    prefix:   /
+
 intelligent_setting:
     resource: "@IntelligentSettingBundle/Resources/config/routing.yml"
     prefix:   /

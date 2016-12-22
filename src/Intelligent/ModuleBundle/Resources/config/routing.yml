@@ -1,0 +1,6 @@
+intelligent_module_homepage:
+    path:     /
+    defaults: { _controller: IntelligentModuleBundle:Default:index }
+intelligent_customer_edit:
+    path:     /customer/edit/{edit_id}
+    defaults: { _controller: IntelligentModuleBundle:Customer:edit }

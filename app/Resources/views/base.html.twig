@@ -133,8 +133,9 @@
             {% endfor %}
         {% endfor %}
     {% block body %}{% endblock %}
-{% block footer %}{% endblock %}
+
 </div>
+{% block footer %}
 <footer class="footer">
     <div class="left-footer">
         <p>&copy; aizan.com</p>
@@ -142,8 +143,10 @@
     <div class="right-footer">
         <p>
             <a href="#">Privacy Policy</a>
+            {% block footerlink %}{% endblock %}
         </p>
     </div>
 </footer>
+{% endblock %}
 </body>
 </html>

@@ -24,8 +24,8 @@ class AppKernel extends Kernel
             new Intelligent\UserBundle\IntelligentUserBundle(),
             new Intelligent\SharedBundle\IntelligentSharedBundle(),
             new Intelligent\SettingBundle\IntelligentSettingBundle(),
-
-            );
+            new Intelligent\ModuleBundle\IntelligentModuleBundle(),
+        );
 
         if (in_array($this->getEnvironment(), array('dev', 'test'), true)) {
             $bundles[] = new Symfony\Bundle\DebugBundle\DebugBundle();
