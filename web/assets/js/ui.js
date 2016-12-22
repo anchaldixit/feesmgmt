@@ -527,7 +527,7 @@ $.extend(User.prototype, {
 
                 if (allroles.length > 0) {
                     $.each(allroles, function (index) {
-                        roles += '<li><input type="checkbox" name="Roles" class="roles" value="' + allroles[index].id + '" /><label>' + (allroles[index].name == 'null' ?allroles[index].email:allroles[index].name) + '</label></li>';
+                        roles += '<li><input type="checkbox" name="Roles" class="roles" value="' + allroles[index].id + '" /><label>' + allroles[index].name + '</label></li>';
                     });
 
                     $('#roles_ul').append(roles);
@@ -543,6 +543,7 @@ $.extend(User.prototype, {
 
             if (data.length > 0) {
                 $.each(data, function (index) {
+                    //console.log(data[index]);
                     var userrole = data[index].role.id;
                     var selectbox = '';
                     selectbox += '<select class="change_role" data-user-id="' + data[index].id + '">';
@@ -559,7 +560,7 @@ $.extend(User.prototype, {
                     else {
                         html += '<tr>';
                     }
-                    html += '<td><a href="#">' + data[index].name + '</a></td>';
+                    html += '<td><a href="#">' + (data[index].name == null ? data[index].email : data[index].name) + '</a></td>';
                     html += '<td>' + selectbox + '</td>';
                     html += '<td class="status">' + status + '</td>';
                     html += '<td>' + data[index].last_login + '</td>';
