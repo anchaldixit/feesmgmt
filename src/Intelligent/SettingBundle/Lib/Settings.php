@@ -33,13 +33,12 @@ class Settings {
         'link' => 'Link',
         'user' => 'User',
         'date' => 'Date',
-        'datetime' => 'Datetime'
+        'datetime' => 'Datetime',
+        'relationship' => 'Relationship'
     );
     private $last_insert_id; //initilized after new field created
-    
-    private $last_sql_withoutlimit;//sql will be store in case total number of count need to be fetched
-    
-    private $last_sql_withoutlimit_params;//store the parameters for $last_sql_withoutlimit variable sql
+    private $last_sql_withoutlimit; //sql will be store in case total number of count need to be fetched
+    private $last_sql_withoutlimit_params; //store the parameters for $last_sql_withoutlimit variable sql
 
     public function __construct($db) {
 
@@ -70,7 +69,7 @@ class Settings {
         return $result;
     }
 
-    public function fetch($nd_condition = array('field-name' => 'value'), $sort = array('field-name' => 'ASC'),$limit='1000') {
+    public function fetch($nd_condition = array('field-name' => 'value'), $sort = array('field-name' => 'ASC'), $limit = '1000') {
 
         $extended_where = '';
         $order_by = '';
@@ -206,6 +205,30 @@ class Settings {
                 $data['module_field_name'] = strlen($new) > 50 ? substr($new, -50) : $new;
             }
 
+            if ($post_data['module_field_datatype'] == 'relationship') {
+                //If Type is set as relationship then need to validate extra for module_field_name also
+                if (empty($post_data['relationship_module'])) {
+
+                    $error[] = "Relationship Module cannot be empty for 'relationship' datatype";
+                } elseif ($post_data['relationship_module'] == $post_data['module']) {
+
+                    $error[] = "Relationship Module cannot be same as module name.";
+                } else {
+                    //check the field name id db for relationship module
+                    $result1 = $this->fetch(
+                            array(
+                                'module' => $post_data['relationship_module'],
+                                'module_field_name' => $data['module_field_name']));
+
+                    if (!count($result1)) {
+                        //Field not found
+                        $error[] = "{$data['module_field_name']} field not found for relationship module";
+                    } else {
+                        $data['relationship_module'] = $post_data['relationship_module'];
+                    }
+                }
+            }
+
             if (empty($post_data['module_field_datatype'])) {
                 $error[] = "Module field's datatype cannot be empty";
             } else {
@@ -265,9 +288,18 @@ class Settings {
         } else {
             $data['required_field'] = $post_data['required_field'];
         }
-        if ($type == 'save') {//Edit not allowed on this field, set it only for new row
-            $data['relationship_module'] = $post_data['relationship_module'];
+
+        if (empty($post_data['display_position'])) {
+            $error[] = "Display position field cannot be empty";
+        } elseif (!is_numeric($post_data['display_position'])) {
+            $error[] = "Display position field should be number";
+        } else {
+            $data['display_position'] = floor($post_data['display_position']);
         }
+
+//        if ($type == 'save') {//Edit not allowed on this field, set it only for new row
+//            $data['relationship_module'] = $post_data['relationship_module'];
+//        }
 
         if (!empty($error)) {
             throw new \Exception(implode('<br>', $error), '001');
@@ -280,6 +312,9 @@ class Settings {
         $other_details = '';
         if ($data['module_field_datatype'] == 'varchar') {
             $other_details = $data['varchar_limit'];
+        } elseif ($data['module_field_datatype'] == 'relationship') {
+            $this->createForeignKey($data['module'], $this->prepareforeignKeyName($data['relationship_module']));
+            return;
         }
         if ($data['unique_field'] == 'Y') {
             $index_type = 'UNIQUE';
@@ -293,6 +328,12 @@ class Settings {
     }
 
     public function afterDelete() {
+        
+    }
+    
+    public function prepareforeignKeyName($module){
+        
+        return "relationship_{$module}_id";
         
     }
 
@@ -332,21 +373,41 @@ class Settings {
             throw new \Exception($this->db->errorInfo(), '002');
         }
     }
-    
+
     function totalCountOfLastFetch() {
-        
-        if(!empty($this->last_sql_withoutlimit)){
+
+        if (!empty($this->last_sql_withoutlimit)) {
             $result = $this->db->fetchAll($this->last_sql_withoutlimit, $this->last_sql_withoutlimit_params);
             if ($this->db->errorCode() != 0) {
 
-            throw new \Exception($this->db->errorInfo(), '002');
-        }
-        }else{
+                throw new \Exception($this->db->errorInfo(), '002');
+            }
+        } else {
             throw new \Exception('last_sql_withoutlimit is empty', '002');
         }
-        
+
         return $result[0]['count(*)'];
-        
+    }
+
+    function createForeignKey($module, $column) {
+
+        $sql = "show columns FROM $module where field = '$column'";
+
+        $result = $this->db->fetchAll($sql);
+
+        if (count($result)) {
+            //column already exist 
+        } else {
+
+            $alt_sql = "ALTER TABLE `$module` 
+            ADD COLUMN `$column` int(11) NULL , ADD index `$column` (`$column` ASC);";
+            $this->db->executeQuery($alt_sql);
+
+            if ($this->db->errorCode() != 0) {
+
+                throw new \Exception($this->db->errorInfo(), '002');
+            }
+        }
     }
 
 }

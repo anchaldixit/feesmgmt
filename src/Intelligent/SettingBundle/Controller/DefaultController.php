@@ -100,7 +100,7 @@ class DefaultController extends Controller {
         });
         //var_dump($filters);
         $params = array();
-        $sort = array('module' => 'ASC');
+        $sort = array('module' => 'ASC','display_position'=>'ASC');
         if (isset($filters['filter'])) {
             if (!empty($filters['filter']['text']['module_field_display_name'])) {
                 $params['module_field_display_name']['like'] = "%{$filters['filter']['text']['module_field_display_name']}%";

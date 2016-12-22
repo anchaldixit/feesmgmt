@@ -38,9 +38,16 @@
                 } else {
                     $('#unique_field_row').slideUp('slow')
                 }
+                if ($(this).val() == 'relationship') {
+                    
+                    $('#relationship_module_row').slideDown('slow')
+                } else {
+                    $('#relationship_module_row').slideUp('slow')
+                }
+                   
             }).trigger('change');
 
-            $('#field_has_relationship').on('change', function () {
+            /*field_has_relationship').on('change', function () {
 
                 if ($(this).val() == 'Y') {
                     $('#relationship_module_row').slideDown('slow');
@@ -48,13 +55,13 @@
                     $('#relationship_module_row').slideUp('slow');
                 }
 
-            }).trigger('change');
+            }).trigger('change');*/
 
             if ($('#edit_id_hidden_field').length) {
                 $('#module_field_datatype').attr('DISABLED', true);
                 $('#module').attr('DISABLED', true);
                 $('#relationship_module').attr('DISABLED', true);
-                $('#field_has_relationship').attr('DISABLED', true);
+                //$('#field_has_relationship').attr('DISABLED', true);
                 $('#varchar_limit').attr('DISABLED', true);
                 $('#unique_field').attr('DISABLED', true);
 
@@ -133,6 +140,26 @@
                                 </div>
                             </div>
                         </li>
+                        <li id="relationship_module_row"> 
+                            <label>Relationship Table: </label>
+                            <div class="field-wrap">
+                                <div class="dropdown">
+                                    <select name="relationship_module" id="relationship_module"  class="selectbox" >
+                                        <option value="">Select Module..</option>
+                                        {% for keyname, module in modules %}
+                                            <option value="{{keyname}}" {{config.relationship_module is defined and config.relationship_module == keyname ? 'SELECTED': ''}}>{{module}}</option>
+                                        {% endfor %}
+                                    </select>
+                                    
+                                </div>
+                                <small><i>Module Field Identifier should be same as Field Identifier of Relationship Module</i></small>
+                            </div>
+                        </li>
+                        <li><label>Display Position:</label> 
+                            <div class="field-wrap">
+                                <input name="display_position" id="display_position"  value="{{config.display_position is defined ? config.display_position : '100'}}" type="text" ><br><small><i>To move column position to left, reduce the value of display position field. </i></small>
+                            </div>
+                        </li>
                         <li id="varchar_limit_row">
                             <label>Max Character Limit:</label> 
                             <div class="field-wrap">
@@ -206,19 +233,7 @@
                             </div>
 
                         </li>
-                        <li id="relationship_module_row"> 
-                            <label>Relationship Table: </label>
-                            <div class="field-wrap">
-                                <div class="dropdown">
-                                    <select name="relationship_module" id="relationship_module"  class="selectbox" >
-                                        <option value="">Select Module..</option>
-                                        {% for keyname, module in modules %}
-                                            <option value="{{keyname}}" {{config.relationship_module is defined and config.relationship_module == keyname ? 'SELECTED': ''}}>{{module}}</option>
-                                        {% endfor %}
-                                    </select>
-                                </div>
-                            </div>
-                        </li>
+                        
                         {% if config.modified_datetime is defined %}
                             <li> 
                                 <label>Last Modified:</label> 
