@@ -32,7 +32,7 @@ function User() {
 $.extend(User, {
     ajaxLink: window.location.origin + '/api/v1/general',
     ajaxLink2: window.location.origin + '/api/v1',
-    roles: ''
+    roles: ['Registered','Unregistered','Unverified','Deactivated','Denied','Password Reset']
 });
 
 $.extend(User.prototype, {
@@ -299,6 +299,8 @@ $.extend(User.prototype, {
                 var ajax_msg = '1 user activated';
                 $('.info-notice').html(ajax_msg);
                 var tr = td.closest('tr');
+                tr.find('.status').text(User.roles[data.body.status-1]);
+                
                 tr.css('background-color', '');
                 td.removeClass('activate_user');
                 td.addClass('disable_user');
@@ -571,12 +573,16 @@ $.extend(User.prototype, {
                     }
                     html += '</tr>';
                 });
+                
+                $('.curr-result, .total-result').text(data.length);
             }
             else {
                 html += '<tr>';
                 html += '<td colspan="5" >No Data is Found</td>';
                 html += '</tr>';
+                $('.curr-result, .total-result').text('0');
             }
+            
             $('#userList tbody').html('');
             $('#userList tbody').html(html);
             $('#userList').show();
