@@ -8,6 +8,8 @@ use Symfony\Component\HttpFoundation\Response;
 use Intelligent\UserBundle\Entity\User;
 use Intelligent\UserBundle\Entity\Role;
 use Intelligent\UserBundle\Entity\RoleGlobalPermission;
+use Intelligent\UserBundle\Entity\RoleModulePermission;
+use Intelligent\UserBundle\Entity\RoleModuleFieldPermission;
 use Symfony\Component\Security\Core\Util\StringUtils;
 use Intelligent\SettingBundle\Lib\Settings;
 
@@ -706,16 +708,54 @@ class ApiController extends Controller {
                     $modules = $module_settings->getModule();
                     $module_permissions = array();
                     foreach($modules as $module_id => $module_name){
+                        $module_permission_obj = $role->getSingleModulePermission($module_id);
                         
-                        $module_permissions[] = array(
+                        # Get global permissions and info
+                        $module_permission = array(
                             'module' => array(
                                 'id' => $module_id,
                                 'name' => $module_name
                             ),
-                            'viewPermission'
+                            'viewPermission' => (is_null($module_permission_obj)? false:$module_permission_obj->getViewPermission()),
+                            'editPermission' => (is_null($module_permission_obj)? false:$module_permission_obj->getModifyPermission()),
+                            'addPermission' => (is_null($module_permission_obj)? false:$module_permission_obj->getAddPermission()),
+                            'deletePermission' => (is_null($module_permission_obj)? false:$module_permission_obj->getDeletePermission()),
                         );
+                        if(!is_null($module_permission_obj) && $module_permission_obj->getFieldPermission() == RoleModulePermission::ACTIVE){
+                            // Get fields permissions
+                            $field_permissions = array();
+                            $module_fields = $module_settings->fetch(array("module" => $module_id));
+                            foreach($module_fields as $module_field){
+                                if(is_null($module_permission_obj)){
+                                    $field_permission_obj = null;
+                                }else{
+                                    $field_permission_obj = $module_permission_obj->getSingleFieldPermissions($module_field['module_field_name']);
+                                }
+                                $field_permissions[] = array(
+                                    'id' => $module_field['module_field_name'],
+                                    'name' => $module_field['module_field_display_name'],
+                                    'permission' => (is_null($field_permission_obj)? RoleModuleFieldPermission::VIEW: $field_permission_obj->getPermission()) 
+                                );
+                            }
+
+                            # Combine the two
+                            $module_permission['fieldPermission'] = $field_permissions;
+                        }else{
+                            $module_permission['fieldPermission'] = FALSE;
+                        }
+                        $module_permissions[] = $module_permission;
                     }
-                    print_r($module_settings->fetch(array("module" => "customer")));
+                    $result = array(
+                        'id' => $role->getId(),
+                        'name' => $role->getName(),
+                        'description' => $role->getDescription(),
+                        'globalPermissions' => array(
+                            "userPermission" => $role->getGlobalPermission()->getManageUserAppPermission(),
+                            "appChangePermission" => $role->getGlobalPermission()->getEditAppStructurePermission()
+                        ),
+                        "modulePermissions" => $module_permissions
+                    );
+                    return $this->_handleSuccessfulRequest($result);
                 }else{
                     throw new \Exception("Role with role_id($body->role_id) do not exists",404);
                 }

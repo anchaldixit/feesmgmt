@@ -13,6 +13,8 @@ use Intelligent\UserBundle\Entity\Role;
  */
 class RoleGlobalPermission
 {
+    const DEACTIVE = 0;
+    const ACTIVE = 1;
     /**
      * @var integer
      *
