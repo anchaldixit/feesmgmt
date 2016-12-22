@@ -297,7 +297,24 @@ class ApiController extends Controller {
                             'last_login' => (!is_null($user->getLastLogin())? $user->getLastLogin()->format("m/d/Y H:i:s") : "Not loggedin yet")
                         );
                     }
-                    return $this->_handleSuccessfulRequest(array('data' => $users,"order_by" => $body->order_by, "order_type" => $body->order_type));
+                    if(isset($body->filter) && $body->filter === true){
+                        return $this->_handleSuccessfulRequest(array(
+                            'data' => $users,
+                            "order_by" => $body->order_by, 
+                            "order_type" => $body->order_type,
+                            "filters" => array(
+                                "roles" => $this->_getActiveRoles(),
+                                "status" => $this->_getUsedStatus()
+                            )
+                        ));
+                    }else{
+                        return $this->_handleSuccessfulRequest(array(
+                            'data' => $users,
+                            "order_by" => $body->order_by, 
+                            "order_type" => $body->order_type
+                        ));
+                    }
+                    
                 }
             }
         }else{
@@ -829,15 +846,62 @@ class ApiController extends Controller {
         }
     }
     
+    /**
+     * The function will check the permitted order by values
+     * 
+     * @param type $orderByKey
+     * @param type $permittedValues
+     * @throws \Exception
+     */
     private function _checkOrderBy($orderByKey, $permittedValues){
         if(!in_array($orderByKey,$permittedValues)){
             throw new \Exception("body.order_by value($orderByKey) is invalid",412);
         }
     }
     
+    /**
+     * This function will check the type of order_type
+     * 
+     * @param type $orderType
+     * @throws \Exception
+     */
     private function _checkOrderType($orderType){
         if($orderType  !== 'asc' && $orderType !== 'desc'){
             throw new \Exception("body.order_type value($orderType) is invalid",412);
         }
+    }
+    
+    /**
+     * This function will return the array of roles
+     * 
+     * @return array
+     */
+    private function _getActiveRoles(){
+        $roles_arr = array();
+        $repo = $this->getDoctrine()->getManager()->getRepository("IntelligentUserBundle:Role");
+        $roles = $repo->findBy(array("status", 1));
+        foreach($roles as $role){
+            $roles_arr[] = array(
+                "id" => $role->getId(),
+                "name" => $role->getName()
+            );
+        }
+        return $roles_arr;
+    }
+    
+    /**
+     * This function will return the array of status
+     * 
+     * @return array
+     */
+    private function _getUsedStatus(){
+        return array(
+            array("id" => User::REGISTERED, "name" => "Registered"),
+            array("id" => User::UNREGISTERED, "name" => "Unregistered"),
+            array("id" => User::UNVERIFIED, "name" => "Unverified"),
+            array("id" => User::DEACTIVATED, "name" => "Deactivated"),
+            array("id" => User::DENIED, "name" => "Denied"),
+            array("id" => User::PASSWORD_RESET, "name" => "Password Reset"),
+        );
     }
 }
