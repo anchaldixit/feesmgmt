@@ -9,6 +9,7 @@ use Intelligent\UserBundle\Entity\User;
 use Intelligent\UserBundle\Entity\Role;
 use Intelligent\UserBundle\Entity\RoleGlobalPermission;
 use Symfony\Component\Security\Core\Util\StringUtils;
+use Intelligent\SettingBundle\Lib\Settings;
 
 class ApiController extends Controller {
     private static $DEBUG = true;
@@ -318,7 +319,7 @@ class ApiController extends Controller {
                 }
             }
         }else{
-            throw new \Exception("Current user has no access to user data", 403);
+            $this->_throwNoPermissionException();
         }
     }
     /**
@@ -377,7 +378,7 @@ class ApiController extends Controller {
                 throw new \Exception("Body should be array in the request json",400);
             }
         }else{
-            throw new \Exception("Current user has no access to user data", 403);
+            $this->_throwNoPermissionException();
         }
     }
     
@@ -441,7 +442,7 @@ class ApiController extends Controller {
                 throw new \Exception("user_id is not set in the request json",400);
             }
         }else{
-            throw new \Exception("Current user has no access to change user role", 403);
+            $this->_throwNoPermissionException();
         }
     }
     
@@ -479,7 +480,7 @@ class ApiController extends Controller {
                 throw new \Exception("user_id is not set in the request json",400);
             }
         }else{
-            throw new \Exception("Current user has no access to change user role", 403);
+            $this->_throwNoPermissionException();
         }
     }
     /**
@@ -515,7 +516,7 @@ class ApiController extends Controller {
                 throw new \Exception("user_id or new_role_id is not set in the request json",400);
             }
         }else{
-            throw new \Exception("Current user has no access to change user role", 403);
+            $this->_throwNoPermissionException();
         }
     }
     
@@ -564,7 +565,7 @@ class ApiController extends Controller {
                 return $this->_handleSuccessfulRequest(array('data' => $roles_result));
             }
         }else{
-            throw new \Exception("Current user has no access to list roles", 403);
+            $this->_throwNoPermissionException();
         }
     }
     
@@ -612,7 +613,7 @@ class ApiController extends Controller {
                 throw new \Exception("name or description is not set in the request json",400);
             }
         }else{
-            throw new \Exception("Current user has no access to create roles", 403);
+            $this->_throwNoPermissionException();
         }
     } 
     
@@ -646,7 +647,7 @@ class ApiController extends Controller {
                 throw new \Exception("role_id not set in the request json");
             }
         }else{
-            throw new \Exception("Current user has no access to disable roles", 403);
+            $this->_throwNoPermissionException();
         }
             
     }
@@ -681,7 +682,48 @@ class ApiController extends Controller {
                 throw new \Exception("role_id not set in the request json");
             }
         }else{
-            throw new \Exception("Current user has no access to disable roles", 403);
+            $this->_throwNoPermissionException();
+        }
+    }
+
+    /**
+     * This method will get the role permissions and details
+     * 
+     * @param Request $request
+     * @param type $json
+     * @return type
+     * @throws \Exception
+     */
+    private function getRolePermission(Request $request, $json){
+        $user_permissions = $this->get('user_permissions');
+        if($user_permissions->getManageUserAndShareAppPermission()){
+            $body = $json->body;
+            if(isset($body->role_id)){
+                $em = $this->getDoctrine()->getManager();
+                $role = $em->getRepository("IntelligentUserBundle:Role")->find($body->role_id);
+                if($role){
+                    $module_settings = new Settings($em->getConnection());
+                    $modules = $module_settings->getModule();
+                    $module_permissions = array();
+                    foreach($modules as $module_id => $module_name){
+                        
+                        $module_permissions[] = array(
+                            'module' => array(
+                                'id' => $module_id,
+                                'name' => $module_name
+                            ),
+                            'viewPermission'
+                        );
+                    }
+                    print_r($module_settings->fetch(array("module" => "customer")));
+                }else{
+                    throw new \Exception("Role with role_id($body->role_id) do not exists",404);
+                }
+            }else{
+                throw new \Exception("role_id not set in request json",412);
+            }
+        }else{
+            $this->_throwNoPermissionException();
         }
     }
     
@@ -802,21 +844,21 @@ class ApiController extends Controller {
             $rolesArr = array($rolesArr);
         }
         $repo = $this->getDoctrine()->getManager()->getRepository("IntelligentUserBundle:Role");
-        $all_active_roles = $repo->findBy(array("status" => Role::ACTIVE));
-        $active_role_ids = array();
-        foreach($all_active_roles as $role){
-            $active_role_ids[] = $role->getId();
+        $all_roles = $repo->findAll();
+        $role_ids = array();
+        foreach($all_roles as $role){
+            $role_ids[] = $role->getId();
         }
         
         $not_available_roles = array();
         foreach($rolesArr as $role_id){
-            if(!in_array($role_id,$active_role_ids)){
+            if(!in_array($role_id,$role_ids)){
                 $not_available_roles[] = $role_id;
             }
         }
         if(count($not_available_roles) > 0){
             $not_available_roles_str = implode(", ", $not_available_roles);
-            throw new \Exception("role ids ($not_available_roles_str) not available or inactive", 412);
+            throw new \Exception("role ids ($not_available_roles_str) not available", 412);
         }
         
     }
@@ -904,5 +946,9 @@ class ApiController extends Controller {
             array("id" => User::DENIED, "name" => "Denied"),
             array("id" => User::PASSWORD_RESET, "name" => "Password Reset"),
         );
+    }
+    
+    private function _throwNoPermissionException(){
+        throw new \Exception("Current user has no access to do this action", 403);
     }
 }
