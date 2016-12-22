@@ -768,7 +768,376 @@ class ApiController extends Controller {
     }
     
     /**
-     * This function will convert the exception into a response object 
+     * This api function will change the global edit user permission
+     * 
+     * @param Request $request
+     * @param type $json
+     * @return type
+     * @throws \Exception
+     */
+    private function changeUserAndShareAppPermission(Request $request, $json){
+        $user_permissions = $this->get('user_permissions');
+        if($user_permissions->getManageUserAndShareAppPermission()){
+            $body = $json->body;
+            if(isset($body->role_id) && isset($body->value)){
+                $em = $this->getDoctrine()->getManager();
+                $role = $em->getRepository("IntelligentUserBundle:Role")->find($body->role_id);
+                if($role->getGlobalPermission()->getManageUserAppPermission() == $body->value){
+                    throw new \Exception("value already $body->value",412);
+                }else{
+                    $role->getGlobalPermission()->setManageUserAppPermission($body->value);
+                    $em->flush();
+                    return $this->_handleSuccessfulRequest();
+                }
+            }else{
+                throw new \Exception("role_id or value not set in request json",412);
+            }
+        }else{
+            $this->_throwNoPermissionException();
+        }
+    }
+    
+    /**
+     * This api function will change the global edit app permission
+     * 
+     * @param Request $request
+     * @param type $json
+     * @return type
+     * @throws \Exception
+     */
+    private function changeEditAppPermission(Request $request, $json){
+        $user_permissions = $this->get('user_permissions');
+        if($user_permissions->getManageUserAndShareAppPermission()){
+            $body = $json->body;
+            if(isset($body->role_id) && isset($body->value)){
+                $em = $this->getDoctrine()->getManager();
+                $role = $em->getRepository("IntelligentUserBundle:Role")->find($body->role_id);
+                if($role){
+                    if($role->getGlobalPermission()->getEditAppStructurePermission() == $body->value){
+                        throw new \Exception("value already $body->value",412);
+                    }else{
+                        $role->getGlobalPermission()->setEditAppStructurePermission($body->value);
+                        $em->flush();
+                        return $this->_handleSuccessfulRequest();
+                    }
+                }else{
+                    throw new \Exception("Role with role_id($body->role_id) not found",404);
+                }
+            }else{
+                throw new \Exception("role_id or value not set in request json",412);
+            }
+        }else{
+            $this->_throwNoPermissionException();
+        }
+    }
+    
+    /**
+     * This api function will change the view permission for a module
+     * 
+     * @param Request $request
+     * @param type $json
+     * @return type
+     * @throws \Exception
+     */
+    private function changeModuleViewPermission(Request $request, $json){
+        $user_permissions = $this->get('user_permissions');
+        if($user_permissions->getManageUserAndShareAppPermission()){
+            $body = $json->body;
+            if(isset($body->role_id) && isset($body->value) && isset($body->module_id)){
+                $em = $this->getDoctrine()->getManager();
+                $role = $em->getRepository("IntelligentUserBundle:Role")->find($body->role_id);
+                if($role){
+                    # Check if the module exists
+                    if($this->_isModuleExists($body->module_id)){
+                        $already_existing_module_permission_object = $role->getSingleModulePermission($body->module_id);
+                        if(is_null($already_existing_module_permission_object)){
+                            # Add a new row
+                            $new_module_permission_object = new RoleModulePermission();
+                            $new_module_permission_object->setRole($role);
+                            $new_module_permission_object->setModule($body->module_id);
+                            $new_module_permission_object->setViewPermission($body->value);
+                            $new_module_permission_object->setAddPermission(RoleModulePermission::DEACTIVE);
+                            $new_module_permission_object->setDeletePermission(RoleModulePermission::DEACTIVE);
+                            $new_module_permission_object->setModifyPermission(RoleModulePermission::DEACTIVE);
+                            $new_module_permission_object->setFieldPermission(RoleModulePermission::DEACTIVE);
+                            $em->persist($new_module_permission_object);
+                            $em->flush();
+                            return $this->_handleSuccessfulRequest();
+                        }else{
+                            if($already_existing_module_permission_object->getViewPermission() == $body->value){
+                                throw new \Exception("Value is already $body->value", 412);
+                            }else{
+                                $already_existing_module_permission_object->setViewPermission($body->value);
+                                $em->flush();
+                                return $this->_handleSuccessfulRequest();
+                            }
+                        }
+                    }else{
+                        throw new \Exception("Module with module_id($body->module_id) not found",404);
+                    }
+                }else{
+                    throw new \Exception("Role with role_id($body->role_id) not found",404);
+                }
+            }else{
+                throw new \Exception("role_id or value or module_id not set in request json",412);
+            }
+        }else{
+            $this->_throwNoPermissionException();
+        }
+    }
+    
+    /**
+     * This api function will change the edit permission for a module
+     * 
+     * @param Request $request
+     * @param type $json
+     * @return type
+     * @throws \Exception
+     */
+    private function changeModuleEditPermission(Request $request, $json){
+        $user_permissions = $this->get('user_permissions');
+        if($user_permissions->getManageUserAndShareAppPermission()){
+            $body = $json->body;
+            if(isset($body->role_id) && isset($body->value) && isset($body->module_id)){
+                $em = $this->getDoctrine()->getManager();
+                $role = $em->getRepository("IntelligentUserBundle:Role")->find($body->role_id);
+                if($role){
+                    # Check if the module exists
+                    if($this->_isModuleExists($body->module_id)){
+                        $already_existing_module_permission_object = $role->getSingleModulePermission($body->module_id);
+                        if(is_null($already_existing_module_permission_object)){
+                            # Add a new row
+                            $new_module_permission_object = new RoleModulePermission();
+                            $new_module_permission_object->setRole($role);
+                            $new_module_permission_object->setModule($body->module_id);
+                            $new_module_permission_object->setViewPermission(RoleModulePermission::DEACTIVE);
+                            $new_module_permission_object->setAddPermission(RoleModulePermission::DEACTIVE);
+                            $new_module_permission_object->setDeletePermission(RoleModulePermission::DEACTIVE);
+                            $new_module_permission_object->setModifyPermission($body->value);
+                            $new_module_permission_object->setFieldPermission(RoleModulePermission::DEACTIVE);
+                            $em->persist($new_module_permission_object);
+                            $em->flush();
+                            return $this->_handleSuccessfulRequest();
+                        }else{
+                            if($already_existing_module_permission_object->getModifyPermission() == $body->value){
+                                throw new \Exception("Value is already $body->value", 412);
+                            }else{
+                                $already_existing_module_permission_object->setModifyPermission($body->value);
+                                $em->flush();
+                                return $this->_handleSuccessfulRequest();
+                            }
+                        }
+                    }else{
+                        throw new \Exception("Module with module_id($body->module_id) not found",404);
+                    }
+                }else{
+                    throw new \Exception("Role with role_id($body->role_id) not found",404);
+                }
+            }else{
+                throw new \Exception("role_id or value or module_id not set in request json",412);
+            }
+        }else{
+            $this->_throwNoPermissionException();
+        }
+    }
+    
+    /**
+     * This api function will change the add permission for a module
+     * 
+     * @param Request $request
+     * @param type $json
+     * @return type
+     * @throws \Exception
+     */
+    private function changeModuleAddPermission(Request $request, $json){
+        $user_permissions = $this->get('user_permissions');
+        if($user_permissions->getManageUserAndShareAppPermission()){
+            $body = $json->body;
+            if(isset($body->role_id) && isset($body->value) && isset($body->module_id)){
+                $em = $this->getDoctrine()->getManager();
+                $role = $em->getRepository("IntelligentUserBundle:Role")->find($body->role_id);
+                if($role){
+                    # Check if the module exists
+                    if($this->_isModuleExists($body->module_id)){
+                        $already_existing_module_permission_object = $role->getSingleModulePermission($body->module_id);
+                        if(is_null($already_existing_module_permission_object)){
+                            # Add a new row
+                            $new_module_permission_object = new RoleModulePermission();
+                            $new_module_permission_object->setRole($role);
+                            $new_module_permission_object->setModule($body->module_id);
+                            $new_module_permission_object->setViewPermission(RoleModulePermission::DEACTIVE);
+                            $new_module_permission_object->setAddPermission($body->value);
+                            $new_module_permission_object->setDeletePermission(RoleModulePermission::DEACTIVE);
+                            $new_module_permission_object->setModifyPermission(RoleModulePermission::DEACTIVE);
+                            $new_module_permission_object->setFieldPermission(RoleModulePermission::DEACTIVE);
+                            $em->persist($new_module_permission_object);
+                            $em->flush();
+                            return $this->_handleSuccessfulRequest();
+                        }else{
+                            if($already_existing_module_permission_object->getAddPermission() == $body->value){
+                                throw new \Exception("Value is already $body->value", 412);
+                            }else{
+                                $already_existing_module_permission_object->setAddPermission($body->value);
+                                $em->flush();
+                                return $this->_handleSuccessfulRequest();
+                            }
+                        }
+                    }else{
+                        throw new \Exception("Module with module_id($body->module_id) not found",404);
+                    }
+                }else{
+                    throw new \Exception("Role with role_id($body->role_id) not found",404);
+                }
+            }else{
+                throw new \Exception("role_id or value or module_id not set in request json",412);
+            }
+        }else{
+            $this->_throwNoPermissionException();
+        }
+    }
+    
+    /**
+     * This api function will change the delete permission for a module
+     * 
+     * @param Request $request
+     * @param type $json
+     * @return type
+     * @throws \Exception
+     */
+    private function changeModuleDeletePermission(Request $request, $json){
+        $user_permissions = $this->get('user_permissions');
+        if($user_permissions->getManageUserAndShareAppPermission()){
+            $body = $json->body;
+            if(isset($body->role_id) && isset($body->value) && isset($body->module_id)){
+                $em = $this->getDoctrine()->getManager();
+                $role = $em->getRepository("IntelligentUserBundle:Role")->find($body->role_id);
+                if($role){
+                    # Check if the module exists
+                    if($this->_isModuleExists($body->module_id)){
+                        $already_existing_module_permission_object = $role->getSingleModulePermission($body->module_id);
+                        if(is_null($already_existing_module_permission_object)){
+                            # Add a new row
+                            $new_module_permission_object = new RoleModulePermission();
+                            $new_module_permission_object->setRole($role);
+                            $new_module_permission_object->setModule($body->module_id);
+                            $new_module_permission_object->setViewPermission(RoleModulePermission::DEACTIVE);
+                            $new_module_permission_object->setAddPermission(RoleModulePermission::DEACTIVE);
+                            $new_module_permission_object->setDeletePermission($body->value);
+                            $new_module_permission_object->setModifyPermission(RoleModulePermission::DEACTIVE);
+                            $new_module_permission_object->setFieldPermission(RoleModulePermission::DEACTIVE);
+                            $em->persist($new_module_permission_object);
+                            $em->flush();
+                            return $this->_handleSuccessfulRequest();
+                        }else{
+                            if($already_existing_module_permission_object->getDeletePermission() == $body->value){
+                                throw new \Exception("Value is already $body->value", 412);
+                            }else{
+                                $already_existing_module_permission_object->setDeletePermission($body->value);
+                                $em->flush();
+                                return $this->_handleSuccessfulRequest();
+                            }
+                        }
+                    }else{
+                        throw new \Exception("Module with module_id($body->module_id) not found",404);
+                    }
+                }else{
+                    throw new \Exception("Role with role_id($body->role_id) not found",404);
+                }
+            }else{
+                throw new \Exception("role_id or value or module_id not set in request json",412);
+            }
+        }else{
+            $this->_throwNoPermissionException();
+        }
+    }
+    
+    /**
+     * This api function will change the field level permission for a module
+     * 
+     * @param Request $request
+     * @param type $json
+     * @return type
+     * @throws \Exception
+     */
+    private function changeModuleFieldPermission(Request $request, $json){
+        $user_permissions = $this->get('user_permissions');
+        if($user_permissions->getManageUserAndShareAppPermission()){
+            $body = $json->body;
+            if(isset($body->role_id) && isset($body->value) && isset($body->module_id)){
+                $em = $this->getDoctrine()->getManager();
+                $role = $em->getRepository("IntelligentUserBundle:Role")->find($body->role_id);
+                if($role){
+                    # Check if the module exists
+                    if($this->_isModuleExists($body->module_id)){
+                        $already_existing_module_permission_object = $role->getSingleModulePermission($body->module_id);
+                        if(is_null($already_existing_module_permission_object)){
+                            # Add a new row
+                            $new_module_permission_object = new RoleModulePermission();
+                            $new_module_permission_object->setRole($role);
+                            $new_module_permission_object->setModule($body->module_id);
+                            $new_module_permission_object->setViewPermission(RoleModulePermission::DEACTIVE);
+                            $new_module_permission_object->setAddPermission(RoleModulePermission::DEACTIVE);
+                            $new_module_permission_object->setDeletePermission(RoleModulePermission::DEACTIVE);
+                            $new_module_permission_object->setModifyPermission(RoleModulePermission::DEACTIVE);
+                            $new_module_permission_object->setFieldPermission(RoleModulePermission::DEACTIVE);
+                            $em->persist($new_module_permission_object);
+                            $module_permission_obj = $new_module_permission_object;
+                        }else{
+                            $module_permission_obj = $already_existing_module_permission_object;
+                        }
+                        
+                        if(is_bool($body->value)){
+                            $module_permission_obj->setFieldPermission($body->value);
+                            $em->flush();
+                            return $this->_handleSuccessfulRequest();
+                        }else if($body->value instanceof \stdClass){
+                            $value = $body->value;
+                            if(isset($value->field_id) && isset($value->permission)){
+                                if($this->_isModuleFieldExists($body->module_id,$value->field_id)){
+                                    $field_permission_obj = $module_permission_obj->getSingleFieldPermissions($value->field_id);
+                                    if(is_null($field_permission_obj)){
+                                        $field_permission_obj = new RoleModuleFieldPermission();
+                                        $field_permission_obj->setModulePermission($module_permission_obj);
+                                        $field_permission_obj->setFieldNameId($value->field_id);
+                                        $field_permission_obj->setPermission($value->permission);
+                                        $module_permission_obj->addFieldPermission($field_permission_obj);
+                                        $em->persist($field_permission_obj);
+                                    }else{
+                                        if($field_permission_obj->getPermission() == $value->permission){
+                                            throw new \Exception("body.value.permission is already $value->permission",412);
+                                        }else{
+                                            $field_permission_obj->setPermission($value->permission);
+                                        }
+                                    }
+                                    # If any field permission is changed then switch to custom mode
+                                    $module_permission_obj->setFieldPermission(RoleModulePermission::ACTIVE);
+                                    $em->flush();
+                                    return $this->_handleSuccessfulRequest();
+                                }else{
+                                    throw new \Exception("body.value.field_id ($value->field_id) do not exists",404);
+                                }
+                            }else{
+                                throw new \Exception("body.value.field_id or body.value.permission do not exists in request json",412);
+                            }
+                        }else{
+                            throw new \Exception("value parameter type is not valid",412);
+                        }
+                    }else{
+                        throw new \Exception("Module with module_id($body->module_id) not found",404);
+                    }
+                }else{
+                    throw new \Exception("Role with role_id($body->role_id) not found",404);
+                }
+            }else{
+                throw new \Exception("role_id or value or module_id not set in request json",412);
+            }
+        }else{
+            $this->_throwNoPermissionException();
+        }
+    }
+    
+    /**
+     * This function will convert the exception into a json response object 
      * 
      * @param \Exception $exception
      * @param type $responseCode
@@ -954,6 +1323,40 @@ class ApiController extends Controller {
     }
     
     /**
+     * This function checks if a mudule exists
+     * 
+     * @param type $moduleId
+     * @return bool
+     */
+    private function _isModuleExists($moduleId){
+        $em = $this->getDoctrine()->getManager();
+        $settings = new Settings($em->getConnection());
+        $modules = $settings->getModule();
+        $module_ids_arr = array_keys($modules);
+        return in_array($moduleId,$module_ids_arr);
+    }
+    
+    /**
+     * This function let you know if a field exists in
+     * a module or not.
+     * 
+     * @param type $moduleId
+     * @param type $fieldId
+     * @return boolean
+     */
+    private function _isModuleFieldExists($moduleId,$fieldId){
+        $em = $this->getDoctrine()->getManager();
+        $settings = new Settings($em->getConnection());
+        $fields = $settings->fetch(array("module" => $moduleId));
+        foreach($fields as $field){
+            if($field['module_field_name'] == $fieldId){
+                return true;
+            }
+        }
+        return false;
+    }
+    
+    /**
      * This function will return the array of roles
      * 
      * @return array
@@ -987,7 +1390,11 @@ class ApiController extends Controller {
             array("id" => User::PASSWORD_RESET, "name" => "Password Reset"),
         );
     }
-    
+    /**
+     * This function throws exception of no user permission
+     * 
+     * @throws \Exception
+     */
     private function _throwNoPermissionException(){
         throw new \Exception("Current user has no access to do this action", 403);
     }
