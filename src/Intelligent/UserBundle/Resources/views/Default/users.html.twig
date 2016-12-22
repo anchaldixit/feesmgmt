@@ -14,50 +14,32 @@
 {% endblock %}
 
 {% block body %}
-    
+
+    <span class="notify"><i class="fa fa-info-circle"></i><span class="info-notice">1 Role Changed</span> </span>
     <div class="content-table">
     <div class="left-sidebar">
-                <div class="filter-box">
-                    <h6><a href="#"><i class="fa fa-caret-down"></i>Access</a></h6>
-                    <ul>
-                        <li><input type="checkbox"><label>App Access</label></li>
-                        <li><input type="checkbox"><label>No Access</label></li>
-                    </ul>
-                </div>
                 
                 <div class="filter-box">
                     <h6><a href="#"><i class="fa fa-caret-down"></i>Role</a></h6>
-                    <ul>
-                        <li><input type="checkbox"><label>None</label></li>
-                        <li><input type="checkbox"><label>Administrator</label></li>
-                        <li><input type="checkbox"><label>Team Member</label></li>
-                        <li><input type="checkbox"><label>Sales Agent</label></li>
-                        <li><input type="checkbox"><label>Client</label></li>
-                        <li><input type="checkbox"><label>TSD</label></li>
-                        <li><input type="checkbox"><label>Expertise</label></li>
+                    <ul id="roles_ul">
+                        
                     </ul>
                 </div>
                 <div class="filter-box">
                     <h6><a href="#"><i class="fa fa-caret-down"></i>Status</a></h6>
-                    <ul>
-                        <li><input type="checkbox"><label>Registered</label></li>
-                        <li><input type="checkbox"><label>Unregistered</label></li>
-                        <li><input type="checkbox"><label>Unverified</label></li>
-                        <li><input type="checkbox"><label>Verified</label></li>
-                        <li><input type="checkbox"><label>Deactivated</label></li>
-                        <li><input type="checkbox"><label>Denied</label></li>
-                        
+                    <ul id="status_ul">
                     </ul>
                 </div>
             </div>
     <div class="table-content user-table">
         <div class="user-filter">
-        <div class="search-box">
+        <div class="search-box" style="margin-left:0">
             <div class="search">
-                <input type="text" name="role-search" placeholder="Search User">
+                <input type="text" name="role-search" placeholder="Search User" id="search_user">
                 <i class="fa fa-search"></i>
             </div>
         </div>
+            <div class="ajax-loader" id="loader"><i class="fa fa-refresh fa-spin fa-1x fa-fw"></i></div>
         <div class="display-result">
             <p>Displaying <span class="curr-result"> 26 </span> out of <span class="total-result">50</span> Roles</p>
         </div>
@@ -65,11 +47,10 @@
                 <table id="userList" style="display:none;">
                     <thead>
                         <tr>
-                            
-                            <th>Name</th>
-                            <th>Role</th>
-                            <th>Status</th>
-                            <th>Last Visit</th>
+                            <th class="sort_table" data-order-by="name" data-order-type="desc">Name<i class="fa fa-caret-down"></i></th>
+                            <th class="sort_table" data-order-by="role" data-order-type="desc">Role<i class="fa fa-caret-down"></i></th>
+                            <th class="sort_table" data-order-by="status" data-order-type="desc">Status<i class="fa fa-caret-down"></i></th>
+                            <th class="sort_table" data-order-by="last_login" data-order-type="desc">Last Visit<i class="fa fa-caret-down"></i></th>
                             <th>Action</th>
                         </tr>
                     </thead>
