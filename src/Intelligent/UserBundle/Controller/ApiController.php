@@ -879,11 +879,12 @@ class ApiController extends Controller {
     private function _getActiveRoles(){
         $roles_arr = array();
         $repo = $this->getDoctrine()->getManager()->getRepository("IntelligentUserBundle:Role");
-        $roles = $repo->findBy(array("status", 1));
-        foreach($roles as $role){
+        $all_active_roles = $repo->findAll();
+        foreach($all_active_roles as $role){
             $roles_arr[] = array(
                 "id" => $role->getId(),
-                "name" => $role->getName()
+                "name" => $role->getName(),
+                "status" => $role->getStatus()
             );
         }
         return $roles_arr;

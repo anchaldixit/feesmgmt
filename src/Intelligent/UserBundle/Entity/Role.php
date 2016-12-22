@@ -40,7 +40,7 @@ class Role
     private $description;
 
     /**
-     * @var boolean
+     * @var integer
      *
      * @ORM\Column(name="status", type="integer", nullable=false)
      */
