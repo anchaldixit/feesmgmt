@@ -1,6 +1,8 @@
 <?php
 
 namespace Intelligent\UserBundle\Entity;
+use Intelligent\UserBundle\Entity\Role;
+use Doctrine\Common\Collections\Collection;
 
 use Doctrine\ORM\Mapping as ORM;
 
@@ -12,6 +14,8 @@ use Doctrine\ORM\Mapping as ORM;
  */
 class RoleModulePermission
 {
+    const DEACTIVE = 0;
+    const ACTIVE = 1;
     /**
      * @var integer
      *
@@ -22,7 +26,7 @@ class RoleModulePermission
     private $id;
 
     /**
-     * @var integer
+     * @var Role
      * @ORM\ManyToOne(targetEntity="Role", inversedBy="modulePermissions")
      * @ORM\JoinColumn(name="role_id", referencedColumnName="id")
      */
@@ -62,6 +66,20 @@ class RoleModulePermission
      * @ORM\Column(name="delete_permission", type="boolean", nullable=false)
      */
     private $deletePermission;
+    
+    /**
+     * @var boolean
+     *
+     * @ORM\Column(name="field_permission", type="boolean", nullable=false)
+     */
+    private $fieldPermission;
+    
+    /**
+     *
+     * @var Collection
+     * @ORM\OneToMany(targetEntity="RoleModuleFieldPermission", mappedBy="modulePermission")
+     */
+    private $fieldPermissions;
 
     /**
      * Get id
@@ -209,5 +227,85 @@ class RoleModulePermission
     public function getModule()
     {
         return $this->module;
+    }
+    /**
+     * Constructor
+     */
+    public function __construct()
+    {
+        $this->fieldPermissions = new \Doctrine\Common\Collections\ArrayCollection();
+    }
+
+    /**
+     * Add fieldPermissions
+     *
+     * @param \Intelligent\UserBundle\Entity\RoleModuleFieldPermission $fieldPermissions
+     * @return RoleModulePermission
+     */
+    public function addFieldPermission(\Intelligent\UserBundle\Entity\RoleModuleFieldPermission $fieldPermissions)
+    {
+        $this->fieldPermissions[] = $fieldPermissions;
+
+        return $this;
+    }
+
+    /**
+     * Remove fieldPermissions
+     *
+     * @param \Intelligent\UserBundle\Entity\RoleModuleFieldPermission $fieldPermissions
+     */
+    public function removeFieldPermission(\Intelligent\UserBundle\Entity\RoleModuleFieldPermission $fieldPermissions)
+    {
+        $this->fieldPermissions->removeElement($fieldPermissions);
+    }
+
+    /**
+     * Get fieldPermissions
+     *
+     * @return \Doctrine\Common\Collections\Collection 
+     */
+    public function getFieldPermissions()
+    {
+        return $this->fieldPermissions;
+    }
+    
+    /**
+     * Get permission for a single field
+     * 
+     * @param string $fieldName Name of the field
+     * @return \Intelligent\UserBundle\Entity\RoleModuleFieldPermission
+     */
+    public function getSingleFieldPermissions($fieldName)
+    {
+        $all_field_permissions = $this->getFieldPermissions();
+        foreach($all_field_permissions as $field_permission){
+            if($field_permission->getFieldNameId() == $fieldName){
+                return $field_permission;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Set fieldPermission
+     *
+     * @param boolean $fieldPermission
+     * @return RoleModulePermission
+     */
+    public function setFieldPermission($fieldPermission)
+    {
+        $this->fieldPermission = $fieldPermission;
+
+        return $this;
+    }
+
+    /**
+     * Get fieldPermission
+     *
+     * @return boolean 
+     */
+    public function getFieldPermission()
+    {
+        return $this->fieldPermission;
     }
 }

@@ -5,6 +5,7 @@ namespace Intelligent\UserBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use Intelligent\UserBundle\Entity\RoleGlobalPermission;
 use Intelligent\UserBundle\Entity\RoleModulePermission;
+use Doctrine\Common\Collections\Collection;
 
 /**
  * Role
@@ -68,12 +69,12 @@ class Role
     private $globalPermission;
 
     /**
-     * @var ArrayList
+     * @var Collection
      *
      * @ORM\OneToMany(targetEntity="RoleModulePermission", mappedBy="role")
      */
     private $modulePermissions;
-
+    
     /**
      * Get id
      *
@@ -260,5 +261,22 @@ class Role
     public function getModulePermissions()
     {
         return $this->modulePermissions;
+    }
+    
+    /**
+     * Get a single module permission
+     * 
+     * @param string $moduleName Name of the module
+     * @return RoleModulePermission
+     */
+    
+    public function getSingleModulePermission($moduleName){
+        $all_module_permissions = $this->getModulePermissions();
+        foreach($all_module_permissions as $module_permission_obj){
+            if($module_permission_obj->getModule() == $moduleName){
+                return $module_permission_obj;
+            }
+        }
+        return null;
     }
 }
