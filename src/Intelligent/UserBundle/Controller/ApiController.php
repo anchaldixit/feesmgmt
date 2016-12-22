@@ -292,6 +292,7 @@ class ApiController extends Controller {
                         $users[] = array(
                             'id' => $user->getId(),
                             'name' => $user->getName(),
+                            'email' => $user->getEmail(),
                             'role' => array(
                                 'id' => $user->getRole()->getId(), 
                                 'name' => $user->getRole()->getName()
