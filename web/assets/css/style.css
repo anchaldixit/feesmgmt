@@ -150,6 +150,31 @@ body {
   display: block;
   margin: 0 0 20px 20px; }
 
+.ajax-loader {
+  float: left;
+  margin-left: 10px;
+  display: none; }
+
+.notify {
+  position: fixed;
+  left: 50%;
+  top: -30px;
+  transform: translate(-50%, 0);
+  font-size: 13px;
+  background-color: rgba(198, 212, 189, 0.6);
+  border-radius: 10px;
+  border: 1px solid #4e9221;
+  padding: 5px 10px; }
+  .notify .fa-info-circle {
+    color: #0c6501; }
+  .notify .info-notice {
+    display: inline-block;
+    margin: 0 20px; }
+
+.n-animation {
+  top: 70px;
+  transition: top 500ms linear; }
+
 .arrow-down {
   width: 0;
   height: 0;
@@ -430,6 +455,10 @@ body {
       background-color: #b5d5fd;
       vertical-align: middle;
       color: #000; }
+      .table-content table tr th .fa {
+        margin-left: 10px; }
+      .table-content table tr th.sort_table {
+        cursor: pointer; }
     .table-content table tr td {
       font-size: 12px;
       border: 1px solid #454545;

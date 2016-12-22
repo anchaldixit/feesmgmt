@@ -25,29 +25,30 @@ $.extend(Loader.prototype, {
     }
 });
 
-function Login() {
+function User() {
 
 }
 
-$.extend(Login, {
+$.extend(User, {
     ajaxLink: window.location.origin + '/api/v1/general',
-    ajaxLink2: window.location.origin + '/api/v1'
+    ajaxLink2: window.location.origin + '/api/v1',
+    roles: ''
 });
 
-$.extend(Login.prototype, {
+$.extend(User.prototype, {
     init: function () {
         var that = this;
         that.bindForgetPasswordAction();
         that.flipForm();
         that.featureSlider();
         that.openMenu();
-        if($('#mypreferences').length){
+        if ($('#mypreferences').length) {
             that.updatePreferences();
         }
-        if($('#change_password').length){
+        if ($('#change_password').length) {
             that.changePassword();
         }
-        if($('#userList').length){
+        if ($('#userList').length) {
             that.createUserPage();
         }
     },
@@ -61,41 +62,41 @@ $.extend(Login.prototype, {
             }
         });
     },
-    featureSlider: function(){
-        if($('.feature-list').length){
+    featureSlider: function () {
+        if ($('.feature-list').length) {
             var li_width = 30;
-            $('.feature-list ul li').each(function(){
+            $('.feature-list ul li').each(function () {
                 li_width = li_width + $(this).outerWidth();
             });
-            $('.feature-list ul').css('width',li_width+'px');
-            $('.next').click(function(){
-                
+            $('.feature-list ul').css('width', li_width + 'px');
+            $('.next').click(function () {
+
                 var diff = $('.feature-list ul').width() - $(window).width();
-                //alert('next'+diff);
-                if(diff > 0){
-                    $('.feature-list ul').animate({'left':'-'+diff+'px'},500);
+                if (diff > 0) {
+                    $('.feature-list ul').animate({'left': '-' + diff + 'px'}, 500);
                 }
             });
-            $('.prev').click(function(){
-                
+            $('.prev').click(function () {
+
                 var diff = $('.feature-list ul').width() - $(window).width();
                 var pos = 0;
-                if(diff > 0){
+                if (diff > 0) {
                     var left_pos = $('.feature-list ul').css('left');
                     left_pos = parseInt(left_pos);
-                    
-                    if(left_pos == 0){
+
+                    if (left_pos == 0) {
                         pos = left_pos;
                     }
-                    else{
+                    else {
                         pos = diff + left_pos;
                     }
-                    $('.feature-list ul').animate({'left':'+'+pos+'px'},500);
+                    $('.feature-list ul').animate({'left': '+' + pos + 'px'}, 500);
                 }
             });
         }
     },
     getForgetPassword: function (_val) {
+        var that = this;
         var obj = {
             head: {
                 action: "forgetPassword"
@@ -104,95 +105,60 @@ $.extend(Login.prototype, {
                 email: _val
             }
         };
-        var str = JSON.stringify(obj);
-        $.ajax({
-            url: Login.ajaxLink,
-            method: 'post',
-            dataType: 'json',
-            data: str,
-            beforeSend: function () {
-                $('#loader').show();
-            },
-            success: function (res) {
-                var msg = '';
+        var _obj = JSON.stringify(obj);
+        var ajaxLink = User.ajaxLink;
+        that.getAjaxData(ajaxLink, _obj, function (data) {
 
-                $('#loader').hide();
-                if (res.head.status === "success") {
-                    $('#forget_password_textbox').val('');
-                    msg = '<span class="msg">An activation link has been sent to your registered email</span>';
-                }
-                $('.validation_msg').html('');
-                $('#valid_error').html('');
-                $('#valid_error').html(msg);
-            },
-            error: function (err) {
-                var error = '';
-                $('#loader').hide();
-                obj = jQuery.parseJSON(err.responseText);
-
-                if (obj.head.status === 'error') {
-                    error = '<span class="error_msg">' + obj.body.error_msg + '</span>';
-                }
-                $('#valid_error').html('');
-                $('#valid_error').html(error);
+            var msg = '';
+            $('#loader').hide();
+            if (data.head.status === "success") {
+                $('#forget_password_textbox').val('');
+                msg = '<span class="msg">An activation link has been sent to your registered email</span>';
             }
+            $('.validation_msg').html('');
+            $('#valid_error').html('');
+            $('#valid_error').html(msg);
         });
-
     },
-    updatePreferences : function (){
-        $('#update_preferences').click(function(){
+    updatePreferences: function () {
+        var that = this;
+        $('#update_preferences').click(function () {
             var _fname = $.trim($('#full_name_text').val());
             var error = 'Name field can not be empty';
-            if(_fname == ''){
+            if (_fname == '') {
                 $('.validation_msg').html(error);
                 $('.validation_msg').show();
             }
-            else{
+            else {
                 var obj = {
-                        head: {
-                            action: "changePreference"
-                        },
-                        body: {
-                            name: _fname
-                        }
-                    };
-                var _str = JSON.stringify(obj);
-                $.ajax({
-                    url: Login.ajaxLink2,
-                    method: 'post',
-                    dataType: 'json',
-                    data: _str,
-                    beforeSend: function () {
-                        $('#loader').show();
+                    head: {
+                        action: "changePreference"
                     },
-                    success: function(res){
-                        var msg = '';
-                        $('#loader').hide();
-                        if (res.head.status === "success") {
-                            msg = '<span class="msg">Your name has been successfully updated</span>';
-                        }
-                        $('.validation_msg').html('');
-                        $('#valid_error').html('');
-                        $('#valid_error').html(msg);
-                    },
-                    error: function(err){
-                        var error = '';
-                        $('#loader').hide();
-                        obj = jQuery.parseJSON(err.responseText);
-
-                        if (obj.head.status === 'error') {
-                            error = '<span class="error_msg">' + obj.body.error_msg + '</span>';
-                        }
-                        $('#valid_error').html('');
-                        $('#valid_error').html(error);
+                    body: {
+                        name: _fname
                     }
-                });   
+                };
+                var _obj = JSON.stringify(obj);
+                var ajaxLink = User.ajaxLink2;
+                that.getAjaxData(ajaxLink, _obj, function (data) {
+
+                    var msg = '';
+                    $('#loader').hide();
+                    if (data.head.status === "success") {
+                        msg = '<span class="msg">Your name has been successfully updated</span>';
+                    }
+                    $('.validation_msg').html('');
+                    $('#valid_error').html('');
+                    $('#valid_error').html(msg);
+
+                });
             }
         });
     },
-    changePassword: function(){
-        $('#change_password_btn').click(function(){
-            
+    changePassword: function () {
+        var that = this;
+        $('#change_password_btn').click(function () {
+
             var error = '';
             var _oldPassword = $('#old_password').val();
             var _newPassword = $('#new_password').val();
@@ -200,142 +166,461 @@ $.extend(Login.prototype, {
             $('#valid_error').html('');
             $('.validation_msg').html('');
             $('.validation_msg2').html('');
-            if(_oldPassword == ''){
+            if (_oldPassword == '') {
                 error = 'Old Password field can not be empty';
                 $('.validation_msg').html(error);
                 $('.validation_msg').show();
             }
-            else if(_newPassword !==  _renewPassword){
+            else if (_newPassword !== _renewPassword) {
                 $('.validation_msg2').html('Retype password is not matching');
                 $('.validation_msg2').show();
             }
-            else if(_newPassword == '' || _renewPassword == ''){
+            else if (_newPassword == '' || _renewPassword == '') {
                 $('.validation_msg2').html('New password fields can not empty');
                 $('.validation_msg2').show();
             }
-            else{
+            else {
                 $('.validation_msg2').html('');
                 $('.validation_msg').html('');
-                
+
                 var obj = {
-                        head: {
-                            action: "changePassword"
-                        },
-                        body: {
-                            old_password: _oldPassword,
-                            new_password: _renewPassword
-                        }
-                    };
-                var _str = JSON.stringify(obj);
-                $.ajax({
-                    url: Login.ajaxLink2,
-                    method: 'post',
-                    dataType: 'json',
-                    data: _str,
-                    beforeSend: function () {
-                        $('#loader').show();
+                    head: {
+                        action: "changePassword"
                     },
-                    success: function(res){
-                        var msg = '';
-                        $('#loader').hide();
-                        if (res.head.status === "success") {
-                            msg = '<span class="msg">Your password has been successfully updated</span>';
-                        }
-                        $('.validation_msg').html('');
-                        $('#valid_error').html('');
-                        $('#valid_error').html(msg);
-                        setTimeout(function(){
-                            window.location.href = 'http://'+window.location.hostname+'/login';
-                        },1000);
-                        
-                    },
-                    error: function(err){
-                        var error = '';
-                        $('#loader').hide();
-                        obj = jQuery.parseJSON(err.responseText);
-                        
-                        if (obj.head.status === 'error') {
-                            error = '<span class="error_msg">' + obj.body.error_msg + '</span>';
-                        }
-                        $('#valid_error').html('');
-                        $('#valid_error').html(error);
+                    body: {
+                        old_password: _oldPassword,
+                        new_password: _renewPassword
                     }
-                }); 
+                };
+                var _obj = JSON.stringify(obj);
+                var ajaxLink = User.ajaxLink2;
+                that.getAjaxData(ajaxLink, _obj, function (data) {
+                    var msg = '';
+                    $('#loader').hide();
+                    if (data.head.status === "success") {
+                        msg = '<span class="msg">Your password has been successfully updated</span>';
+                    }
+                    $('.validation_msg').html('');
+                    $('#valid_error').html('');
+                    $('#valid_error').html(msg);
+                    setTimeout(function () {
+                        window.location.href = 'http://' + window.location.hostname + '/login';
+                    }, 1000);
+                });
+
             }
-            
-            
+
+
         });
     },
-    createUserPage: function(){
+    createUserPage: function () {
         var that = this;
+        that.flag = true;
         var obj = {
-                head:{
-                    action:"getUsers"
+            head: {
+                action: "getUsers"
+            },
+            body: {
+                where: {
+                    name: "",
+                    role: [],
+                    status: []
                 },
-                body:{
-                    where:{
-                        name: "",
-                        role: [],
-                        status: []
-                    },
-                    order_by: "name",
-                    order_type: "asc"
-                }
+                order_by: "name",
+                order_type: "asc",
+                filter: true
             }
+        }
         var _str = JSON.stringify(obj);
         that.getUserList(_str);
+        that.disableUser();
+        that.activateUser();
+        that.searchUser();
+        that.addFilter();
+        that.changeRole();
+        that.sortTable();
+
     },
-    getUserList: function (_obj){
+    disableUser: function () {
+        var that = this;
+        var ajaxLink = User.ajaxLink2;
+        $('#userList').on('click', '.disable_user', function () {
+            id = $(this).attr('data-id');
+            var td = $(this);
+            var obj = {
+                head: {
+                    action: "disableUser"
+                },
+                body: {
+                    user_id: id
+                }
+            }
+            var _obj = JSON.stringify(obj);
+
+            that.getAjaxData(ajaxLink, _obj, function (data) {
+                var ajax_msg = '1 user disabled';
+                $('.info-notice').html(ajax_msg);
+                var tr = td.closest('tr');
+                tr.find('.status').text('Deactivated');
+                tr.css('background-color', '#ffc0cc');
+                td.removeClass('disable_user');
+                td.addClass('activate_user');
+                var iTag = td.find('i');
+                iTag.removeClass('fa-times');
+                iTag.removeClass('red');
+                iTag.addClass('fa-check');
+                iTag.addClass('green');
+                $('#loader').hide();
+                $('.notify').addClass('n-animation');
+                setTimeout(function () {
+                    $('.notify').removeClass('n-animation');
+                }, 2000);
+            });
+            return false;
+        });
+    },
+    activateUser: function () {
+        var that = this;
+        var ajaxLink = User.ajaxLink2;
+        $('#userList').on('click', '.activate_user', function () {
+            id = $(this).attr('data-id');
+            var td = $(this);
+            var obj = {
+                head: {
+                    action: "enableUser"
+                },
+                body: {
+                    user_id: id
+                }
+            }
+            var _obj = JSON.stringify(obj);
+
+            that.getAjaxData(ajaxLink, _obj, function (data) {
+                var ajax_msg = '1 user activated';
+                $('.info-notice').html(ajax_msg);
+                var tr = td.closest('tr');
+                tr.css('background-color', '');
+                td.removeClass('activate_user');
+                td.addClass('disable_user');
+                var iTag = td.find('i');
+                iTag.removeClass('fa-check');
+                iTag.removeClass('green');
+                iTag.addClass('fa-times');
+                iTag.addClass('red');
+                $('#loader').hide();
+                $('.notify').addClass('n-animation');
+                setTimeout(function () {
+                    $('.notify').removeClass('n-animation');
+                }, 2000);
+            });
+            return false;
+        });
+    },
+    changeRole: function () {
+
+        var that = this;
+        var ajaxLink = User.ajaxLink2;
+        $('#userList').on('change', '.change_role', function () {
+            var user_id = $(this).attr('data-user-id');
+            var new_rol = $(this).val();
+            
+            var obj = {
+                    head: {
+                        action: "changeRole"
+                    },
+                    body: {
+                        user_id: user_id,
+                        new_role_id: new_rol
+                    }
+                }
+                var _obj = JSON.stringify(obj);
+
+                that.getAjaxData(ajaxLink, _obj, function (data) {
+                var ajax_msg = '1 Role Changed';
+                $('.info-notice').html(ajax_msg);
+
+                $('#loader').hide();
+                $('.notify').addClass('n-animation');
+                setTimeout(function(){
+                $('.notify').removeClass('n-animation');
+                },2000);
+                });
+            return false;
+        });
+
+
+    },
+    searchUser: function () {
+        var that = this;
+        ;
+        (function ($) {
+
+            $.fn.extend({
+                donetyping: function (callback, timeout) {
+                    timeout = timeout || 1e3; // 1 second default timeout
+                    var timeoutReference,
+                            doneTyping = function (el) {
+                                if (!timeoutReference)
+                                    return;
+                                timeoutReference = null;
+                                callback.call(el);
+                            };
+                    return this.each(function (i, el) {
+                        var $el = $(el);
+                        $el.is(':input') && $el.on('keyup keypress paste', function (e) {
+                            if (e.type == 'keyup' && e.keyCode != 8)
+                                return;
+                            if (timeoutReference)
+                                clearTimeout(timeoutReference);
+                            timeoutReference = setTimeout(function () {
+                                doneTyping(el);
+                            }, timeout);
+                        }).on('blur', function () {
+                            doneTyping(el);
+                        });
+                    });
+                }
+            });
+        })(jQuery);
+
+        $('#search_user').donetyping(function () {
+            var sortoption = that.getSortingOrder();
+            var checkedroles = that.getSelectedRoles();
+            var checkedStatus = that.getSelectedStatus();
+            var searchText = $('#search_user').val();
+            var obj = {
+                head: {
+                    action: "getUsers"
+                },
+                body: {
+                    where: {
+                        name: searchText,
+                        role: checkedroles,
+                        status: checkedStatus
+                    },
+                    order_by: sortoption[0],
+                    order_type: sortoption[1],
+                    filter: true
+                }
+            }
+            var _str = JSON.stringify(obj);
+            that.getUserList(_str);
+        }, 500);
+
+    },
+    addFilter: function () {
+        var that = this;
+        $('#roles_ul').on('change', '.roles', function () {
+            var sortoption = that.getSortingOrder();
+            var checkedroles = that.getSelectedRoles();
+            var checkedStatus = that.getSelectedStatus();
+            var searchText = $.trim($('#search_user').val());
+            var obj = {
+                head: {
+                    action: "getUsers"
+                },
+                body: {
+                    where: {
+                        name: searchText,
+                        role: checkedroles,
+                        status: checkedStatus
+                    },
+                    order_by: sortoption[0],
+                    order_type: sortoption[1],
+                    filter: true
+                }
+            }
+            console.log(obj);
+            var _obj = JSON.stringify(obj);
+            that.getUserList(_obj);
+
+        });
+        $('#status_ul').on('change', '.status', function () {
+            var sortoption = that.getSortingOrder();
+            var checkedroles = that.getSelectedRoles();
+            var checkedStatus = that.getSelectedStatus();
+            var searchText = $.trim($('#search_user').val());
+            var obj = {
+                head: {
+                    action: "getUsers"
+                },
+                body: {
+                    where: {
+                        name: searchText,
+                        role: checkedroles,
+                        status: checkedStatus
+                    },
+                    order_by: sortoption[0],
+                    order_type: sortoption[1],
+                    filter: true
+                }
+            }
+            console.log(obj);
+            var _obj = JSON.stringify(obj);
+            that.getUserList(_obj);
+        });
+    },
+    sortTable: function(){
+        var that = this;
+        $('.sort_table').click(function(){
+            var order_by = $(this).attr('data-order-by');
+            var order_type = $(this).attr('data-order-type');
+            
+            $('#userList .sort_table').find('.fa').removeClass('fa-caret-up').addClass('fa-caret-down');
+            $(this).find('.fa').removeClass('fa-caret-down').addClass('fa-caret-up');
+            $('#userList .sort_table').attr('data-order-type','asc');
+            $(this).attr('data-order-type','desc');
+            $('#userList .sort_table').removeClass('active_sort');
+            $(this).addClass('active_sort');
+            
+            var checkedroles = that.getSelectedRoles();
+            var checkedStatus = that.getSelectedStatus();
+            var searchText = $.trim($('#search_user').val());
+            var obj = {
+                head: {
+                    action: "getUsers"
+                },
+                body: {
+                    where: {
+                        name: searchText,
+                        role: checkedroles,
+                        status: checkedStatus
+                    },
+                    order_by: order_by,
+                    order_type: order_type,
+                    filter: true
+                }
+            }
+
+            var _obj = JSON.stringify(obj);
+            that.getUserList(_obj);
+        });
+    },
+    getSortingOrder: function(){
+        var sortby = [];
+        if($('#userList .active_sort').length){
+            var oderby = $('#userList .active_sort').attr('data-order-by');
+            var ordertype = $('#userList .active_sort').attr('data-order-type');
+            sortby.push(oderby);
+            sortby.push(ordertype);
+        }
+        else{
+            sortby.push("name");
+            sortby.push("asc");
+        }
+        return sortby;
+    },
+    getUserList: function (_obj) {
+        var that = this;
+        var ajaxLink = User.ajaxLink2;
+        that.getAjaxData(ajaxLink, _obj, function (responseData) {
+            var html = '';
+            var status = '';
+            var status_ul = '';
+            var roles = '';
+            var data = responseData.body.data;
+            var allstatus = responseData.body.filters.status;
+            var allroles = responseData.body.filters.roles;
+
+            if (that.flag == true) {
+                that.flag = false;
+
+                if (allroles.length > 0) {
+                    $.each(allroles, function (index) {
+                        roles += '<li><input type="checkbox" name="Roles" class="roles" value="' + allroles[index].id + '" /><label>' + allroles[index].name + '</label></li>';
+                    });
+
+                    $('#roles_ul').append(roles);
+                }
+                if (allstatus.length) {
+                    $.each(allstatus, function (index) {
+                        status_ul += '<li><input type="checkbox" name="Status" class="status" value="' + allstatus[index].id + '" /><label>' + allstatus[index].name + '</label></li>';
+                    });
+
+                    $('#status_ul').append(status_ul);
+                }
+            }
+
+            if (data.length > 0) {
+                $.each(data, function (index) {
+                    var userrole = data[index].role.id;
+                    var selectbox = '';
+                    selectbox += '<select class="change_role" data-user-id="' + data[index].id + '">';
+                    $.each(allroles, function (index) {
+                        selectbox += '<option ' + (userrole == allroles[index].id ? 'selected' : '') + ' value = "' + allroles[index].id + '" ' + (allroles[index].status == 1 ? "" : 'disabled') + '>' + allroles[index].name + '</option>';
+                    });
+                    selectbox += '</select>';
+
+
+                    status = allstatus[data[index].status - 1].name;
+                    if (data[index].status == 4) {
+                        html += '<tr style="background-color:#ffc0cc">';
+                    }
+                    else {
+                        html += '<tr>';
+                    }
+                    html += '<td><a href="#">' + data[index].name + '</a></td>';
+                    html += '<td>' + selectbox + '</td>';
+                    html += '<td class="status">' + status + '</td>';
+                    html += '<td>' + data[index].last_login + '</td>';
+                    if (data[index].status == 4)
+                        html += '<td><a class="activate_user" href="#"  data-id="' + data[index].id + '"><i class="fa fa-check green"></i></a></td>';
+                    else {
+                        html += '<td><a class="disable_user" href="#"  data-id="' + data[index].id + '"><i class="fa fa-times red"></i></a></td>';
+                    }
+                    html += '</tr>';
+                });
+            }
+            else {
+                html += '<tr>';
+                html += '<td colspan="5" >No Data is Found</td>';
+                html += '</tr>';
+            }
+            $('#userList tbody').html('');
+            $('#userList tbody').html(html);
+            $('#userList').show();
+            $('#loader').hide();
+
+
+        });
+    },
+    getSelectedRoles: function () {
+        var that = this;
+        that.checkedRoles = [];
+        $('#roles_ul :checked').each(function () {
+            that.checkedRoles.push($(this).val());
+        });
+        //that.checkedRoles = that.checkedRoles.substring(0, that.checkedRoles.length - 1);
+        return that.checkedRoles;
+    },
+    getSelectedStatus: function () {
+        var that = this;
+        that.checkedStatus = [];
+        $('#status_ul :checked').each(function () {
+            that.checkedStatus.push($(this).val());
+        });
+        //that.checkedStatus = that.checkedStatus.substring(0, that.checkedStatus.length - 1);
+        return that.checkedStatus;
+    },
+    getAjaxData: function (_ajaxLink, _obj, callback) {
         $.ajax({
-            url: Login.ajaxLink2,
+            url: _ajaxLink,
             method: 'post',
             dataType: 'json',
             data: _obj,
             beforeSend: function () {
                 $('#loader').show();
             },
-            success: function(res){
-                var html = '';
-                var data = res.body.data;
-                if(data.length > 0){
-                    $.each(data,function(index){
-                        html += '<tr>';
-                        html += '<td><a href="#">'+data[index].name+'</a></td>';
-                        html += '<td>';
-                        html += '<select>';
-                        html += '<option value="administrator" >Administrator</option>';
-                        html += '<option value="team_member" >Team Member</option>';
-                        html += '<option value="sales_agent" >Sales Agent</option>';
-                        html += '<option value="client" >Client</option>';
-                        html += '<option value="tsd" >TSD</option>';
-                        html += '<option value="expertise" >Expertise</option>';
-                        html += '<option value="none" >None</option>';
-                        html += '</select>';
-                        html += '</td>';
-                        html += '<td>Registered</td>';
-                        html += '<td>'+data[index].last_login+'</td>'
-                        html += '<td><a href="#"><i class="fa fa-times red"></i></a></td>'
-                        html += '</tr>';
-                    });
-                }
-            else{
-                html += '<tr>';
-                html += '<td colspan="5" >No Data is Found</td>';
-                html += '</tr>';
-            }
-                $('#userList tbody').html('');
-                $('#userList tbody').html(html);
-                $('#userList').show();
-                
+            success: function (res) {
+                callback(res);
             },
-            error: function(err){
+            error: function (err) {
                 obj = jQuery.parseJSON(err.responseText);
                 if (obj.head.status === 'error') {
-                            alert( obj.body.error_msg);
-                        }
+                    alert(obj.body.error_msg);
+                }
             }
         });
-        
     },
     fieldValidate: function (valobj, field) {
 
@@ -377,9 +662,9 @@ $.extend(Login.prototype, {
             });
         }
     },
-    openMenu: function(){
-        if($('.open-menu').length){
-            $('.open-menu').click(function(){
+    openMenu: function () {
+        if ($('.open-menu').length) {
+            $('.open-menu').click(function () {
                 var id = $(this).attr('href');
                 $(id).slideToggle();
                 return false;
@@ -389,9 +674,9 @@ $.extend(Login.prototype, {
 });
 
 $(document).ready(function () {
-    
-    login = new Login();
-    login.init();
+
+    user = new User();
+    user.init();
 });
 
 
