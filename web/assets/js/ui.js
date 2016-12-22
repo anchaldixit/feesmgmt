@@ -527,7 +527,7 @@ $.extend(User.prototype, {
 
                 if (allroles.length > 0) {
                     $.each(allroles, function (index) {
-                        roles += '<li><input type="checkbox" name="Roles" class="roles" value="' + allroles[index].id + '" /><label>' + allroles[index].name + '</label></li>';
+                        roles += '<li><input type="checkbox" name="Roles" class="roles" value="' + allroles[index].id + '" /><label>' + (allroles[index].name == null ?allroles[index].email:allroles[index].name) + '</label></li>';
                     });
 
                     $('#roles_ul').append(roles);
