@@ -469,7 +469,7 @@ class ApiController extends Controller {
                             // If user is available then disable it
                             $user->setStatus($user->getBeforeDisableStatus())->setUpdateDatetime(new \DateTime());
                             $em->flush();
-                            return $this->_handleSuccessfulRequest();
+                            return $this->_handleSuccessfulRequest(array("status" => $user->getStatus()));
                         }
                     }
                 }else{
