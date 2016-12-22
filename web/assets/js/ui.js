@@ -432,7 +432,7 @@ $.extend(User.prototype, {
                     filter: true
                 }
             }
-            console.log(obj);
+            //console.log(obj);
             var _obj = JSON.stringify(obj);
             that.getUserList(_obj);
 
@@ -457,7 +457,7 @@ $.extend(User.prototype, {
                     filter: true
                 }
             }
-            console.log(obj);
+            //console.log(obj);
             var _obj = JSON.stringify(obj);
             that.getUserList(_obj);
         });
