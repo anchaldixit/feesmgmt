@@ -81,3 +81,8 @@
         {% endif %}
     </div>
 {% endblock %}
+{% block inlinejs %}
+    {{parent()}}
+    <script> var emailVerifyId = '{{emailVerifyId}}'</script>
+{% endblock %}
+    
