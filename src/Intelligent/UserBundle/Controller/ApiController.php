@@ -398,8 +398,8 @@ class ApiController extends Controller {
         if(isset($body->verification_id) && isset($body->name) && isset($body->password)){
             $em = $this->getDoctrine()->getManager();
             $new_user = $em->getRepository("IntelligentUserBundle:User")->findOneBy(array("verificationId" => $body->verification_id));
-            $status = $new_user->getStatus();
-            if($status == User::UNVERIFIED){
+            
+            if($new_user instanceof User && $new_user->getStatus() == User::UNVERIFIED){
                 $new_user->setName($body->name);
                 $new_user->setStatus(User::REGISTERED);
                 $new_user->setPassword($body->password);
