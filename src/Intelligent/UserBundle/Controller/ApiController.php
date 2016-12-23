@@ -674,7 +674,7 @@ class ApiController extends Controller {
             $body = $json->body;
             if(isset($body->role_id)){
                 $em = $this->getDoctrine()->getManager();
-                $role = $em->getRepository("IntelligentUserBundle:Role")->find($json->role_id);
+                $role = $em->getRepository("IntelligentUserBundle:Role")->find($body->role_id);
                 if($role){
                     if($role->getStatus() == Role::ACTIVE){
                         throw new \Exception("Role is already enabled");
