@@ -20,6 +20,9 @@
                                 {{error}}
                             </li>
                         {% endif %}
+                        {% if app.request.get('new_registration') == 1 %}
+                            <li style="color:green">You are successfully registered. Please login here.</li>
+                        {% endif %}
                         <li>
                             <input type="text" placeholder="username or email" name="_username" value="{{last_username}}" />
                         </li>
