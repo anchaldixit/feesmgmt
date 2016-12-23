@@ -20,7 +20,7 @@ security:
             security: false
         not_secured:
             pattern: ^/(resetPassword|api/v1/general|login|inviteUser)$
-            anonymous: ~
+            security: false
         secured_area:
             pattern: ^/
             access_denied_url: /noaccess
@@ -32,6 +32,11 @@ security:
             logout:
                 path: /logout
                 target: /login
+                
+    access_control:
+        - { path: ^/users$ , roles: ROLE_USER_ADMIN }
+        - { path: ^/roles$ , roles: ROLE_USER_ADMIN }
+        - { path: ^/ , roles: ROLE_USER }
             
     encoders:
         Symfony\Component\Security\Core\User\User: plaintext
