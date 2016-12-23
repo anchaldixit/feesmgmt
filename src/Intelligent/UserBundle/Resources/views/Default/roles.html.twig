@@ -11,6 +11,11 @@
         
     </div>
 {% endblock %}
+{% block custom_feature %}
+    <div class="custom-feature">
+        <a href="#" class="add-popup" data-modal-id="#addRole"><i class="fa fa-plus"></i>New Roles</a>
+    </div>
+{% endblock %}
 {% block body %}
     <div class="user-filter">
         
@@ -42,4 +47,41 @@
             </tbody>
         </table>
     </div>
+    
+    <div class="popup-wrapper" id="addRole" style="display:none;">
+            <div class="popup">
+                <div class="create-roles-outer">
+                    <div class="popup-header">
+                        <h4>Create a New Role </h4>
+                        <a class="close-popup" href="#"><i class="fa fa-times red"></i></a>
+                    </div>
+                    <div class="popup-body">
+                        <div class="create-roles">
+                            <ul>
+                                <li>
+                                    <label>Role Name</label>
+                                    <div class="field-wrap">
+                                        <input type="text">
+                                    </div>
+                                </li>
+                                <li>
+                                    <label>Description</label>
+                                    <div class="field-wrap">
+                                        <textarea cols="50" rows="4"></textarea>
+                                    </div>
+                                </li>
+                                <li>
+
+                                    <div class="field-wrap">
+                                        <input type="submit" name="create_role" value="OK" />
+                                        <input type="button" name="cancel" class="close-popup" value="Cancel" />
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
 {% endblock %}
+
