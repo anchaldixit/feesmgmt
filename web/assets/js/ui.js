@@ -215,7 +215,6 @@ $.extend(User.prototype, {
                 
                 error = 'Name Field can be empty';
                 errDiv = $('#full_name_text').next('.validation_msg');
-                console.log(errDiv);
                 errDiv.html(error);
             }
             else if(passw == ''){
@@ -448,7 +447,7 @@ $.extend(User.prototype, {
                     filter: true
                 }
             }
-            //console.log(obj);
+            
             var _obj = JSON.stringify(obj);
             that.getUserList(_obj);
 
@@ -473,7 +472,7 @@ $.extend(User.prototype, {
                     filter: true
                 }
             }
-            //console.log(obj);
+            
             var _obj = JSON.stringify(obj);
             that.getUserList(_obj);
         });
@@ -561,7 +560,7 @@ $.extend(User.prototype, {
 
             if (_data.length > 0) {
                 $.each(_data, function (index) {
-                    //console.log(_data[index]);
+                    
                     var userrole = _data[index].role.id;
                     var selectbox = '';
                     selectbox += '<select class="change_role" data-user-id="' + _data[index].id + '">';
@@ -781,7 +780,7 @@ $.extend(Role.prototype,{
             var html = '';
             var currentUserRoleId = data.body.loggedin_user_role_id;
             var _data = data.body.data;
-            console.log(_data);
+            
             if(_data.length){
                 $.each(_data,function(index){
                     var access = user.getPermissionAccess(_data[index].app_permissions);
@@ -855,14 +854,20 @@ $.extend(Role.prototype,{
                         role_id:roleId
                     }
                 }
-                console.log(obj);
+                
             var _obj = JSON.stringify(obj);
             user.getAjaxData(ajaxLink,_obj,function(data){
                 td.addClass('enable_role').removeClass('disable_role');
                 td.html('<i class="fa fa-check green"></i>');
                 var tr = td.closest('tr');
                 tr.css('background-color','#ffc0cc');
+                var ajax_msg = '1 Role Disabled';
+                $('.info-notice').html(ajax_msg);
                 $('#loader').hide();
+                $('.notify').addClass('n-animation');
+                setTimeout(function(){
+                $('.notify').removeClass('n-animation');
+                },2000);
             });
             
             return false;
@@ -889,7 +894,13 @@ $.extend(Role.prototype,{
                 td.html('<i class="fa fa-times red"></i>');
                 var tr = td.closest('tr');
                 tr.css('background-color','');
+                var ajax_msg = '1 Role Enabled';
+                $('.info-notice').html(ajax_msg);
                 $('#loader').hide();
+                $('.notify').addClass('n-animation');
+                setTimeout(function(){
+                $('.notify').removeClass('n-animation');
+                },2000);
             });
             return false;
         });
