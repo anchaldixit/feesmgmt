@@ -11,7 +11,6 @@ use Intelligent\UserBundle\Entity\RoleGlobalPermission;
 use Intelligent\UserBundle\Entity\RoleModulePermission;
 use Intelligent\UserBundle\Entity\RoleModuleFieldPermission;
 use Symfony\Component\Security\Core\Util\StringUtils;
-use Intelligent\SettingBundle\Lib\Settings;
 
 class ApiController extends Controller {
     private static $DEBUG = true;
@@ -632,12 +631,15 @@ class ApiController extends Controller {
      * @throws \Exception
      */
     private function disableRole(Request $request, $json){
+        /**
+         * @var Intelligent\UserBundle\Services\UserPermissions
+         */
         $user_permissions = $this->get('user_permissions');
         if($user_permissions->getManageUserAndShareAppPermission()){
             $body = $json->body;
             if(isset($body->role_id)){
                 $em = $this->getDoctrine()->getManager();
-                $role = $em->getRepository("IntelligentUserBundle:Role")->find($json->role_id);
+                $role = $em->getRepository("IntelligentUserBundle:Role")->find($body->role_id);
                 if($role){
                     if($role->getStatus() == Role::DEACTIVE){
                         throw new \Exception("Role is already disabled");
@@ -708,8 +710,7 @@ class ApiController extends Controller {
                 $em = $this->getDoctrine()->getManager();
                 $role = $em->getRepository("IntelligentUserBundle:Role")->find($body->role_id);
                 if($role){
-                    $module_settings = new Settings($em->getConnection());
-                    $modules = $module_settings->getModule();
+                    $modules = $user_permissions->getSetting()->getModule();
                     $module_permissions = array();
                     foreach($modules as $module_id => $module_name){
                         $module_permission_obj = $role->getSingleModulePermission($module_id);
@@ -728,7 +729,7 @@ class ApiController extends Controller {
                         if(!is_null($module_permission_obj) && $module_permission_obj->getFieldPermission() == RoleModulePermission::ACTIVE){
                             // Get fields permissions
                             $field_permissions = array();
-                            $module_fields = $module_settings->fetch(array("module" => $module_id));
+                            $module_fields = $user_permissions->getSetting()->fetch(array("module" => $module_id));
                             foreach($module_fields as $module_field){
                                 if(is_null($module_permission_obj)){
                                     $field_permission_obj = null;
@@ -852,7 +853,7 @@ class ApiController extends Controller {
                 $role = $em->getRepository("IntelligentUserBundle:Role")->find($body->role_id);
                 if($role){
                     # Check if the module exists
-                    if($this->_isModuleExists($body->module_id)){
+                    if($user_permissions->isModuleExists($body->module_id)){
                         $already_existing_module_permission_object = $role->getSingleModulePermission($body->module_id);
                         if(is_null($already_existing_module_permission_object)){
                             # Add a new row
@@ -907,7 +908,7 @@ class ApiController extends Controller {
                 $role = $em->getRepository("IntelligentUserBundle:Role")->find($body->role_id);
                 if($role){
                     # Check if the module exists
-                    if($this->_isModuleExists($body->module_id)){
+                    if($user_permissions->isModuleExists($body->module_id)){
                         $already_existing_module_permission_object = $role->getSingleModulePermission($body->module_id);
                         if(is_null($already_existing_module_permission_object)){
                             # Add a new row
@@ -962,7 +963,7 @@ class ApiController extends Controller {
                 $role = $em->getRepository("IntelligentUserBundle:Role")->find($body->role_id);
                 if($role){
                     # Check if the module exists
-                    if($this->_isModuleExists($body->module_id)){
+                    if($user_permissions->isModuleExists($body->module_id)){
                         $already_existing_module_permission_object = $role->getSingleModulePermission($body->module_id);
                         if(is_null($already_existing_module_permission_object)){
                             # Add a new row
@@ -1017,7 +1018,7 @@ class ApiController extends Controller {
                 $role = $em->getRepository("IntelligentUserBundle:Role")->find($body->role_id);
                 if($role){
                     # Check if the module exists
-                    if($this->_isModuleExists($body->module_id)){
+                    if($user_permissions->isModuleExists($body->module_id)){
                         $already_existing_module_permission_object = $role->getSingleModulePermission($body->module_id);
                         if(is_null($already_existing_module_permission_object)){
                             # Add a new row
@@ -1072,7 +1073,7 @@ class ApiController extends Controller {
                 $role = $em->getRepository("IntelligentUserBundle:Role")->find($body->role_id);
                 if($role){
                     # Check if the module exists
-                    if($this->_isModuleExists($body->module_id)){
+                    if($user_permissions->isModuleExists($body->module_id)){
                         $already_existing_module_permission_object = $role->getSingleModulePermission($body->module_id);
                         if(is_null($already_existing_module_permission_object)){
                             # Add a new row
@@ -1097,7 +1098,7 @@ class ApiController extends Controller {
                         }else if($body->value instanceof \stdClass){
                             $value = $body->value;
                             if(isset($value->field_id) && isset($value->permission)){
-                                if($this->_isModuleFieldExists($body->module_id,$value->field_id)){
+                                if($user_permissions->isfieldExists($body->module_id,$value->field_id)){
                                     $field_permission_obj = $module_permission_obj->getSingleFieldPermissions($value->field_id);
                                     if(is_null($field_permission_obj)){
                                         $field_permission_obj = new RoleModuleFieldPermission();
@@ -1324,40 +1325,6 @@ class ApiController extends Controller {
         if($orderType  !== 'asc' && $orderType !== 'desc'){
             throw new \Exception("body.order_type value($orderType) is invalid",412);
         }
-    }
-    
-    /**
-     * This function checks if a mudule exists
-     * 
-     * @param type $moduleId
-     * @return bool
-     */
-    private function _isModuleExists($moduleId){
-        $em = $this->getDoctrine()->getManager();
-        $settings = new Settings($em->getConnection());
-        $modules = $settings->getModule();
-        $module_ids_arr = array_keys($modules);
-        return in_array($moduleId,$module_ids_arr);
-    }
-    
-    /**
-     * This function let you know if a field exists in
-     * a module or not.
-     * 
-     * @param type $moduleId
-     * @param type $fieldId
-     * @return boolean
-     */
-    private function _isModuleFieldExists($moduleId,$fieldId){
-        $em = $this->getDoctrine()->getManager();
-        $settings = new Settings($em->getConnection());
-        $fields = $settings->fetch(array("module" => $moduleId));
-        foreach($fields as $field){
-            if($field['module_field_name'] == $fieldId){
-                return true;
-            }
-        }
-        return false;
     }
     
     /**
