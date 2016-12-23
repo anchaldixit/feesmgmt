@@ -395,7 +395,7 @@ class ApiController extends Controller {
      */
     private function registerUser(Request $request, $json){
         $body = $json->body;
-        if($isset($body->verification_id) && $isset($body->name) && $isset($body->password)){
+        if(isset($body->verification_id) && isset($body->name) && isset($body->password)){
             $em = $this->getDoctrine()->getManager();
             $new_user = $em->getRepository("IntelligentUserBundle:User")->findOneBy(array("verificationId" => $body->verification_id));
             $status = $new_user->getStatus();
