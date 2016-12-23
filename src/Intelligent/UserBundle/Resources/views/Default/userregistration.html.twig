@@ -16,9 +16,9 @@
 {% block body %}
     <div class="my-preferences-outer" style="min-height: 560px;">
         {% if status == false %}
-            This link is not valid
+            <div class="access-msg"><p>This link is not valid</p></div>
         {% elseif status == 1 or status == 6%}
-            You are already registered. <a href='{{path('login')}}'>Click here</a> to login
+            <div class="access-msg"><p>You are already registered. <a href='{{path('login')}}'>Click here</a> to login</p></div>
         {% elseif status == 2 or status == 3 %}
         <div class="my-preferences">
             <div class="pref-header">
@@ -28,7 +28,7 @@
                     <h4>Register here</h4>
                 {% endif %}
             </div>
-            <div class="my-pref-body" id="mypreferences">
+            <div class="my-pref-body" id="registration">
                 <ul>
                     <li>
                         <label>Name</label>
@@ -48,12 +48,14 @@
                         <label>Password</label>
                         <div class="field-wrap">
                             <input type="password" name="password"  id="password" value="" />
+                            <span class="validation_msg"></span>
                         </div>
                     </li>
                     <li>
                         <label>Retype Password</label>
                         <div class="field-wrap">
                             <input type="password" name="re_password"  id="re_password" value="" />
+                            <span class="validation_msg"></span>
                         </div>
                     </li>
                     
@@ -76,7 +78,7 @@
             </div>
         </div>
         {% elseif status == 4 or status == 5 %}
-            You account is deactivated. Please contact admin
+            <div class="access-msg"><p>You account is deactivated. Please contact admin</p></div>
         {% endif %}
     </div>
 {% endblock %}
