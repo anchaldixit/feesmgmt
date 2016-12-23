@@ -12,10 +12,6 @@ logout:
 login_check:
     path: /login_check
     
-register:
-    path: /registration
-    defaults: { _controller: IntelligentUserBundle:Default:register }
-    
 reset_password:
     path: /resetPassword/{resetPasswordId}
     defaults: { _controller: IntelligentUserBundle:Default:resetPassword }
