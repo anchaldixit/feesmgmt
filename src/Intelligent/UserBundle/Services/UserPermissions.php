@@ -6,6 +6,7 @@ use Intelligent\UserBundle\Entity\Role;
 use Intelligent\UserBundle\Entity\RoleGlobalPermission;
 use Intelligent\UserBundle\Entity\RoleModulePermission;
 use Doctrine\Common\Collections\ArrayCollection;
+use Intelligent\SettingBundle\Lib\Settings;
 
 /**
  * This service will give information about the user settings
@@ -15,15 +16,15 @@ use Doctrine\Common\Collections\ArrayCollection;
 class UserPermissions {
     
     private $user;
-    private $doctrine;
+    private $settings;
     private $globalPermission;
     private $modulePermissions;
     
-    public function __construct(TokenStorage $tokenStorage, Registry $doctrine) {
+    public function __construct(TokenStorage $tokenStorage, Settings $settings) {
         // Recieve other services
         
-        $this->doctrine = $doctrine;
         $this->user = $tokenStorage->getToken()->getUser();
+        $this->settings = $settings;
         //$role = null;
         $role = $this->user->getRole();
         
@@ -132,6 +133,46 @@ class UserPermissions {
         $modulePermission = $this->_getModulePermissions($module);
         if($modulePermission instanceof RoleModulePermission){
             return $modulePermission->getDeletePermission();
+        }else{
+            return false;
+        }
+    }
+    
+    /**
+     * This function will return true if that module have custom 
+     * access enabled for individual fields
+     * 
+     * @param string $module Name of the module
+     * @return bool true if custom access is enabled. false if not
+     */
+    public function getCustomFieldPermission($module){
+        $modulePermission = $this->_getModulePermissions($module);
+        if($modulePermission instanceof RoleModulePermission){
+            return $modulePermission->getFieldPermission();
+        }else{
+            return false;
+        }
+    }
+    
+    /**
+     * This function will return the permissions user have for
+     * individual fields in the module row
+     * 
+     * @param string $module Name of the module
+     * @param string $field  Name of the field
+     * @return mixed false => if the module or field do not exists,
+     *               1 => if only view access is enabled
+     *               2 => if view and edit both permissions are enabled
+     */
+    public function getFieldPermissionFor($module,$field){
+        $modulePermission = $this->_getModulePermissions($module);
+        if($modulePermission instanceof RoleModulePermission){
+            $field_permission = $modulePermission->getSingleFieldPermissions($field);
+            if(is_null($field_permission)){
+                return false;
+            }else{
+                return $field_permission->getPermission();
+            }
         }else{
             return false;
         }

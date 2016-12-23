@@ -3,9 +3,12 @@ services:
 #        class: Intelligent\UserBundle\Example
 #        arguments: ["@service_id", "plain_value", "%parameter%"]
     
+    module_settings:
+        class: Intelligent\SettingBundle\Lib\Settings
+        arguments: ["@database_connection"]
     user_permissions:
         class: Intelligent\UserBundle\Services\UserPermissions
-        arguments: ["@security.token_storage","@doctrine"]
+        arguments: ["@security.token_storage","@doctrine","@module_settings"]
     entry_point.user_login:
         class: Intelligent\UserBundle\Services\LoginEntryPoint
         arguments: ["@router"]

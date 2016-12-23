@@ -565,7 +565,10 @@ class ApiController extends Controller {
                         "is_active" => $role->getStatus()
                     );
                 }
-                return $this->_handleSuccessfulRequest(array('data' => $roles_result));
+                return $this->_handleSuccessfulRequest(array(
+                    'data' => $roles_result, 
+                    'loggedin_user_role_id' => $this->getUser()->getRole()->getId()
+                ));
             }
         }else{
             $this->_throwNoPermissionException();
