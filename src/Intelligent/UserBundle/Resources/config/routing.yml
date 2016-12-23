@@ -12,6 +12,10 @@ logout:
 login_check:
     path: /login_check
     
+register:
+    path: /registration
+    defaults: { _controller: IntelligentUserBundle:Default:register }
+    
 reset_password:
     path: /resetPassword/{resetPasswordId}
     defaults: { _controller: IntelligentUserBundle:Default:resetPassword }
@@ -38,6 +42,10 @@ intelligent_invite_user:
 intelligent_roles:
     path: /roles
     defaults: { _controller: IntelligentUserBundle:Default:roles }
+    
+intelligent_noaccess:
+    path: /noaccess
+    defaults: { _controller: IntelligentUserBundle:Default:noaccess }
 
 intelligent_my_preferences:
     path: /myPreferences

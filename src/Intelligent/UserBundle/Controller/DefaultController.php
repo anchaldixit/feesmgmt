@@ -37,7 +37,9 @@ class DefaultController extends Controller {
             'error' => $error,
         ));
     }
-    
+    public function registerAction(Request $request){
+        return $this->render('IntelligentUserBundle:Default:userregistration.html.twig', array());
+    }
     public function inviteUserAction($emailVerifyId){
         /**
          * @TODO create this page
@@ -67,6 +69,10 @@ class DefaultController extends Controller {
     public function mypreferencesAction(Request $request){
         
         return $this->render('IntelligentUserBundle:Default:mypreferences.html.twig', array());
+    }
+    public function noaccessAction(Request $request){
+        
+        return $this->render('IntelligentUserBundle:Default:noaccess.html.twig', array());
     }
 
 }
