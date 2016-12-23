@@ -18,14 +18,8 @@ security:
         dev:
             pattern: ^/(_(profiler|wdt)|css|images|js)/
             security: false
-        reset_password_firewall:
-            pattern: ^/resetPassword
-            anonymous: ~
-        api_general_firewall:
-            pattern: ^/api/v1/general$
-            anonymous: ~
-        login_firewall:
-            pattern: ^/login$
+        not_secured:
+            pattern: ^/(resetPassword|api/v1/general|login|inviteUser)$
             anonymous: ~
         secured_area:
             pattern: ^/

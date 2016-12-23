@@ -6,6 +6,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\SecurityContextInterface;
+use Intelligent\UserBundle\Entity\User;
 
 class DefaultController extends Controller {
 
@@ -41,11 +42,28 @@ class DefaultController extends Controller {
         return $this->render('IntelligentUserBundle:Default:userregistration.html.twig', array());
     }
     public function inviteUserAction($emailVerifyId){
+        $email = $status = $role = '';
         /**
          * @TODO create this page
          */
-        return $this->render('IntelligentUserBundle:Default:inviteUser.html.twig', array(
-            'emailVerifyId' => $emailVerifyId
+        $em = $this->getDoctrine()->getManager();
+        $user = $em->getRepository("IntelligentUserBundle:User")->findOneBy(array("verificationId" => $emailVerifyId));
+        if($user){
+            $status = $user->getStatus();
+            if($user->getStatus() == User::UNVERIFIED){
+                $user->setStatus(User::UNREGISTERED);
+                $em->flush();
+            }
+            $email = $user->getEmail();
+            $role  = $user->getRole()->getName();
+        }else{
+            $status = false;
+        }
+        return $this->render('IntelligentUserBundle:Default:userregistration.html.twig', $param = array(
+            'emailVerifyId' => $emailVerifyId,
+            'status' => $status,
+            "email"  => $email,
+            "role"   => $role
         ));
     }
     
