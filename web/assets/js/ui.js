@@ -4,14 +4,16 @@
  * and open the template in the editor.
  */
 
-function User() {}
+function User() {
+}
 
-function Role(){}
+function Role() {
+}
 
 $.extend(User, {
     ajaxLink: window.location.origin + '/api/v1/general',
     ajaxLink2: window.location.origin + '/api/v1',
-    roles: ['Registered','Unregistered','Unverified','Deactivated','Denied','Password Reset'],
+    roles: ['Registered', 'Unregistered', 'Unverified', 'Deactivated', 'Denied', 'Password Reset'],
     role: new Role()
 });
 
@@ -29,13 +31,13 @@ $.extend(User.prototype, {
         if ($('#change_password').length) {
             that.changePassword();
         }
-        if($('#registration').length){
+        if ($('#registration').length) {
             that.registration();
         }
         if ($('#userList').length) {
             that.createUserPage();
         }
-        
+
     },
     bindForgetPasswordAction: function () {
         var that = this;
@@ -198,62 +200,62 @@ $.extend(User.prototype, {
 
         });
     },
-    registration: function(){
+    registration: function () {
         var that = this;
         var error = '';
         var name = '';
         var passw = '';
         var errDiv = '';
         var re_passw = '';
-        
-        $('#user_register').click(function(){
+
+        $('#user_register').click(function () {
             $('.validation_msg').html('');
             name = $('#full_name_text').val();
             passw = $('#password').val();
             re_passw = $('#re_password').val();
-            if(name == ''){
-                
+            if (name == '') {
+
                 error = 'Name Field can be empty';
                 errDiv = $('#full_name_text').next('.validation_msg');
                 errDiv.html(error);
             }
-            else if(passw == ''){
+            else if (passw == '') {
                 error = 'Password Field can be empty';
                 errDiv = $('#password').next('.validation_msg');
                 errDiv.html(error);
             }
-            else if(re_passw == ''){
+            else if (re_passw == '') {
                 error = 'Retype Password Field can be empty';
                 errDiv = $('#re_password').next('.validation_msg');
                 errDiv.html(error);
             }
-            else if(passw != re_passw){
+            else if (passw != re_passw) {
                 error = 'Retype Password is not matching';
                 errDiv = $('#re_password').next('.validation_msg');
                 errDiv.html(error);
             }
-            else{
-            var obj = {
-                    head:{
-                        action:"registerUser"
+            else {
+                var obj = {
+                    head: {
+                        action: "registerUser"
                     },
-                    body:{
-                        verification_id:emailVerifyId,
+                    body: {
+                        verification_id: emailVerifyId,
                         name: name,
-                        password:passw
+                        password: passw
                     }
                 }
-            var _obj = JSON.stringify(obj);
-            that.getAjaxData(User.ajaxLink2,_obj,function(){
-                window.location.href = 'http://'+window.location.hostname+'/login?new_registration=1';
-            });
-                
+                var _obj = JSON.stringify(obj);
+                that.getAjaxData(User.ajaxLink2, _obj, function () {
+                    window.location.href = 'http://' + window.location.hostname + '/login?new_registration=1';
+                });
+
             }
-            
+
         });
-        
-        
-            
+
+
+
     },
     createUserPage: function () {
         var that = this;
@@ -283,7 +285,6 @@ $.extend(User.prototype, {
         that.sortTable();
 
     },
-    
     disableUser: function () {
         var that = this;
         var ajaxLink = User.ajaxLink2;
@@ -342,8 +343,8 @@ $.extend(User.prototype, {
                 var ajax_msg = '1 user activated';
                 $('.info-notice').html(ajax_msg);
                 var tr = td.closest('tr');
-                tr.find('.status').text(User.roles[_data.body.status-1]);
-                
+                tr.find('.status').text(User.roles[_data.body.status - 1]);
+
                 tr.css('background-color', '');
                 td.removeClass('activate_user');
                 td.addClass('disable_user');
@@ -368,28 +369,28 @@ $.extend(User.prototype, {
         $('#userList').on('change', '.change_role', function () {
             var user_id = $(this).attr('data-user-id');
             var new_rol = $(this).val();
-            
-            var obj = {
-                    head: {
-                        action: "changeRole"
-                    },
-                    body: {
-                        user_id: user_id,
-                        new_role_id: new_rol
-                    }
-                }
-                var _obj = JSON.stringify(obj);
 
-                that.getAjaxData(ajaxLink, _obj, function (_data) {
+            var obj = {
+                head: {
+                    action: "changeRole"
+                },
+                body: {
+                    user_id: user_id,
+                    new_role_id: new_rol
+                }
+            }
+            var _obj = JSON.stringify(obj);
+
+            that.getAjaxData(ajaxLink, _obj, function (_data) {
                 var ajax_msg = '1 Role Changed';
                 $('.info-notice').html(ajax_msg);
 
                 $('#loader').hide();
                 $('.notify').addClass('n-animation');
-                setTimeout(function(){
-                $('.notify').removeClass('n-animation');
-                },2000);
-                });
+                setTimeout(function () {
+                    $('.notify').removeClass('n-animation');
+                }, 2000);
+            });
             return false;
         });
 
@@ -424,7 +425,6 @@ $.extend(User.prototype, {
         }, 500);
 
     },
-    
     addFilter: function () {
         var that = this;
         $('#roles_ul').on('change', '.roles', function () {
@@ -447,7 +447,7 @@ $.extend(User.prototype, {
                     filter: true
                 }
             }
-            
+
             var _obj = JSON.stringify(obj);
             that.getUserList(_obj);
 
@@ -472,24 +472,24 @@ $.extend(User.prototype, {
                     filter: true
                 }
             }
-            
+
             var _obj = JSON.stringify(obj);
             that.getUserList(_obj);
         });
     },
-    sortTable: function(){
+    sortTable: function () {
         var that = this;
-        $('.sort_table').click(function(){
+        $('.sort_table').click(function () {
             var order_by = $(this).attr('data-order-by');
             var order_type = $(this).attr('data-order-type');
-            
+
             $('#userList .sort_table').find('.fa').removeClass('fa-caret-up').addClass('fa-caret-down');
             $(this).find('.fa').removeClass('fa-caret-down').addClass('fa-caret-up');
-            $('#userList .sort_table').attr('data-order-type','asc');
-            $(this).attr('data-order-type','desc');
+            $('#userList .sort_table').attr('data-order-type', 'asc');
+            $(this).attr('data-order-type', 'desc');
             $('#userList .sort_table').removeClass('active_sort');
             $(this).addClass('active_sort');
-            
+
             var checkedroles = that.getSelectedRoles();
             var checkedStatus = that.getSelectedStatus();
             var searchText = $.trim($('#search_user').val());
@@ -513,15 +513,15 @@ $.extend(User.prototype, {
             that.getUserList(_obj);
         });
     },
-    getSortingOrder: function(){
+    getSortingOrder: function () {
         var sortby = [];
-        if($('#userList .active_sort').length){
+        if ($('#userList .active_sort').length) {
             var oderby = $('#userList .active_sort').attr('data-order-by');
             var ordertype = $('#userList .active_sort').attr('data-order-type');
             sortby.push(oderby);
             sortby.push(ordertype);
         }
-        else{
+        else {
             sortby.push("name");
             sortby.push("asc");
         }
@@ -560,7 +560,7 @@ $.extend(User.prototype, {
 
             if (_data.length > 0) {
                 $.each(_data, function (index) {
-                    
+
                     var userrole = _data[index].role.id;
                     var selectbox = '';
                     selectbox += '<select class="change_role" data-user-id="' + _data[index].id + '">';
@@ -588,7 +588,7 @@ $.extend(User.prototype, {
                     }
                     html += '</tr>';
                 });
-                
+
                 $('.curr-result, .total-result').text(_data.length);
             }
             else {
@@ -597,7 +597,7 @@ $.extend(User.prototype, {
                 html += '</tr>';
                 $('.curr-result, .total-result').text('0');
             }
-            
+
             $('#userList tbody').html('');
             $('#userList tbody').html(html);
             $('#userList').show();
@@ -606,14 +606,13 @@ $.extend(User.prototype, {
 
         });
     },
-    
     getSelectedRoles: function () {
         var that = this;
         that.checkedRoles = [];
         $('#roles_ul :checked').each(function () {
             that.checkedRoles.push($(this).val());
         });
-        
+
         return that.checkedRoles;
     },
     getSelectedStatus: function () {
@@ -622,16 +621,16 @@ $.extend(User.prototype, {
         $('#status_ul :checked').each(function () {
             that.checkedStatus.push($(this).val());
         });
-        
+
         return that.checkedStatus;
     },
-    getSearchPlugin : function (){
+    getSearchPlugin: function () {
         ;
         (function ($) {
 
             $.fn.extend({
                 donetyping: function (callback, timeout) {
-                    timeout = timeout || 1e3; 
+                    timeout = timeout || 1e3;
                     var timeoutReference,
                             doneTyping = function (el) {
                                 if (!timeoutReference)
@@ -657,18 +656,18 @@ $.extend(User.prototype, {
             });
         })(jQuery);
     },
-    getPermissionAccess: function(_access){
+    getPermissionAccess: function (_access) {
         var _permission = '';
-        if(_access.app == true && _access.user == true){
+        if (_access.app == true && _access.user == true) {
             _permission = 'App, User';
         }
-        else if(_access.app == false && _access.user == true){
+        else if (_access.app == false && _access.user == true) {
             _permission = 'User';
         }
-        else if(_access.app == true && _access.user == false){
+        else if (_access.app == true && _access.user == false) {
             _permission = 'App';
         }
-        else{
+        else {
             _permission = 'Basic';
         }
         return _permission;
@@ -744,25 +743,25 @@ $.extend(User.prototype, {
     }
 });
 
-$.extend(Role,{
-user: new User()    
+$.extend(Role, {
+    user: new User()
 });
 
-$.extend(Role.prototype,{
-    init: function(){
+$.extend(Role.prototype, {
+    init: function () {
         var that = this;
         if ($('#roleList').length) {
             that.createRolePage();
         }
     },
-   createRolePage: function(){
+    createRolePage: function () {
         var that = this;
         var obj = {
-            head:{
-                action:"getRoles"
+            head: {
+                action: "getRoles"
             },
-            body:{
-                where:{
+            body: {
+                where: {
                     name: ""
                 }
             }
@@ -772,50 +771,52 @@ $.extend(Role.prototype,{
         that.disableRole();
         that.enableRole();
         that.searchRoles();
-    }, 
-    getRolesList: function (_obj){
+        that.openPopup('.add-popup');
+        that.closePopup();
+    },
+    getRolesList: function (_obj) {
         var that = this;
         var ajaxLink = User.ajaxLink2;
-        user.getAjaxData(ajaxLink,_obj,function(data){
+        user.getAjaxData(ajaxLink, _obj, function (data) {
             var html = '';
             var currentUserRoleId = data.body.loggedin_user_role_id;
             var _data = data.body.data;
-            
-            if(_data.length){
-                $.each(_data,function(index){
+
+            if (_data.length) {
+                $.each(_data, function (index) {
                     var access = user.getPermissionAccess(_data[index].app_permissions);
-                    if(_data[index].is_active){
+                    if (_data[index].is_active) {
                         html += '<tr>';
                     }
-                    else{
+                    else {
                         html += '<tr style="background-color:#ffc0cc">';
                     }
-                    html += '<td><a href="#">'+ _data[index].name +'</a>'+ (_data[index].id == currentUserRoleId ? '<i class="fa fa-check"></i>':'') +'</td>';
-                    html += '<td>'+access+'</td>';
+                    html += '<td><a href="#">' + _data[index].name + '</a>' + (_data[index].id == currentUserRoleId ? '<i class="fa fa-check"></i>' : '') + '</td>';
+                    html += '<td>' + access + '</td>';
                     html += '<td>-</td>';
-                    if(_data[index].is_active){
-                        html += '<td>'+(_data[index].id != currentUserRoleId ? '<a class="disable_role" href="#" data-role-id="'+_data[index].id+'"><i class="fa fa-times red"></i></a>':'')+'</td>';
+                    if (_data[index].is_active) {
+                        html += '<td>' + (_data[index].id != currentUserRoleId ? '<a class="disable_role" href="#" data-role-id="' + _data[index].id + '"><i class="fa fa-times red"></i></a>' : '') + '</td>';
                     }
-                    else{
-                        html += '<td>'+(_data[index].id != currentUserRoleId ? '<a class="enable_role" href="#" data-role-id="'+_data[index].id+'"><i class="fa fa-check green"></i></a>':'')+'</td>';
-                        
+                    else {
+                        html += '<td>' + (_data[index].id != currentUserRoleId ? '<a class="enable_role" href="#" data-role-id="' + _data[index].id + '"><i class="fa fa-check green"></i></a>' : '') + '</td>';
+
                     }
                     html += '</tr>';
                 });
-                
+
                 $('.curr-result, .total-result').text(_data.length);
             }
-            else{
-               html += '<tr>';
-               html += '<td colspan="4">No data found</td>';
-               html += '</tr>';
-               $('.curr-result, .total-result').text('0');
+            else {
+                html += '<tr>';
+                html += '<td colspan="4">No data found</td>';
+                html += '</tr>';
+                $('.curr-result, .total-result').text('0');
             }
             $('#roleList tbody').html('');
             $('#roleList tbody').html(html);
             $('#roleList').show();
             $('#loader').hide();
-            
+
         });
     },
     searchRoles: function () {
@@ -823,86 +824,100 @@ $.extend(Role.prototype,{
         user.getSearchPlugin();
 
         $('#search_role').donetyping(function () {
-            
+
             var searchText = $('#search_role').val();
             var obj = {
-            head:{
-                action:"getRoles"
-            },
-            body:{
-                where:{
-                    name: searchText
+                head: {
+                    action: "getRoles"
+                },
+                body: {
+                    where: {
+                        name: searchText
+                    }
                 }
             }
-        }
-        var _obj = JSON.stringify(obj);
-        that.getRolesList(_obj);
+            var _obj = JSON.stringify(obj);
+            that.getRolesList(_obj);
         }, 500);
 
     },
-    disableRole: function(){
-        $('#roleList').on('click','.disable_role',function(){
+    disableRole: function () {
+        $('#roleList').on('click', '.disable_role', function () {
             var that = this;
             var td = $(this);
             var ajaxLink = User.ajaxLink2;
             var roleId = $(this).attr('data-role-id');
             var obj = {
-                    head:{
-                        action:"disableRole"
-                    },
-                    body:{
-                        role_id:roleId
-                    }
+                head: {
+                    action: "disableRole"
+                },
+                body: {
+                    role_id: roleId
                 }
-                
+            }
+
             var _obj = JSON.stringify(obj);
-            user.getAjaxData(ajaxLink,_obj,function(data){
+            user.getAjaxData(ajaxLink, _obj, function (data) {
                 td.addClass('enable_role').removeClass('disable_role');
                 td.html('<i class="fa fa-check green"></i>');
                 var tr = td.closest('tr');
-                tr.css('background-color','#ffc0cc');
+                tr.css('background-color', '#ffc0cc');
                 var ajax_msg = '1 Role Disabled';
                 $('.info-notice').html(ajax_msg);
                 $('#loader').hide();
                 $('.notify').addClass('n-animation');
-                setTimeout(function(){
-                $('.notify').removeClass('n-animation');
-                },2000);
+                setTimeout(function () {
+                    $('.notify').removeClass('n-animation');
+                }, 2000);
             });
-            
+
             return false;
         });
     },
-    enableRole: function(){
-        $('#roleList').on('click','.enable_role',function(){
+    enableRole: function () {
+        $('#roleList').on('click', '.enable_role', function () {
             var that = this;
             var td = $(this);
             var ajaxLink = User.ajaxLink2;
             var roleId = $(this).attr('data-role-id');
             var obj = {
-                    head:{
-                        action:"enableRole"
-                    },
-                    body:{
-                        role_id:roleId
-                    }
+                head: {
+                    action: "enableRole"
+                },
+                body: {
+                    role_id: roleId
                 }
-                
+            }
+
             var _obj = JSON.stringify(obj);
-            user.getAjaxData(ajaxLink,_obj,function(data){
+            user.getAjaxData(ajaxLink, _obj, function (data) {
                 td.addClass('disable_role').removeClass('enable_role');
                 td.html('<i class="fa fa-times red"></i>');
                 var tr = td.closest('tr');
-                tr.css('background-color','');
+                tr.css('background-color', '');
                 var ajax_msg = '1 Role Enabled';
                 $('.info-notice').html(ajax_msg);
                 $('#loader').hide();
                 $('.notify').addClass('n-animation');
-                setTimeout(function(){
-                $('.notify').removeClass('n-animation');
-                },2000);
+                setTimeout(function () {
+                    $('.notify').removeClass('n-animation');
+                }, 2000);
             });
             return false;
+        });
+    },
+    openPopup: function (_Id) {
+        $(_Id).click(function(){
+            var modalId = $(this).attr('data-modal-id');
+            $(modalId).show();
+            return false;
+        });
+    },
+    closePopup: function () {
+        $('.close-popup').click(function(){
+          $('.popup-wrapper').hide();
+          return false;
+            
         });
     }
 });
