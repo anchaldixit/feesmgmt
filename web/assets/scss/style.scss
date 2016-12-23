@@ -207,6 +207,32 @@ body{font-family: helvetica; font-weight: 300;}
     border-top: 8px solid #0b6f4f;
 
 }
+
+.no-access{
+    width:600px;
+    margin: 150px auto;
+    min-height:350px;
+    h3{
+        color: #ff2d2d;
+        font-size: 35px;
+        margin-bottom:20px;
+        overflow:hidden;
+        .fa{
+            float:left;
+            font-size: 80px;
+        }
+        span{
+            display: inline-block;
+            margin-left: 20px;
+            line-height: 70px;
+        }
+    }
+    p{
+        font-weight: 400;
+        line-height: 20px;
+    }
+}
+
 .wrapper{width: 100%;}
 .white-bg{background-color: #f8f8f8; min-height: 690px;}
 .header{
