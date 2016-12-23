@@ -4,35 +4,15 @@
  * and open the template in the editor.
  */
 
-function Loader() {
+function User() {}
 
-}
-
-$.extend(Loader.prototype, {
-    init: function () {
-        win_height = $(window).height();
-
-
-    },
-    show: function () {
-        that = this;
-        $('.wrapper').css({height: '0px', overflow: 'hidden'});
-
-    },
-    hide: function () {
-        $('.wrapper').removeAttr('style');
-
-    }
-});
-
-function User() {
-
-}
+function Role(){}
 
 $.extend(User, {
     ajaxLink: window.location.origin + '/api/v1/general',
     ajaxLink2: window.location.origin + '/api/v1',
-    roles: ['Registered','Unregistered','Unverified','Deactivated','Denied','Password Reset']
+    roles: ['Registered','Unregistered','Unverified','Deactivated','Denied','Password Reset'],
+    role: new Role()
 });
 
 $.extend(User.prototype, {
@@ -42,15 +22,20 @@ $.extend(User.prototype, {
         that.flipForm();
         that.featureSlider();
         that.openMenu();
+        User.role.init();
         if ($('#mypreferences').length) {
             that.updatePreferences();
         }
         if ($('#change_password').length) {
             that.changePassword();
         }
+        if($('#registration').length){
+            that.registration();
+        }
         if ($('#userList').length) {
             that.createUserPage();
         }
+        
     },
     bindForgetPasswordAction: function () {
         var that = this;
@@ -107,11 +92,11 @@ $.extend(User.prototype, {
         };
         var _obj = JSON.stringify(obj);
         var ajaxLink = User.ajaxLink;
-        that.getAjaxData(ajaxLink, _obj, function (data) {
+        that.getAjaxData(ajaxLink, _obj, function (_data) {
 
             var msg = '';
             $('#loader').hide();
-            if (data.head.status === "success") {
+            if (_data.head.status === "success") {
                 $('#forget_password_textbox').val('');
                 msg = '<span class="msg">An activation link has been sent to your registered email</span>';
             }
@@ -140,11 +125,11 @@ $.extend(User.prototype, {
                 };
                 var _obj = JSON.stringify(obj);
                 var ajaxLink = User.ajaxLink2;
-                that.getAjaxData(ajaxLink, _obj, function (data) {
+                that.getAjaxData(ajaxLink, _obj, function (_data) {
 
                     var msg = '';
                     $('#loader').hide();
-                    if (data.head.status === "success") {
+                    if (_data.head.status === "success") {
                         msg = '<span class="msg">Your name has been successfully updated</span>';
                     }
                     $('.validation_msg').html('');
@@ -194,10 +179,10 @@ $.extend(User.prototype, {
                 };
                 var _obj = JSON.stringify(obj);
                 var ajaxLink = User.ajaxLink2;
-                that.getAjaxData(ajaxLink, _obj, function (data) {
+                that.getAjaxData(ajaxLink, _obj, function (_data) {
                     var msg = '';
                     $('#loader').hide();
-                    if (data.head.status === "success") {
+                    if (_data.head.status === "success") {
                         msg = '<span class="msg">Your password has been successfully updated</span>';
                     }
                     $('.validation_msg').html('');
@@ -212,6 +197,64 @@ $.extend(User.prototype, {
 
 
         });
+    },
+    registration: function(){
+        var that = this;
+        var error = '';
+        var name = '';
+        var passw = '';
+        var errDiv = '';
+        var re_passw = '';
+        
+        $('#user_register').click(function(){
+            $('.validation_msg').html('');
+            name = $('#full_name_text').val();
+            passw = $('#password').val();
+            re_passw = $('#re_password').val();
+            if(name == ''){
+                
+                error = 'Name Field can be empty';
+                errDiv = $('#full_name_text').next('.validation_msg');
+                console.log(errDiv);
+                errDiv.html(error);
+            }
+            else if(passw == ''){
+                error = 'Password Field can be empty';
+                errDiv = $('#password').next('.validation_msg');
+                errDiv.html(error);
+            }
+            else if(re_passw == ''){
+                error = 'Retype Password Field can be empty';
+                errDiv = $('#re_password').next('.validation_msg');
+                errDiv.html(error);
+            }
+            else if(passw != re_passw){
+                error = 'Retype Password is not matching';
+                errDiv = $('#re_password').next('.validation_msg');
+                errDiv.html(error);
+            }
+            else{
+            var obj = {
+                    head:{
+                        action:"registerUser"
+                    },
+                    body:{
+                        verification_id:emailVerifyId,
+                        name: name,
+                        password:passw
+                    }
+                }
+            var _obj = JSON.stringify(obj);
+            that.getAjaxData(User.ajaxLink2,_obj,function(){
+                window.location.href = 'http://'+window.location.hostname+'/login?new_registration=1';
+            });
+                
+            }
+            
+        });
+        
+        
+            
     },
     createUserPage: function () {
         var that = this;
@@ -241,6 +284,7 @@ $.extend(User.prototype, {
         that.sortTable();
 
     },
+    
     disableUser: function () {
         var that = this;
         var ajaxLink = User.ajaxLink2;
@@ -257,7 +301,7 @@ $.extend(User.prototype, {
             }
             var _obj = JSON.stringify(obj);
 
-            that.getAjaxData(ajaxLink, _obj, function (data) {
+            that.getAjaxData(ajaxLink, _obj, function (_data) {
                 var ajax_msg = '1 user disabled';
                 $('.info-notice').html(ajax_msg);
                 var tr = td.closest('tr');
@@ -295,11 +339,11 @@ $.extend(User.prototype, {
             }
             var _obj = JSON.stringify(obj);
 
-            that.getAjaxData(ajaxLink, _obj, function (data) {
+            that.getAjaxData(ajaxLink, _obj, function (_data) {
                 var ajax_msg = '1 user activated';
                 $('.info-notice').html(ajax_msg);
                 var tr = td.closest('tr');
-                tr.find('.status').text(User.roles[data.body.status-1]);
+                tr.find('.status').text(User.roles[_data.body.status-1]);
                 
                 tr.css('background-color', '');
                 td.removeClass('activate_user');
@@ -337,7 +381,7 @@ $.extend(User.prototype, {
                 }
                 var _obj = JSON.stringify(obj);
 
-                that.getAjaxData(ajaxLink, _obj, function (data) {
+                that.getAjaxData(ajaxLink, _obj, function (_data) {
                 var ajax_msg = '1 Role Changed';
                 $('.info-notice').html(ajax_msg);
 
@@ -354,36 +398,7 @@ $.extend(User.prototype, {
     },
     searchUser: function () {
         var that = this;
-        ;
-        (function ($) {
-
-            $.fn.extend({
-                donetyping: function (callback, timeout) {
-                    timeout = timeout || 1e3; // 1 second default timeout
-                    var timeoutReference,
-                            doneTyping = function (el) {
-                                if (!timeoutReference)
-                                    return;
-                                timeoutReference = null;
-                                callback.call(el);
-                            };
-                    return this.each(function (i, el) {
-                        var $el = $(el);
-                        $el.is(':input') && $el.on('keyup keypress paste', function (e) {
-                            if (e.type == 'keyup' && e.keyCode != 8)
-                                return;
-                            if (timeoutReference)
-                                clearTimeout(timeoutReference);
-                            timeoutReference = setTimeout(function () {
-                                doneTyping(el);
-                            }, timeout);
-                        }).on('blur', function () {
-                            doneTyping(el);
-                        });
-                    });
-                }
-            });
-        })(jQuery);
+        that.getSearchPlugin();
 
         $('#search_user').donetyping(function () {
             var sortoption = that.getSortingOrder();
@@ -405,11 +420,12 @@ $.extend(User.prototype, {
                     filter: true
                 }
             }
-            var _str = JSON.stringify(obj);
-            that.getUserList(_str);
+            var _obj = JSON.stringify(obj);
+            that.getUserList(_obj);
         }, 500);
 
     },
+    
     addFilter: function () {
         var that = this;
         $('#roles_ul').on('change', '.roles', function () {
@@ -520,7 +536,7 @@ $.extend(User.prototype, {
             var status = '';
             var status_ul = '';
             var roles = '';
-            var data = responseData.body.data;
+            var _data = responseData.body.data;
             var allstatus = responseData.body.filters.status;
             var allroles = responseData.body.filters.roles;
 
@@ -543,38 +559,38 @@ $.extend(User.prototype, {
                 }
             }
 
-            if (data.length > 0) {
-                $.each(data, function (index) {
-                    //console.log(data[index]);
-                    var userrole = data[index].role.id;
+            if (_data.length > 0) {
+                $.each(_data, function (index) {
+                    //console.log(_data[index]);
+                    var userrole = _data[index].role.id;
                     var selectbox = '';
-                    selectbox += '<select class="change_role" data-user-id="' + data[index].id + '">';
+                    selectbox += '<select class="change_role" data-user-id="' + _data[index].id + '">';
                     $.each(allroles, function (index) {
                         selectbox += '<option ' + (userrole == allroles[index].id ? 'selected' : '') + ' value = "' + allroles[index].id + '" ' + (allroles[index].status == 1 ? "" : 'disabled') + '>' + allroles[index].name + '</option>';
                     });
                     selectbox += '</select>';
 
 
-                    status = allstatus[data[index].status - 1].name;
-                    if (data[index].status == 4) {
+                    status = allstatus[_data[index].status - 1].name;
+                    if (_data[index].status == 4) {
                         html += '<tr style="background-color:#ffc0cc">';
                     }
                     else {
                         html += '<tr>';
                     }
-                    html += '<td><a href="#">' + (data[index].name == null ? data[index].email : data[index].name) + '</a></td>';
+                    html += '<td><a href="#">' + (_data[index].name == null ? _data[index].email : _data[index].name) + '</a></td>';
                     html += '<td>' + selectbox + '</td>';
                     html += '<td class="status">' + status + '</td>';
-                    html += '<td>' + data[index].last_login + '</td>';
-                    if (data[index].status == 4)
-                        html += '<td><a class="activate_user" href="#"  data-id="' + data[index].id + '"><i class="fa fa-check green"></i></a></td>';
+                    html += '<td>' + _data[index].last_login + '</td>';
+                    if (_data[index].status == 4)
+                        html += '<td><a class="activate_user" href="#"  data-id="' + _data[index].id + '"><i class="fa fa-check green"></i></a></td>';
                     else {
-                        html += '<td><a class="disable_user" href="#"  data-id="' + data[index].id + '"><i class="fa fa-times red"></i></a></td>';
+                        html += '<td><a class="disable_user" href="#"  data-id="' + _data[index].id + '"><i class="fa fa-times red"></i></a></td>';
                     }
                     html += '</tr>';
                 });
                 
-                $('.curr-result, .total-result').text(data.length);
+                $('.curr-result, .total-result').text(_data.length);
             }
             else {
                 html += '<tr>';
@@ -591,13 +607,14 @@ $.extend(User.prototype, {
 
         });
     },
+    
     getSelectedRoles: function () {
         var that = this;
         that.checkedRoles = [];
         $('#roles_ul :checked').each(function () {
             that.checkedRoles.push($(this).val());
         });
-        //that.checkedRoles = that.checkedRoles.substring(0, that.checkedRoles.length - 1);
+        
         return that.checkedRoles;
     },
     getSelectedStatus: function () {
@@ -606,8 +623,56 @@ $.extend(User.prototype, {
         $('#status_ul :checked').each(function () {
             that.checkedStatus.push($(this).val());
         });
-        //that.checkedStatus = that.checkedStatus.substring(0, that.checkedStatus.length - 1);
+        
         return that.checkedStatus;
+    },
+    getSearchPlugin : function (){
+        ;
+        (function ($) {
+
+            $.fn.extend({
+                donetyping: function (callback, timeout) {
+                    timeout = timeout || 1e3; 
+                    var timeoutReference,
+                            doneTyping = function (el) {
+                                if (!timeoutReference)
+                                    return;
+                                timeoutReference = null;
+                                callback.call(el);
+                            };
+                    return this.each(function (i, el) {
+                        var $el = $(el);
+                        $el.is(':input') && $el.on('keyup keypress paste', function (e) {
+                            if (e.type == 'keyup' && e.keyCode != 8)
+                                return;
+                            if (timeoutReference)
+                                clearTimeout(timeoutReference);
+                            timeoutReference = setTimeout(function () {
+                                doneTyping(el);
+                            }, timeout);
+                        }).on('blur', function () {
+                            doneTyping(el);
+                        });
+                    });
+                }
+            });
+        })(jQuery);
+    },
+    getPermissionAccess: function(_access){
+        var _permission = '';
+        if(_access.app == true && _access.user == true){
+            _permission = 'App, User';
+        }
+        else if(_access.app == false && _access.user == true){
+            _permission = 'User';
+        }
+        else if(_access.app == true && _access.user == false){
+            _permission = 'App';
+        }
+        else{
+            _permission = 'Basic';
+        }
+        return _permission;
     },
     getAjaxData: function (_ajaxLink, _obj, callback) {
         $.ajax({
@@ -679,6 +744,158 @@ $.extend(User.prototype, {
         }
     }
 });
+
+$.extend(Role,{
+user: new User()    
+});
+
+$.extend(Role.prototype,{
+    init: function(){
+        var that = this;
+        if ($('#roleList').length) {
+            that.createRolePage();
+        }
+    },
+   createRolePage: function(){
+        var that = this;
+        var obj = {
+            head:{
+                action:"getRoles"
+            },
+            body:{
+                where:{
+                    name: ""
+                }
+            }
+        }
+        var _obj = JSON.stringify(obj);
+        that.getRolesList(_obj);
+        that.disableRole();
+        that.enableRole();
+        that.searchRoles();
+    }, 
+    getRolesList: function (_obj){
+        var that = this;
+        var ajaxLink = User.ajaxLink2;
+        user.getAjaxData(ajaxLink,_obj,function(data){
+            var html = '';
+            var currentUserRoleId = data.body.loggedin_user_role_id;
+            var _data = data.body.data;
+            console.log(_data);
+            if(_data.length){
+                $.each(_data,function(index){
+                    var access = user.getPermissionAccess(_data[index].app_permissions);
+                    if(_data[index].is_active){
+                        html += '<tr>';
+                    }
+                    else{
+                        html += '<tr style="background-color:#ffc0cc">';
+                    }
+                    html += '<td><a href="#">'+ _data[index].name +'</a>'+ (_data[index].id == currentUserRoleId ? '<i class="fa fa-check"></i>':'') +'</td>';
+                    html += '<td>'+access+'</td>';
+                    html += '<td>-</td>';
+                    if(_data[index].is_active){
+                        html += '<td>'+(_data[index].id != currentUserRoleId ? '<a class="disable_role" href="#" data-role-id="'+_data[index].id+'"><i class="fa fa-times red"></i></a>':'')+'</td>';
+                    }
+                    else{
+                        html += '<td>'+(_data[index].id != currentUserRoleId ? '<a class="enable_role" href="#" data-role-id="'+_data[index].id+'"><i class="fa fa-check green"></i></a>':'')+'</td>';
+                        
+                    }
+                    html += '</tr>';
+                });
+                
+                $('.curr-result, .total-result').text(_data.length);
+            }
+            else{
+               html += '<tr>';
+               html += '<td colspan="4">No data found</td>';
+               html += '</tr>';
+               $('.curr-result, .total-result').text('0');
+            }
+            $('#roleList tbody').html('');
+            $('#roleList tbody').html(html);
+            $('#roleList').show();
+            $('#loader').hide();
+            
+        });
+    },
+    searchRoles: function () {
+        var that = this;
+        user.getSearchPlugin();
+
+        $('#search_role').donetyping(function () {
+            
+            var searchText = $('#search_role').val();
+            var obj = {
+            head:{
+                action:"getRoles"
+            },
+            body:{
+                where:{
+                    name: searchText
+                }
+            }
+        }
+        var _obj = JSON.stringify(obj);
+        that.getRolesList(_obj);
+        }, 500);
+
+    },
+    disableRole: function(){
+        $('#roleList').on('click','.disable_role',function(){
+            var that = this;
+            var td = $(this);
+            var ajaxLink = User.ajaxLink2;
+            var roleId = $(this).attr('data-role-id');
+            var obj = {
+                    head:{
+                        action:"disableRole"
+                    },
+                    body:{
+                        role_id:roleId
+                    }
+                }
+                console.log(obj);
+            var _obj = JSON.stringify(obj);
+            user.getAjaxData(ajaxLink,_obj,function(data){
+                td.addClass('enable_role').removeClass('disable_role');
+                td.html('<i class="fa fa-check green"></i>');
+                var tr = td.closest('tr');
+                tr.css('background-color','#ffc0cc');
+                $('#loader').hide();
+            });
+            
+            return false;
+        });
+    },
+    enableRole: function(){
+        $('#roleList').on('click','.enable_role',function(){
+            var that = this;
+            var td = $(this);
+            var ajaxLink = User.ajaxLink2;
+            var roleId = $(this).attr('data-role-id');
+            var obj = {
+                    head:{
+                        action:"enableRole"
+                    },
+                    body:{
+                        role_id:roleId
+                    }
+                }
+                
+            var _obj = JSON.stringify(obj);
+            user.getAjaxData(ajaxLink,_obj,function(data){
+                td.addClass('disable_role').removeClass('enable_role');
+                td.html('<i class="fa fa-times red"></i>');
+                var tr = td.closest('tr');
+                tr.css('background-color','');
+                $('#loader').hide();
+            });
+            return false;
+        });
+    }
+});
+
 
 $(document).ready(function () {
 

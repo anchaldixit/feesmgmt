@@ -233,7 +233,7 @@ body{font-family: helvetica; font-weight: 300;}
     }
 }
 
-.wrapper{width: 100%;}
+.wrapper{width: 100%; overflow: hidden;}
 .white-bg{background-color: #f8f8f8; min-height: 690px;}
 .header{
     padding: 10px 15px; 
@@ -473,6 +473,7 @@ body{font-family: helvetica; font-weight: 300;}
     overflow: hidden;
     
     margin: 20px 0 10px 0;
+    padding:0 15px;
     a{
         float: left;
         .fa{
