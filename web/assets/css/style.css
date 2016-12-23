@@ -203,7 +203,8 @@ body {
     line-height: 20px; }
 
 .wrapper {
-  width: 100%; }
+  width: 100%;
+  overflow: hidden; }
 
 .white-bg {
   background-color: #f8f8f8;
@@ -399,7 +400,8 @@ body {
 
 .user-filter {
   overflow: hidden;
-  margin: 20px 0 10px 0; }
+  margin: 20px 0 10px 0;
+  padding: 0 15px; }
   .user-filter a {
     float: left; }
     .user-filter a .fa {
