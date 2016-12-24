@@ -13,6 +13,9 @@ function User() {
 function Role() {
 }
 
+function Permission(){
+}
+
 $.extend(Login,{
     ajaxLink: window.location.origin + '/api/v1/general',
     ajaxLink2: window.location.origin + '/api/v1',
@@ -988,6 +991,23 @@ $.extend(Role.prototype, {
                 });
             }
         });
+    }
+});
+
+
+
+$.extend(Permission,{
+    
+});
+
+$.extend(Permission.prototype,{
+    init: function(){
+        
+    },
+    createTabs: function(){
+        if($('#createTab').length){
+            
+        }
     }
 });
 
