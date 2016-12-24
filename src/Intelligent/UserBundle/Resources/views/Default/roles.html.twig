@@ -26,12 +26,16 @@
             </div>
         </div>
         <div class="ajax-loader" id="loader" style="display: none;"><i class="fa fa-refresh fa-spin fa-1x fa-fw"></i></div>
+        
         <div class="display-result">
             <p>Displaying <span class="curr-result" > 6 </span> out of <span class="total-result">6</span> Roles</p>
         </div>
     </div>
     <span class="notify"><i class="fa fa-info-circle"></i><span class="info-notice">1 Role Changed</span> </span>
     <div class="table-content user-table">
+        {% if app.request.get('new_role') > 0 %}
+            <div style="color:green; margin: 10px 0;">A new role successfully created.</div>
+        {% endif %}
         <table id="roleList" style="display:none;">
             <thead>
                 <tr>
@@ -46,6 +50,8 @@
 
             </tbody>
         </table>
+        
+        
     </div>
     
     <div class="popup-wrapper" id="addRole" style="display:none;">
@@ -61,19 +67,21 @@
                                 <li>
                                     <label>Role Name</label>
                                     <div class="field-wrap">
-                                        <input type="text">
+                                        <input type="text" name="role_name" id="role_name" placeholder="Role Name"/>
+                                        <span class="validation_msg"></span>
                                     </div>
                                 </li>
                                 <li>
                                     <label>Description</label>
                                     <div class="field-wrap">
-                                        <textarea cols="50" rows="4"></textarea>
+                                        <textarea cols="50" rows="4"  id="role_description"></textarea>
+                                        <span class="validation_msg"></span>
                                     </div>
                                 </li>
                                 <li>
 
                                     <div class="field-wrap">
-                                        <input type="submit" name="create_role" value="OK" />
+                                        <input type="submit" name="create_role" value="OK" id="create_role" />
                                         <input type="button" name="cancel" class="close-popup" value="Cancel" />
                                     </div>
                                 </li>
