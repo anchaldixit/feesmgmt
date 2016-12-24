@@ -38,7 +38,9 @@ intelligent_invite_user:
 intelligent_roles:
     path: /roles
     defaults: { _controller: IntelligentUserBundle:Default:roles }
-    
+intelligent_rolePermissions:
+    path: /rolePermissions
+    defaults: { _controller: IntelligentUserBundle:Default:rolePermissions }
 intelligent_noaccess:
     path: /noaccess
     defaults: { _controller: IntelligentUserBundle:Default:noaccess }

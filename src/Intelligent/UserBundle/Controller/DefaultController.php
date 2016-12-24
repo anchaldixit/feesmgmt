@@ -88,6 +88,13 @@ class DefaultController extends Controller {
         
         return $this->render('IntelligentUserBundle:Default:mypreferences.html.twig', array());
     }
+    
+    public function rolePermissionsAction(Request $request){
+        
+        return $this->render('IntelligentUserBundle:Default:rolepermissions.html.twig', array());
+        
+    }
+    
     public function noaccessAction(Request $request){
         
         return $this->render('IntelligentUserBundle:Default:noaccess.html.twig', array());
