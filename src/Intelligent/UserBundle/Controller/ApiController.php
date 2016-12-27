@@ -166,12 +166,13 @@ class ApiController extends Controller {
     private function resetPassword(Request $request, $json) {
         if(isset($json->body->reset_password_id) && isset($json->body->new_password)){
             $em = $this->getDoctrine()->getManager();
-            $em->getRepository("IntelligentUserBundle:User");
-            $user = $em->findOneBy(array('passwordResetId' => $json->body->reset_password_id));
+            $repo = $em->getRepository("IntelligentUserBundle:User");
+            $user = $repo->findOneBy(array('passwordResetId' => $json->body->reset_password_id));
             if($user){
                 // Change password
                 $user->setPassword($json->body->new_password)
                 // Clear reset password id
+                        ->setStatus(User::REGISTERED)
                         ->setPasswordResetId(null)
                         ->setUpdateDatetime(new \DateTime());
                 
