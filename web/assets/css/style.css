@@ -950,12 +950,12 @@ input[type="submit"]:focus, input[type="button"]:focus {
           display: block; }
         .popup-wrapper .popup .popup-body ul li .field-wrap {
           margin-bottom: 15px; }
-          .popup-wrapper .popup .popup-body ul li .field-wrap input[type="text"], .popup-wrapper .popup .popup-body ul li .field-wrap input[type="password"], .popup-wrapper .popup .popup-body ul li .field-wrap textarea {
+          .popup-wrapper .popup .popup-body ul li .field-wrap input[type="text"], .popup-wrapper .popup .popup-body ul li .field-wrap input[type="password"], .popup-wrapper .popup .popup-body ul li .field-wrap input[type="email"], .popup-wrapper .popup .popup-body ul li .field-wrap textarea {
             width: 96%;
             padding: 5px;
             font-size: 15px;
             border: 1px solid #c1c1c1; }
-            .popup-wrapper .popup .popup-body ul li .field-wrap input[type="text"]:focus, .popup-wrapper .popup .popup-body ul li .field-wrap input[type="password"]:focus, .popup-wrapper .popup .popup-body ul li .field-wrap textarea:focus {
+            .popup-wrapper .popup .popup-body ul li .field-wrap input[type="text"]:focus, .popup-wrapper .popup .popup-body ul li .field-wrap input[type="password"]:focus, .popup-wrapper .popup .popup-body ul li .field-wrap input[type="email"]:focus, .popup-wrapper .popup .popup-body ul li .field-wrap textarea:focus {
               outline: none;
               border: 1px solid #5aa3ff; }
           .popup-wrapper .popup .popup-body ul li .field-wrap input[type="submit"], .popup-wrapper .popup .popup-body ul li .field-wrap input[type="button"] {

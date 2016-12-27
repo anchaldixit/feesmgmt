@@ -23,6 +23,9 @@
                         {% if app.request.get('new_registration') == 1 %}
                             <li style="color:green">You are successfully registered. Please login here.</li>
                         {% endif %}
+                        {% if app.request.get('reset_pass') == 1 %}
+                            <li style="color:green">Your password is reset now. Please login here.</li>
+                        {% endif %}
                         <li>
                             <input type="text" placeholder="username or email" name="_username" value="{{last_username}}" />
                         </li>

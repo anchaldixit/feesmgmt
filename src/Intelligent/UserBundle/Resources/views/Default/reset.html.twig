@@ -5,10 +5,52 @@
 {% endblock %}
 
 {% block body %}
-    Reset Password
+    
+    <div class="my-preferences-outer" style="min-height:550px">
+        {% if status == 0 %}
+                
+            <div class="access-msg"><p>This URL is not valid for Reset Password</p></div>
+            {% else %}
+        <div class="my-preferences" id="reset_password">
+            <div class="pref-header">
+                <h4>Reset Password</h4>
+            </div>
+            
+            <div class="my-pref-body" id="change_password">
+                <ul>
+                    
+                    <li>
+                        <label>New Password</label>
+                        <div class="field-wrap">
+                            <input type="password" name="reset_new_password" id="reset_new_password" />
+                            <span class="validation_msg2"></span>
+                        </div>
+                    </li>
+                    <li>
+                        <label>Retype New Password</label>
+                        <div class="field-wrap">
+                            <input type="password" name="reset_re_new_password" id="reset_re_new_password" />
+                            <span class="validation_msg2 re_pass"></span>
+                        </div>
+                    </li>
+                    <li>
+                        <label>&nbsp;</label>
+                        <div class="field-wrap">
+                            <input type="submit" name="Reset_Password" value="Reset Password" id="reset_password_btn"/>
+                        </div>
+                    </li>
+                </ul>
+                <p id="valid_error"></p>
+            </div>
+            
+        </div> 
+        {% endif %}
+    </div>
+                
 {% endblock %}
 {% block inlinejs %}
     <script>
         var resetId = '{{resetPasswordId}}';
+        
     </script>
 {% endblock %}    

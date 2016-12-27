@@ -12,7 +12,13 @@
         
     </div>
 {% endblock %}
-
+{% block custom_feature %}
+    <div class="custom-feature">
+                    <a href="#" class="add-popup" data-modal-id="#inviteUsers"><i class="fa fa-user-plus"></i>Share app with new user</a>
+                    <a href="/roles"><i class="fa fa-user-secret"></i>Manage Roles</a>
+    </div>
+    
+{% endblock %}
 {% block body %}
 
     <span class="notify"><i class="fa fa-info-circle"></i><span class="info-notice">1 Role Changed</span> </span>
@@ -59,4 +65,46 @@
                 </table>
             </div>
     </div>
+    <div class="popup-wrapper" id="inviteUsers" style="display:none;">
+            <div class="popup">
+                <div class="create-roles-outer">
+                    <div class="popup-header">
+                        <h4>Invite Users for this App</h4>
+                        <a class="close-popup" href="#"><i class="fa fa-times red"></i></a>
+                    </div>
+                    <div class="popup-body">
+                        <div class="create-roles" id="invite-users-action">
+                            <ul>
+                                <li>
+                                    <label>Email</label>
+                                    <div class="field-wrap">
+                                        <input type="email" name="user_email" id="useremail" placeholder="Email"/>
+                                        <span class="validation_msg"></span>
+                                    </div>
+                                </li>
+                                <li>
+                                    <label>Roles</label>
+                                    <div class="field-wrap">
+                                        <select id="selected_role">
+                                            
+                                            <option value="1">Admin</option>
+                                            <option value="2">Team Member</option>
+                                            <option value="3">Client</option>
+                                        </select>
+                                        <span class="validation_msg"></span>
+                                    </div>
+                                </li>
+                                <li>
+
+                                    <div class="field-wrap">
+                                        <input type="submit" name="invite_users" value="Invite" id="invite_users" />
+                                        <input type="button" name="cancel" class="close-popup" value="Cancel" />
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
 {% endblock %}
