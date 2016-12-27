@@ -53,8 +53,8 @@ $.extend(Login.prototype, {
             }
         };
         var _obj = JSON.stringify(obj);
-        var ajaxLink = Login.ajaxLink;
-        Login.user.getAjaxData(ajaxLink, _obj, function (_data) {
+
+        Login.user.getAjaxData(Login.ajaxLink, _obj, function (_data) {
 
             var msg = '';
             $('#loader').hide();
@@ -113,8 +113,8 @@ $.extend(Login.prototype, {
                     }
                 };
                 var _obj = JSON.stringify(obj);
-                var ajaxLink = Login.ajaxLink2;
-                Login.user.getAjaxData(ajaxLink, _obj, function (_data) {
+
+                Login.user.getAjaxData(Login.ajaxLink2, _obj, function (_data) {
 
                     var msg = '';
                     $('#loader').hide();
@@ -167,8 +167,8 @@ $.extend(Login.prototype, {
                     }
                 };
                 var _obj = JSON.stringify(obj);
-                var ajaxLink = Login.ajaxLink2;
-                Login.user.getAjaxData(ajaxLink, _obj, function (_data) {
+
+                Login.user.getAjaxData(Login.ajaxLink2, _obj, function (_data) {
                     var msg = '';
                     $('#loader').hide();
                     if (_data.head.status === "success") {
@@ -319,10 +319,11 @@ $.extend(Login.prototype, {
 });
 
 $.extend(User, {
-    ajaxLink2: window.location.origin + '/api/v1',
+    ajaxLink2: Login.ajaxLink2,
     roles: ['Registered', 'Unregistered', 'Unverified', 'Deactivated', 'Denied', 'Password Reset'],
     role: new Role(),
-    login: new Login()
+    login: new Login(),
+    permission: new Permission()
 });
 
 $.extend(User.prototype, {
@@ -331,6 +332,8 @@ $.extend(User.prototype, {
 
         User.role.init();
         User.login.init();
+        
+        User.permission.init();
         that.featureSlider();
         if ($('#userList').length) {
             that.createUserPage();
@@ -388,6 +391,12 @@ $.extend(User.prototype, {
                 filter: true
             }
         }
+        if ($('#inviteMsg').length) {
+            setTimeout(function () {
+                $('#inviteMsg').hide();
+                window.location.href = 'http://' + window.location.hostname + '/users';
+            }, 4000);
+        }
         var _str = JSON.stringify(obj);
         that.getUserList(_str);
         that.disableUser();
@@ -396,12 +405,14 @@ $.extend(User.prototype, {
         that.addUserFilter();
         that.changeRole();
         that.sortUserTable();
+        that.prepareRoleDD();
         User.role.openPopup('.add-popup');
         User.role.closePopup();
+        that.inviteUsers();
     },
     disableUser: function () {
         var that = this;
-        var ajaxLink = User.ajaxLink2;
+
         $('#userList').on('click', '.disable_user', function () {
             id = $(this).attr('data-id');
             var td = $(this);
@@ -415,7 +426,7 @@ $.extend(User.prototype, {
             }
             var _obj = JSON.stringify(obj);
 
-            that.getAjaxData(ajaxLink, _obj, function (_data) {
+            that.getAjaxData(User.ajaxLink2, _obj, function (_data) {
                 var ajax_msg = '1 user disabled';
                 $('.info-notice').html(ajax_msg);
                 var tr = td.closest('tr');
@@ -439,7 +450,7 @@ $.extend(User.prototype, {
     },
     activateUser: function () {
         var that = this;
-        var ajaxLink = User.ajaxLink2;
+
         $('#userList').on('click', '.activate_user', function () {
             id = $(this).attr('data-id');
             var td = $(this);
@@ -453,7 +464,7 @@ $.extend(User.prototype, {
             }
             var _obj = JSON.stringify(obj);
 
-            that.getAjaxData(ajaxLink, _obj, function (_data) {
+            that.getAjaxData(User.ajaxLink2, _obj, function (_data) {
                 var ajax_msg = '1 user activated';
                 $('.info-notice').html(ajax_msg);
                 var tr = td.closest('tr');
@@ -479,7 +490,7 @@ $.extend(User.prototype, {
     changeRole: function () {
 
         var that = this;
-        var ajaxLink = User.ajaxLink2;
+
         $('#userList').on('change', '.change_role', function () {
             var user_id = $(this).attr('data-user-id');
             var new_rol = $(this).val();
@@ -495,7 +506,7 @@ $.extend(User.prototype, {
             }
             var _obj = JSON.stringify(obj);
 
-            that.getAjaxData(ajaxLink, _obj, function (_data) {
+            that.getAjaxData(User.ajaxLink2, _obj, function (_data) {
                 var ajax_msg = '1 Role Changed';
                 $('.info-notice').html(ajax_msg);
 
@@ -634,9 +645,33 @@ $.extend(User.prototype, {
                     filter: true
                 }
             }
-            console.log(obj);
+            //console.log(obj);
             var _obj = JSON.stringify(obj);
             that.getUserList(_obj);
+        });
+    },
+    prepareRoleDD: function () {
+        var that = this;
+        var obj = {
+            head: {
+                action: "getRoles"
+            },
+            body: {
+                where: {
+                    name: ""
+                }
+            }
+        }
+        var _obj = JSON.stringify(obj);
+        that.getAjaxData(User.ajaxLink2, _obj, function (_data) {
+            var html = '';
+            html += '<option value="0">Select Role</option>';
+            var _roles = _data.body.data;
+            $.each(_roles, function (index) {
+                html += '<option value="' + _roles[index].id + '">' + _roles[index].name + '</option>';
+            });
+            $('#selected_role').html('');
+            $('#selected_role').html(html);
         });
     },
     getSortingOrder: function () {
@@ -656,8 +691,8 @@ $.extend(User.prototype, {
     },
     getUserList: function (_obj) {
         var that = this;
-        var ajaxLink = User.ajaxLink2;
-        that.getAjaxData(ajaxLink, _obj, function (responseData) {
+
+        that.getAjaxData(User.ajaxLink2, _obj, function (responseData) {
             var html = '';
             var status = '';
             var status_ul = '';
@@ -733,12 +768,60 @@ $.extend(User.prototype, {
 
         });
     },
-    inviteUsers: function(){
-        $('#invite-users-action').click(function(){
+    inviteUsers: function () {
+        var that = this;
+        var email_obj = '';
+        var error = '';
+        var errDiv = '';
+        $('#invite_users').click(function () {
+
             var useremail = $('#useremail').val();
+
             var selectedrole = $('#selected_role :selected').val();
-            
-            
+            if (useremail == '') {
+                error = 'Email field can not empty';
+                email_obj = $('#useremail');
+                errDiv = email_obj.next('.validation_msg');
+                errDiv.html(error);
+                console.log(User.login.isEmail(useremail));
+            }
+            else if (User.login.isEmail(useremail) == false) {
+                error = 'Enter a valid email';
+                email_obj = $('#useremail');
+                errDiv = email_obj.next('.validation_msg');
+                errDiv.html(error);
+            }
+            else if (selectedrole == 0) {
+                error = 'Please select a Role';
+                role_obj = $('#selected_role');
+                errDiv = role_obj.next('.validation_msg');
+                errDiv.html(error);
+            }
+            else {
+                var obj = {
+                    head: {
+                        action: "inviteUsers"
+                    },
+                    body: [
+                        {
+                            email: useremail,
+                            new_role: selectedrole
+                        }
+                    ]
+                }
+                var _obj = JSON.stringify(obj);
+
+                that.getAjaxData(User.ajaxLink2, _obj, function (_data) {
+                    $('#inviteUsers').hide();
+                    window.location.href = 'http://' + window.location.hostname + '/users?invitation_send=' + useremail;
+
+
+                });
+
+
+            }
+
+
         });
     },
     getSelectedRoles: function () {
@@ -831,6 +914,7 @@ $.extend(User.prototype, {
 });
 
 $.extend(Role, {
+    ajaxLink2: User.ajaxLink2,
     user: new User(),
     login: new Login()
 });
@@ -865,8 +949,8 @@ $.extend(Role.prototype, {
     },
     getRolesList: function (_obj) {
         var that = this;
-        var ajaxLink = User.ajaxLink2;
-        user.getAjaxData(ajaxLink, _obj, function (data) {
+
+        Role.user.getAjaxData(Role.ajaxLink2, _obj, function (data) {
             var html = '';
             var currentUserRoleId = data.body.loggedin_user_role_id;
             var _data = data.body.data;
@@ -967,7 +1051,6 @@ $.extend(Role.prototype, {
         $('#roleList').on('click', '.enable_role', function () {
             var that = this;
             var td = $(this);
-            var ajaxLink = User.ajaxLink2;
             var roleId = $(this).attr('data-role-id');
             var obj = {
                 head: {
@@ -979,7 +1062,7 @@ $.extend(Role.prototype, {
             }
 
             var _obj = JSON.stringify(obj);
-            user.getAjaxData(ajaxLink, _obj, function (data) {
+            user.getAjaxData(User.ajaxLink2, _obj, function (data) {
                 td.addClass('disable_role').removeClass('enable_role');
                 td.html('<i class="fa fa-times red"></i>');
                 var tr = td.closest('tr');
@@ -1012,7 +1095,6 @@ $.extend(Role.prototype, {
     createRole: function () {
         var that = this;
         var error = '';
-        var ajaxLink = User.ajaxLink2;
         $('#create_role').click(function () {
             $('.validation_msg').html('');
             var _roleName = $.trim($('#role_name').val());
@@ -1040,8 +1122,8 @@ $.extend(Role.prototype, {
                     }
                 }
                 var _obj = JSON.stringify(obj);
-                user.getAjaxData(ajaxLink, _obj, function (_data) {
-                    window.location.href = 'http://' + window.location.hostname + '/roles?new_role=' + _data.body.role_id;
+                user.getAjaxData(User.ajaxLink2, _obj, function (_data) {
+                    window.location.href = 'http://' + window.location.hostname + '/rolePermissions/' + _data.body.role_id;
                 });
             }
         });
@@ -1051,16 +1133,120 @@ $.extend(Role.prototype, {
 
 
 $.extend(Permission, {
+    moduleIcon: [
+        '<i class="fa fa-users"></i>',
+        '<i class="fa fa-list-alt"></i>',
+        '<i class="fa fa-bullhorn"></i>',
+        '<i class="fa fa-address-book"></i>',
+        '<i class="fa fa-envelope"></i>',
+        '<i class="fa fa-desktop"></i>'
+    ]
 });
 
 $.extend(Permission.prototype, {
     init: function () {
-
+        var that = this;
+        
+        that.createPermissionPage();
+        
+        
     },
     createTabs: function () {
         if ($('#createTab').length) {
+            $('.tab ul li a').click(function () {
+                var id = $(this).attr('href');
+                $('.tab ul li a').removeClass('active');
+                $(this).addClass('active');
+                $('.tab-body').hide();
+                $(id).show();
 
+                return false;
+            });
         }
+    },
+    createPermissionPage: function (){
+        var that = this;
+        if($('#createTab').length){
+            that.createTabs();
+            that.getPermissionsByRole();
+        }
+        
+    },
+    getPermissionsByRole: function(){
+        var obj = {
+            head:{
+                action: "getRolePermission"
+            },
+            body:{
+                role_id:roleId
+            }       
+        }
+        
+        var _obj = JSON.stringify(obj);
+        user.getAjaxData(User.ajaxLink2, _obj, function (data) {
+            var _data = data.body.modulePermissions;
+            console.log(_data);
+            var html = '';
+            var viewPermission ='';
+            var addPermission ='';
+            var editPermission ='';
+            var deletePermission ='';
+            var icon ='';
+            $.each(_data,function(index){
+                console.log(Permission.moduleIcon[index] != undefined);
+                if(Permission.moduleIcon[index] !== undefined){  
+                    icon = Permission.moduleIcon[index];
+                }
+                else{
+                    icon ='<i class="fa"></i>';
+                }
+                
+                
+                if(_data[index].viewPermission){
+                   viewPermission = '<a href="#"><i class="fa fa-check green"></i></a>'; 
+                }
+                else{
+                   viewPermission = '<a href="#"><i class="fa fa-times red"></i></a>'; 
+                }
+                
+                if(_data[index].addPermission){
+                   addPermission = '<a href="#"><i class="fa fa-check green"></i></a>'; 
+                }
+                else{
+                   addPermission = '<a href="#"><i class="fa fa-times red"></i></a>'; 
+                }
+                
+                if(_data[index].editPermission){
+                   editPermission = '<a href="#"><i class="fa fa-check green"></i></a>'; 
+                }
+                else{
+                   editPermission = '<a href="#"><i class="fa fa-times red"></i></a>'; 
+                }
+                
+                if(_data[index].deletePermission){
+                   deletePermission = '<a href="#"><i class="fa fa-check green"></i></a>'; 
+                }
+                else{
+                   deletePermission = '<a href="#"><i class="fa fa-times red"></i></a>'; 
+                }
+                
+                html += '<tr>';
+                html += '<td>'+icon+_data[index].module.name+'</td>';
+                html += '<td>'+viewPermission+'</td>';
+                html += '<td>'+addPermission+'</td>';
+                html += '<td>'+editPermission+'</td>';
+                html += '<td>'+deletePermission+'</td>';
+                html += '<td>';
+                html += '<select>';
+                html += '<option value="full_access">Full Access</option>';
+                html += '<option value="no_access">No Access</option>';
+                html += '</select>';
+                html += '</td>';
+                html += '</tr>';
+            });
+            
+            $('#permissionsTable tbody').html(html);
+        });
     }
 });
 
@@ -1069,6 +1255,7 @@ $(document).ready(function () {
 
     user = new User();
     user.init();
+    
 });
 
 

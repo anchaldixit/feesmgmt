@@ -38,7 +38,7 @@
                 </div>
             </div>
     <div class="table-content user-table">
-        <div class="user-filter">
+        <div class="user-filter" style="padding:0">
         <div class="search-box" style="margin-left:0">
             <div class="search">
                 <input type="text" name="user-search" placeholder="Search User" id="search_user">
@@ -50,6 +50,9 @@
             <p>Displaying <span class="curr-result">  </span> out of <span class="total-result"></span> Users</p>
         </div>
     </div>
+        {% if app.request.get('invitation_send') != '' %}
+            <div style="color:green; margin: 10px 0;" id="inviteMsg"> '{{ app.request.get('invitation_send') }}' email has been registered and An invitation has been sent to this email.</div>
+        {% endif %}
                 <table id="userList" style="display:none;">
                     <thead>
                         <tr>
@@ -87,9 +90,6 @@
                                     <div class="field-wrap">
                                         <select id="selected_role">
                                             
-                                            <option value="1">Admin</option>
-                                            <option value="2">Team Member</option>
-                                            <option value="3">Client</option>
                                         </select>
                                         <span class="validation_msg"></span>
                                     </div>
@@ -100,6 +100,7 @@
                                         <input type="submit" name="invite_users" value="Invite" id="invite_users" />
                                         <input type="button" name="cancel" class="close-popup" value="Cancel" />
                                     </div>
+                                    <p id="resp-msg"></p>
                                 </li>
                             </ul>
                         </div>

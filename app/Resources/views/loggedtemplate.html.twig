@@ -43,11 +43,11 @@ and open the template in the editor.
                         <li>
                             <h4>{{ app.user.getName() }}</h4>
                             <a class="e-mail" href="mailto:{{ app.user.getEmail() }}">{{ app.user.getEmail() }}</a>
-                            <p><A href="/my-preferences">My Preferences</a></p>
+                            <p><A href="/myPreferences">My Preferences</a></p>
                         </li>
                         <li>
                             <h4>Aizan</h4>
-                            <span>My role in this app is administrator</span>
+                            <span>My role in this app is {{ app.user.getRole().getName() }}</span>
                             <p><a href="#">My Personal setting in this app</a></p>
                         </li>
                         <li><a class="signout" href="/logout">Sign Out</a></li>
