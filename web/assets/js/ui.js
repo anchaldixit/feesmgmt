@@ -1123,7 +1123,7 @@ $.extend(Role.prototype, {
                 }
                 var _obj = JSON.stringify(obj);
                 user.getAjaxData(User.ajaxLink2, _obj, function (_data) {
-                    window.location.href = 'http://' + window.location.hostname + '/roles?new_role=' + _data.body.role_id;
+                    window.location.href = 'http://' + window.location.hostname + '/rolePermissions/' + _data.body.role_id;
                 });
             }
         });
@@ -1133,6 +1133,14 @@ $.extend(Role.prototype, {
 
 
 $.extend(Permission, {
+    moduleIcon: [
+        '<i class="fa fa-users"></i>',
+        '<i class="fa fa-list-alt"></i>',
+        '<i class="fa fa-bullhorn"></i>',
+        '<i class="fa fa-address-book"></i>',
+        '<i class="fa fa-envelope"></i>',
+        '<i class="fa fa-desktop"></i>'
+    ]
 });
 
 $.extend(Permission.prototype, {
@@ -1165,7 +1173,80 @@ $.extend(Permission.prototype, {
         
     },
     getPermissionsByRole: function(){
+        var obj = {
+            head:{
+                action: "getRolePermission"
+            },
+            body:{
+                role_id:roleId
+            }       
+        }
         
+        var _obj = JSON.stringify(obj);
+        user.getAjaxData(User.ajaxLink2, _obj, function (data) {
+            var _data = data.body.modulePermissions;
+            console.log(_data);
+            var html = '';
+            var viewPermission ='';
+            var addPermission ='';
+            var editPermission ='';
+            var deletePermission ='';
+            var icon ='';
+            $.each(_data,function(index){
+                console.log(Permission.moduleIcon[index] != undefined);
+                if(Permission.moduleIcon[index] !== undefined){  
+                    icon = Permission.moduleIcon[index];
+                }
+                else{
+                    icon ='<i class="fa"></i>';
+                }
+                
+                
+                if(_data[index].viewPermission){
+                   viewPermission = '<a href="#"><i class="fa fa-check green"></i></a>'; 
+                }
+                else{
+                   viewPermission = '<a href="#"><i class="fa fa-times red"></i></a>'; 
+                }
+                
+                if(_data[index].addPermission){
+                   addPermission = '<a href="#"><i class="fa fa-check green"></i></a>'; 
+                }
+                else{
+                   addPermission = '<a href="#"><i class="fa fa-times red"></i></a>'; 
+                }
+                
+                if(_data[index].editPermission){
+                   editPermission = '<a href="#"><i class="fa fa-check green"></i></a>'; 
+                }
+                else{
+                   editPermission = '<a href="#"><i class="fa fa-times red"></i></a>'; 
+                }
+                
+                if(_data[index].deletePermission){
+                   deletePermission = '<a href="#"><i class="fa fa-check green"></i></a>'; 
+                }
+                else{
+                   deletePermission = '<a href="#"><i class="fa fa-times red"></i></a>'; 
+                }
+                
+                html += '<tr>';
+                html += '<td>'+icon+_data[index].module.name+'</td>';
+                html += '<td>'+viewPermission+'</td>';
+                html += '<td>'+addPermission+'</td>';
+                html += '<td>'+editPermission+'</td>';
+                html += '<td>'+deletePermission+'</td>';
+                html += '<td>';
+                html += '<select>';
+                html += '<option value="full_access">Full Access</option>';
+                html += '<option value="no_access">No Access</option>';
+                html += '</select>';
+                html += '</td>';
+                html += '</tr>';
+            });
+            
+            $('#permissionsTable tbody').html(html);
+        });
     }
 });
 
