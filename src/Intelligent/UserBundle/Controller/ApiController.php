@@ -13,7 +13,9 @@ use Intelligent\UserBundle\Entity\RoleModuleFieldPermission;
 use Symfony\Component\Security\Core\Util\StringUtils;
 
 class ApiController extends Controller {
+
     private static $DEBUG = true;
+
     /**
      * This is a api end for all the api requests. This will 
      * parse the json request and call the appropriate method
@@ -34,7 +36,7 @@ class ApiController extends Controller {
         # if the function exists then call that function and get the result.
         # if the function throws exception then deliver error response
         # If the function dont throw exception then deliver success responce.
-        
+
         try {
             if ($request->isMethod('POST')) {
                 $request_json = $request->getContent();
@@ -45,13 +47,13 @@ class ApiController extends Controller {
                     if (isset($parsed_request_json->head) && isset($parsed_request_json->body)) {
                         if (isset($parsed_request_json->head->action) && !empty($parsed_request_json->head->action)) {
                             $request_action = $parsed_request_json->head->action;
-                            if($this->_isAllowed($request_action)){
+                            if ($this->_isAllowed($request_action)) {
                                 if (method_exists($this, $request_action)) {
                                     return $this->{$request_action}($request, $parsed_request_json);
                                 } else {
                                     throw new \Exception("Method '$request_action' do not exists in the api", 405);
                                 }
-                            }else{
+                            } else {
                                 throw new \Exception("User not allowed to access api without login", 401);
                             }
                         } else {
@@ -65,14 +67,14 @@ class ApiController extends Controller {
                 throw new \Exception("Any method other than POST is not allowed", 400);
             }
         } catch (\Exception $e) {
-            if(self::$DEBUG){
-                return $this->_handleException($e,$e->getTrace());
-            }else{
+            if (self::$DEBUG) {
+                return $this->_handleException($e, $e->getTrace());
+            } else {
                 return $this->_handleException($e);
             }
         }
     }
-    
+
     /**
      * This function will reset the password for a user and send 
      * a mail to him with reset email
@@ -136,24 +138,24 @@ class ApiController extends Controller {
      */
     private function changePassword(Request $request, $json) {
         $user = $this->getUser();
-        if(isset($json->body->old_password) && isset($json->body->new_password)){
+        if (isset($json->body->old_password) && isset($json->body->new_password)) {
             # Now compare passwords
-            if(StringUtils::equals($user->getPassword(), $json->body->old_password)){
+            if (StringUtils::equals($user->getPassword(), $json->body->old_password)) {
                 $em = $this->getDoctrine()->getManager();
                 $user->setPassword(trim($json->body->new_password))
                         ->setUpdateDatetime(new \DateTime());
-                
+
                 $em->persist($user);
                 $em->flush();
                 return $this->_handleSuccessfulRequest();
-            }else{
-                throw new \Exception("Old password do not match with the current user" , 403);
+            } else {
+                throw new \Exception("Old password do not match with the current user", 403);
             }
-        }else{
-            throw new \Exception("old_password or new_password variable do not exists in the request body",400);
+        } else {
+            throw new \Exception("old_password or new_password variable do not exists in the request body", 400);
         }
     }
-    
+
     /**
      * This function will reset the password of a user from the link
      * sent in the email
@@ -164,30 +166,29 @@ class ApiController extends Controller {
      * @throws \Exception
      */
     private function resetPassword(Request $request, $json) {
-        if(isset($json->body->reset_password_id) && isset($json->body->new_password)){
+        if (isset($json->body->reset_password_id) && isset($json->body->new_password)) {
             $em = $this->getDoctrine()->getManager();
             $repo = $em->getRepository("IntelligentUserBundle:User");
             $user = $repo->findOneBy(array('passwordResetId' => $json->body->reset_password_id));
-            if($user){
+            if ($user) {
                 // Change password
                 $user->setPassword($json->body->new_password)
-                // Clear reset password id
+                        // Clear reset password id
                         ->setStatus(User::REGISTERED)
                         ->setPasswordResetId(null)
                         ->setUpdateDatetime(new \DateTime());
-                
+
                 $em->persist($user);
                 $em->flush();
                 return $this->_handleSuccessfulRequest();
-            }else{
-                throw new \Exception("reset_password_id do not exists or has already used" , 403);
+            } else {
+                throw new \Exception("reset_password_id do not exists or has already used", 403);
             }
-            
-        }else{
-            throw new \Exception("reset_password_id or new_password variable do not exists in the request body",400);
+        } else {
+            throw new \Exception("reset_password_id or new_password variable do not exists in the request body", 400);
         }
     }
-    
+
     /**
      * This function will change first and last name of the user.
      * We will all more variables to it in the future 
@@ -197,18 +198,18 @@ class ApiController extends Controller {
      * @return Response
      * @throws \Exception
      */
-    private function changePreference(Request $request, $json){
+    private function changePreference(Request $request, $json) {
         $user = $this->getUser();
-        if(isset($json->body->name)){
+        if (isset($json->body->name)) {
             $em = $this->getDoctrine()->getManager();
             $user->setName($json->body->name)
                     ->setUpdateDatetime(new \DateTime());
-            
+
             $em->persist($user);
             $em->flush();
             return $this->_handleSuccessfulRequest();
-        }else{
-            throw new \Exception("First name or last name is not set in the request json",400);
+        } else {
+            throw new \Exception("First name or last name is not set in the request json", 400);
         }
     }
 
@@ -220,54 +221,54 @@ class ApiController extends Controller {
      * @return Response
      * @throws \Exception
      */
-    private function getUsers(Request $request, $json){
+    private function getUsers(Request $request, $json) {
         $user_permissions = $this->get('user_permissions');
-        if($user_permissions->getManageUserAndShareAppPermission()){
+        if ($user_permissions->getManageUserAndShareAppPermission()) {
             $body = $json->body;
-            if(!isset($body->where)){
-                throw new \Exception("where is not set in the request json",400);
-            }else if(!isset($body->order_by)){
-                throw new \Exception("order_by is not set in the request json",400);
-            }else if(!isset($body->order_type)){
-                throw new \Exception("order_type is not set in the request json",400);
-            }else{
+            if (!isset($body->where)) {
+                throw new \Exception("where is not set in the request json", 400);
+            } else if (!isset($body->order_by)) {
+                throw new \Exception("order_by is not set in the request json", 400);
+            } else if (!isset($body->order_type)) {
+                throw new \Exception("order_type is not set in the request json", 400);
+            } else {
                 $where = $body->where;
-                if(!isset($where->name)){
-                    throw new \Exception("where.name is not set in the request json",400);
-                }else if(!isset($where->role)){
-                    throw new \Exception("where.role is not set in the request json",400);
-                }else if(!isset($where->status)){
-                    throw new \Exception("where.status is not set in the request json",400);
-                }else{
+                if (!isset($where->name)) {
+                    throw new \Exception("where.name is not set in the request json", 400);
+                } else if (!isset($where->role)) {
+                    throw new \Exception("where.role is not set in the request json", 400);
+                } else if (!isset($where->status)) {
+                    throw new \Exception("where.status is not set in the request json", 400);
+                } else {
                     // Check roles or status ids 
                     $this->_checkRoles($where->role);
                     $this->_checkStatus($where->status);
                     // check order by and order type
                     $this->_checkOrderBy($body->order_by, array("name", "role", "status", "last_login"));
                     $this->_checkOrderType($body->order_type);
-                    
+
                     // Fetch results 
                     $em = $this->getDoctrine()->getManager();
                     $query = $em->createQueryBuilder();
                     $query->select("u")
                             ->addSelect("r")
-                            ->from("IntelligentUserBundle:User","u")
-                            ->join("u.role","r");
-                            
-                    if($where->name){
-                        $query->andWhere($query->expr()->like("u.name",$query->expr()->literal($where->name . "%")));
+                            ->from("IntelligentUserBundle:User", "u")
+                            ->join("u.role", "r");
+
+                    if ($where->name) {
+                        $query->andWhere($query->expr()->like("u.name", $query->expr()->literal($where->name . "%")));
                     }
-                        
-                    if($where->role){
+
+                    if ($where->role) {
                         $query->andWhere($query->expr()->in("r.id", $where->role));
                     }
-                        
-                    if($where->status){
+
+                    if ($where->status) {
                         $query->andWhere($query->expr()->in("u.status", $where->status));
                     }
-                    
+
                     // Get order by clause
-                    switch($body->order_by){
+                    switch ($body->order_by) {
                         case "name":
                             $order_by = "u.name";
                             break;
@@ -281,50 +282,50 @@ class ApiController extends Controller {
                             $order_by = "u.name";
                             $body->order_by = 'name';
                     }
-                    $body->order_type = ($body->order_type?$body->order_type:"asc");
-                    $query->orderBy($order_by,$body->order_type);
-                    
+                    $body->order_type = ($body->order_type ? $body->order_type : "asc");
+                    $query->orderBy($order_by, $body->order_type);
+
                     $dql = $query->getQuery();
                     $results = $dql->getResult();
-                    
+
                     $users = array();
-                    foreach($results as $user){
+                    foreach ($results as $user) {
                         $users[] = array(
                             'id' => $user->getId(),
                             'name' => $user->getName(),
                             'email' => $user->getEmail(),
                             'role' => array(
-                                'id' => $user->getRole()->getId(), 
+                                'id' => $user->getRole()->getId(),
                                 'name' => $user->getRole()->getName()
                             ),
                             'status' => $user->getStatus(),
-                            'last_login' => (!is_null($user->getLastLogin())? $user->getLastLogin()->format("m/d/Y H:i:s") : "Not loggedin yet")
+                            'last_login' => (!is_null($user->getLastLogin()) ? $user->getLastLogin()->format("m/d/Y H:i:s") : "Not loggedin yet")
                         );
                     }
-                    if(isset($body->filter) && $body->filter === true){
+                    if (isset($body->filter) && $body->filter === true) {
                         return $this->_handleSuccessfulRequest(array(
-                            'data' => $users,
-                            "order_by" => $body->order_by, 
-                            "order_type" => $body->order_type,
-                            "filters" => array(
-                                "roles" => $this->_getActiveRoles(),
-                                "status" => $this->_getUsedStatus()
-                            )
+                                    'data' => $users,
+                                    "order_by" => $body->order_by,
+                                    "order_type" => $body->order_type,
+                                    "filters" => array(
+                                        "roles" => $this->_getActiveRoles(),
+                                        "status" => $this->_getUsedStatus()
+                                    )
                         ));
-                    }else{
+                    } else {
                         return $this->_handleSuccessfulRequest(array(
-                            'data' => $users,
-                            "order_by" => $body->order_by, 
-                            "order_type" => $body->order_type
+                                    'data' => $users,
+                                    "order_by" => $body->order_by,
+                                    "order_type" => $body->order_type
                         ));
                     }
-                    
                 }
             }
-        }else{
+        } else {
             $this->_throwNoPermissionException();
         }
     }
+
     /**
      * This function will create and invite users by sending them
      * verification links in email
@@ -334,25 +335,25 @@ class ApiController extends Controller {
      * @return type
      * @throws \Exception
      */
-    private function inviteUsers(Request $request, $json){
+    private function inviteUsers(Request $request, $json) {
         $user_permissions = $this->get('user_permissions');
-        if($user_permissions->getManageUserAndShareAppPermission()){
+        if ($user_permissions->getManageUserAndShareAppPermission()) {
             $body = $json->body;
-            if(is_array($body)){
+            if (is_array($body)) {
                 $new_user_arr = array();
-                foreach($body as $index => $new_user){
-                    if(isset($new_user->email) && isset($new_user->new_role)){
+                foreach ($body as $index => $new_user) {
+                    if (isset($new_user->email) && isset($new_user->new_role)) {
                         $em = $this->getDoctrine()->getManager();
                         # check for already existing email/username
                         $already_existing_user = $em->getRepository("IntelligentUserBundle:User")
                                 ->findOneBy(array("email" => $new_user->email));
-                        if($already_existing_user){
-                            throw new \Exception("Email ($new_user->email) already exists as user",412);
+                        if ($already_existing_user) {
+                            throw new \Exception("Email ($new_user->email) already exists as user", 412);
                         }
                         # Check the role
                         $attached_role = $em->getRepository("IntelligentUserBundle:Role")->find($new_user->new_role);
-                        if(!$attached_role){
-                            throw new \Exception("new_role ($new_user->new_role) is not valid",412);
+                        if (!$attached_role) {
+                            throw new \Exception("new_role ($new_user->new_role) is not valid", 412);
                         }
                         $newUser = new User();
                         $newUser->setEmail($new_user->email);
@@ -362,11 +363,10 @@ class ApiController extends Controller {
                         $newUser->setCreateDatetime(new \DateTime());
                         $newUser->setUpdateDatetime(new \DateTime());
                         $new_user_arr[] = $newUser;
-                        
-                    }else{
-                        throw new \Exception("Email or new role_id is not set in json at index #$index",400);
+                    } else {
+                        throw new \Exception("Email or new role_id is not set in json at index #$index", 400);
                     }
-                    foreach($new_user_arr as $new_user_final){
+                    foreach ($new_user_arr as $new_user_final) {
                         // Send email
                         $email_body = $this->_getEmailBody("inviteUser.html.twig", array('emailVerifyId' => $new_user_final->getVerificationId()));
                         $this->_sendEmail($new_user_final->getEmail(), "Verify your email", $email_body);
@@ -377,14 +377,14 @@ class ApiController extends Controller {
                     $em->flush();
                     return $this->_handleSuccessfulRequest();
                 }
-            }else{
-                throw new \Exception("Body should be array in the request json",400);
+            } else {
+                throw new \Exception("Body should be array in the request json", 400);
             }
-        }else{
+        } else {
             $this->_throwNoPermissionException();
         }
     }
-    
+
     /**
      * This function will register users after verifying them and 
      * recieving parameters like name and password
@@ -394,26 +394,27 @@ class ApiController extends Controller {
      * @return type
      * @throws \Exception
      */
-    private function registerUser(Request $request, $json){
+    private function registerUser(Request $request, $json) {
         $body = $json->body;
-        if(isset($body->verification_id) && isset($body->name) && isset($body->password)){
+        if (isset($body->verification_id) && isset($body->name) && isset($body->password)) {
             $em = $this->getDoctrine()->getManager();
             $new_user = $em->getRepository("IntelligentUserBundle:User")->findOneBy(array("verificationId" => $body->verification_id));
-            
-            if($new_user instanceof User && ($new_user->getStatus() == User::UNVERIFIED || $new_user->getStatus() == User::UNREGISTERED)){
+
+            if ($new_user instanceof User && ($new_user->getStatus() == User::UNVERIFIED || $new_user->getStatus() == User::UNREGISTERED)) {
                 $new_user->setName($body->name);
                 $new_user->setStatus(User::REGISTERED);
                 $new_user->setPassword($body->password);
                 $new_user->setUpdateDateTime(new \DateTime());
                 $em->flush();
                 return $this->_handleSuccessfulRequest();
-            }else{
-                throw new \Exception("verification_id is not valid",412);
+            } else {
+                throw new \Exception("verification_id is not valid", 412);
             }
-        }else{
-            throw new \Exception("verification_id or first_name or last_name or password is not set in the request json",400);
+        } else {
+            throw new \Exception("verification_id or first_name or last_name or password is not set in the request json", 400);
         }
     }
+
     /**
      * This api action will be used to disable users
      * 
@@ -422,33 +423,33 @@ class ApiController extends Controller {
      * @return type
      * @throws \Exception
      */
-    private function disableUser(Request $request, $json){
+    private function disableUser(Request $request, $json) {
         $user_permissions = $this->get('user_permissions');
-        if($user_permissions->getManageUserAndShareAppPermission()){
-            if(isset($json->body->user_id)){
+        if ($user_permissions->getManageUserAndShareAppPermission()) {
+            if (isset($json->body->user_id)) {
                 $em = $this->getDoctrine()->getManager();
                 $user = $em->getRepository("IntelligentUserBundle:User")->find($json->body->user_id);
-                if($user){
-                    if($user->getStatus() == User::DEACTIVATED){
-                        throw new \Exception("User is already disabled",412);
-                    }else{
+                if ($user) {
+                    if ($user->getStatus() == User::DEACTIVATED) {
+                        throw new \Exception("User is already disabled", 412);
+                    } else {
                         // If user is available then disable it
                         $user->setBeforeDisableStatus($user->getStatus());
                         $user->setStatus(User::DEACTIVATED)->setUpdateDatetime(new \DateTime());
                         $em->flush();
                         return $this->_handleSuccessfulRequest();
                     }
-                }else{
-                    throw new \Exception("User with this user_id not found",404);
+                } else {
+                    throw new \Exception("User with this user_id not found", 404);
                 }
-            }else{
-                throw new \Exception("user_id is not set in the request json",400);
+            } else {
+                throw new \Exception("user_id is not set in the request json", 400);
             }
-        }else{
+        } else {
             $this->_throwNoPermissionException();
         }
     }
-    
+
     /**
      * This method will enable the disabled user again
      * 
@@ -457,35 +458,36 @@ class ApiController extends Controller {
      * @return type
      * @throws \Exception
      */
-    private function enableUser(Request $request, $json){
+    private function enableUser(Request $request, $json) {
         $user_permissions = $this->get('user_permissions');
-        if($user_permissions->getManageUserAndShareAppPermission()){
-            if(isset($json->body->user_id)){
+        if ($user_permissions->getManageUserAndShareAppPermission()) {
+            if (isset($json->body->user_id)) {
                 $em = $this->getDoctrine()->getManager();
                 $user = $em->getRepository("IntelligentUserBundle:User")->find($json->body->user_id);
-                if($user){
-                    if($user->getStatus() !== User::DEACTIVATED){
-                        throw new \Exception("User is not disabled so it cannot be enabled",412);
-                    }else{
-                        if(is_null($user->getBeforeDisableStatus())){
-                            throw new \Exception("Previous state of user is not known, so it cannot be enabled",500);
-                        }else{
+                if ($user) {
+                    if ($user->getStatus() !== User::DEACTIVATED) {
+                        throw new \Exception("User is not disabled so it cannot be enabled", 412);
+                    } else {
+                        if (is_null($user->getBeforeDisableStatus())) {
+                            throw new \Exception("Previous state of user is not known, so it cannot be enabled", 500);
+                        } else {
                             // If user is available then disable it
                             $user->setStatus($user->getBeforeDisableStatus())->setUpdateDatetime(new \DateTime());
                             $em->flush();
                             return $this->_handleSuccessfulRequest(array("status" => $user->getStatus()));
                         }
                     }
-                }else{
-                    throw new \Exception("User with this user_id not found",404);
+                } else {
+                    throw new \Exception("User with this user_id not found", 404);
                 }
-            }else{
-                throw new \Exception("user_id is not set in the request json",400);
+            } else {
+                throw new \Exception("user_id is not set in the request json", 400);
             }
-        }else{
+        } else {
             $this->_throwNoPermissionException();
         }
     }
+
     /**
      * This api action will be used to change role of the user 
      * 
@@ -494,35 +496,35 @@ class ApiController extends Controller {
      * @return type
      * @throws \Exception
      */
-    private function changeRole(Request $request, $json){
+    private function changeRole(Request $request, $json) {
         $user_permissions = $this->get('user_permissions');
-        if($user_permissions->getManageUserAndShareAppPermission()){
-            if(isset($json->body->user_id) && isset($json->body->new_role_id)){
+        if ($user_permissions->getManageUserAndShareAppPermission()) {
+            if (isset($json->body->user_id) && isset($json->body->new_role_id)) {
                 $em = $this->getDoctrine()->getManager();
                 // Get user
                 $user = $em->getRepository("IntelligentUserBundle:User")->find($json->body->user_id);
-                if($user){
+                if ($user) {
                     // Now get role 
                     $role = $em->getRepository("IntelligentUserBundle:Role")->find($json->body->new_role_id);
-                    if($role){
+                    if ($role) {
                         // If both are present then change it
                         $user->setRole($role)->setUpdateDatetime(new \DateTime());
                         $em->flush();
                         return $this->_handleSuccessfulRequest();
-                    }else{
-                        throw new \Exception("Role with this new_role_id not found",404);
+                    } else {
+                        throw new \Exception("Role with this new_role_id not found", 404);
                     }
-                }else{
-                    throw new \Exception("User with this user_id not found",404);
+                } else {
+                    throw new \Exception("User with this user_id not found", 404);
                 }
-            }else{
-                throw new \Exception("user_id or new_role_id is not set in the request json",400);
+            } else {
+                throw new \Exception("user_id or new_role_id is not set in the request json", 400);
             }
-        }else{
+        } else {
             $this->_throwNoPermissionException();
         }
     }
-    
+
     /**
      * This method will get the list of roles
      * 
@@ -531,50 +533,50 @@ class ApiController extends Controller {
      * @return type
      * @throws \Exception
      */
-    private function getRoles(Request $request, $json){
+    private function getRoles(Request $request, $json) {
         $user_permissions = $this->get('user_permissions');
-        if($user_permissions->getManageUserAndShareAppPermission()){
+        if ($user_permissions->getManageUserAndShareAppPermission()) {
             $body = $json->body;
-            if(isset($body->where) && !isset($body->where->name)){
-                throw new \Exception("where.name is not set in the request json",400);
-            }else{
+            if (isset($body->where) && !isset($body->where->name)) {
+                throw new \Exception("where.name is not set in the request json", 400);
+            } else {
                 $em = $this->getDoctrine()->getManager();
                 $query = $em->createQueryBuilder();
                 $query->select("r")
                         ->addSelect("p")
-                        ->from("IntelligentUserBundle:Role","r")
-                        ->join("r.globalPermission","p");
-                
+                        ->from("IntelligentUserBundle:Role", "r")
+                        ->join("r.globalPermission", "p");
+
                 #Add where clauses;
-                if(isset($body->where) && isset($body->where->name)){
+                if (isset($body->where) && isset($body->where->name)) {
                     $query->where($query->expr()->like("r.name", $query->expr()->literal($body->where->name . '%')));
                 }
                 # Always order by name
-                $query->orderBy("r.name","asc");
+                $query->orderBy("r.name", "asc");
                 # Get result
                 $roles = $query->getQuery()->getResult();
                 $roles_result = array();
-                foreach($roles as $role){
+                foreach ($roles as $role) {
                     $roles_result[] = array(
                         'id' => $role->getId(),
                         'name' => $role->getName(),
                         'app_permissions' => array(
-                            'user' => ($role->getGlobalPermission()? $role->getGlobalPermission()->getManageUserAppPermission():false),
-                            'app'  => ($role->getGlobalPermission()? $role->getGlobalPermission()->getEditAppStructurePermission():false)
+                            'user' => ($role->getGlobalPermission() ? $role->getGlobalPermission()->getManageUserAppPermission() : false),
+                            'app' => ($role->getGlobalPermission() ? $role->getGlobalPermission()->getEditAppStructurePermission() : false)
                         ),
                         "is_active" => $role->getStatus()
                     );
                 }
                 return $this->_handleSuccessfulRequest(array(
-                    'data' => $roles_result, 
-                    'loggedin_user_role_id' => $this->getUser()->getRole()->getId()
+                            'data' => $roles_result,
+                            'loggedin_user_role_id' => $this->getUser()->getRole()->getId()
                 ));
             }
-        }else{
+        } else {
             $this->_throwNoPermissionException();
         }
     }
-    
+
     /**
      * This method will create a role
      * 
@@ -583,17 +585,17 @@ class ApiController extends Controller {
      * @return type
      * @throws \Exception
      */
-    private function createRole(Request $request, $json){
+    private function createRole(Request $request, $json) {
         $user_permissions = $this->get('user_permissions');
-        if($user_permissions->getManageUserAndShareAppPermission()){
+        if ($user_permissions->getManageUserAndShareAppPermission()) {
             $body = $json->body;
-            if(isset($body->name) && isset($body->description)){
+            if (isset($body->name) && isset($body->description)) {
                 $em = $this->getDoctrine()->getManager();
                 $repo = $em->getRepository("IntelligentUserBundle:Role");
                 $present_role = $repo->findOneBy(array('name' => $body->name));
-                if($present_role){
-                    throw new \Exception("Role with name($body->name) is already present",412);
-                }else{
+                if ($present_role) {
+                    throw new \Exception("Role with name($body->name) is already present", 412);
+                } else {
                     # Create role
                     $new_role = new Role();
                     $new_role->setName($body->name);
@@ -601,28 +603,28 @@ class ApiController extends Controller {
                     $new_role->setStatus(Role::ACTIVE);
                     $new_role->setCreateDatetime(new \DateTime());
                     $new_role->setUpdateDatetime(new \DateTime());
-                    
+
                     # Create global role permission
                     $new_role_global_premission = new RoleGlobalPermission();
                     $new_role_global_premission->setEditAppStructurePermission(FALSE);
                     $new_role_global_premission->setManageUserAppPermission(FALSE);
-                    
+
                     # bind them two
                     $new_role_global_premission->setRole($new_role);
-                    
+
                     $em->persist($new_role);
                     $em->persist($new_role_global_premission);
                     $em->flush();
                     return $this->_handleSuccessfulRequest(array('role_id' => $new_role->getId()));
                 }
-            }else{
-                throw new \Exception("name or description is not set in the request json",400);
+            } else {
+                throw new \Exception("name or description is not set in the request json", 400);
             }
-        }else{
+        } else {
             $this->_throwNoPermissionException();
         }
-    } 
-    
+    }
+
     /**
      * This method will disable a role
      * 
@@ -631,36 +633,35 @@ class ApiController extends Controller {
      * @return type
      * @throws \Exception
      */
-    private function disableRole(Request $request, $json){
+    private function disableRole(Request $request, $json) {
         /**
          * @var Intelligent\UserBundle\Services\UserPermissions
          */
         $user_permissions = $this->get('user_permissions');
-        if($user_permissions->getManageUserAndShareAppPermission()){
+        if ($user_permissions->getManageUserAndShareAppPermission()) {
             $body = $json->body;
-            if(isset($body->role_id)){
+            if (isset($body->role_id)) {
                 $em = $this->getDoctrine()->getManager();
                 $role = $em->getRepository("IntelligentUserBundle:Role")->find($body->role_id);
-                if($role){
-                    if($role->getStatus() == Role::DEACTIVE){
+                if ($role) {
+                    if ($role->getStatus() == Role::DEACTIVE) {
                         throw new \Exception("Role is already disabled");
-                    }else{
+                    } else {
                         $role->setStatus(Role::DEACTIVE);
                         $em->flush();
                         return $this->_handleSuccessfulRequest();
                     }
-                }else{
-                    throw new \Exception("Role with this role_id #$body->role_id not found",404);
+                } else {
+                    throw new \Exception("Role with this role_id #$body->role_id not found", 404);
                 }
-            }else{
+            } else {
                 throw new \Exception("role_id not set in the request json");
             }
-        }else{
+        } else {
             $this->_throwNoPermissionException();
         }
-            
     }
-    
+
     /**
      * This method will enable a disable role
      * 
@@ -669,28 +670,28 @@ class ApiController extends Controller {
      * @return type
      * @throws \Exception
      */
-    private function enableRole(Request $request, $json){
+    private function enableRole(Request $request, $json) {
         $user_permissions = $this->get('user_permissions');
-        if($user_permissions->getManageUserAndShareAppPermission()){
+        if ($user_permissions->getManageUserAndShareAppPermission()) {
             $body = $json->body;
-            if(isset($body->role_id)){
+            if (isset($body->role_id)) {
                 $em = $this->getDoctrine()->getManager();
                 $role = $em->getRepository("IntelligentUserBundle:Role")->find($body->role_id);
-                if($role){
-                    if($role->getStatus() == Role::ACTIVE){
+                if ($role) {
+                    if ($role->getStatus() == Role::ACTIVE) {
                         throw new \Exception("Role is already enabled");
-                    }else{
+                    } else {
                         $role->setStatus(Role::ACTIVE);
                         $em->flush();
                         return $this->_handleSuccessfulRequest();
                     }
-                }else{
-                    throw new \Exception("Role with this role_id #$body->role_id not found",404);
+                } else {
+                    throw new \Exception("Role with this role_id #$body->role_id not found", 404);
                 }
-            }else{
+            } else {
                 throw new \Exception("role_id not set in the request json");
             }
-        }else{
+        } else {
             $this->_throwNoPermissionException();
         }
     }
@@ -703,17 +704,17 @@ class ApiController extends Controller {
      * @return type
      * @throws \Exception
      */
-    private function getRolePermission(Request $request, $json){
+    private function getRolePermission(Request $request, $json) {
         $user_permissions = $this->get('user_permissions');
-        if($user_permissions->getManageUserAndShareAppPermission()){
+        if ($user_permissions->getManageUserAndShareAppPermission()) {
             $body = $json->body;
-            if(isset($body->role_id)){
+            if (isset($body->role_id)) {
                 $em = $this->getDoctrine()->getManager();
                 $role = $em->getRepository("IntelligentUserBundle:Role")->find($body->role_id);
-                if($role){
+                if ($role) {
                     $modules = $user_permissions->getSetting()->getModule();
                     $module_permissions = array();
-                    foreach($modules as $module_id => $module_name){
+                    foreach ($modules as $module_id => $module_name) {
                         $module_permission_obj = $role->getSingleModulePermission($module_id);
                         $module_fields = $user_permissions->getSetting()->fetch(array("module" => $module_id));
                         # Get global permissions and info
@@ -721,33 +722,30 @@ class ApiController extends Controller {
                             'module' => array(
                                 'id' => $module_id,
                                 'name' => $module_name,
-                                'fields' => $this->_getModuleFieldsArr($module_fields)
                             ),
-                            'viewPermission' => (is_null($module_permission_obj)? false:$module_permission_obj->getViewPermission()),
-                            'editPermission' => (is_null($module_permission_obj)? false:$module_permission_obj->getModifyPermission()),
-                            'addPermission' => (is_null($module_permission_obj)? false:$module_permission_obj->getAddPermission()),
-                            'deletePermission' => (is_null($module_permission_obj)? false:$module_permission_obj->getDeletePermission()),
+                            'viewPermission' => (is_null($module_permission_obj) ? false : $module_permission_obj->getViewPermission()),
+                            'editPermission' => (is_null($module_permission_obj) ? false : $module_permission_obj->getModifyPermission()),
+                            'addPermission' => (is_null($module_permission_obj) ? false : $module_permission_obj->getAddPermission()),
+                            'deletePermission' => (is_null($module_permission_obj) ? false : $module_permission_obj->getDeletePermission()),
+                            'fieldPermission' => (is_null($module_permission_obj) ? false : $module_permission_obj->getFieldPermission())
                         );
-                        if(!is_null($module_permission_obj) && $module_permission_obj->getFieldPermission() == RoleModulePermission::ACTIVE){
-                            // Get fields permissions
-                            $field_permissions = array();
-                            foreach($module_fields as $module_field){
-                                if(is_null($module_permission_obj)){
-                                    $field_permission_obj = null;
-                                }else{
-                                    $field_permission_obj = $module_permission_obj->getSingleFieldPermissions($module_field['module_field_name']);
-                                }
-                                $field_permissions[] = array(
-                                    'id' => $module_field['module_field_name'],
-                                    'permission' => (is_null($field_permission_obj)? RoleModuleFieldPermission::VIEW: $field_permission_obj->getPermission()) 
-                                );
+                        
+                        $field_permissions = array();
+                        foreach ($module_fields as $module_field) {
+                            if (is_null($module_permission_obj)) {
+                                $field_permission_obj = null;
+                            } else {
+                                $field_permission_obj = $module_permission_obj->getSingleFieldPermissions($module_field['module_field_name']);
                             }
-
-                            # Combine the two
-                            $module_permission['fieldPermission'] = $field_permissions;
-                        }else{
-                            $module_permission['fieldPermission'] = FALSE;
+                            $field_permissions[] = array(
+                                'id' => $module_field['module_field_name'],
+                                'name' => $module_field['module_field_display_name'],
+                                'permission' => (is_null($field_permission_obj) ? RoleModuleFieldPermission::VIEW : $field_permission_obj->getPermission())
+                            );
                         }
+
+                        # Combine the two
+                        $module_permission['customFieldPermission'] = $field_permissions;
                         $module_permissions[] = $module_permission;
                     }
                     $result = array(
@@ -761,17 +759,17 @@ class ApiController extends Controller {
                         "modulePermissions" => $module_permissions
                     );
                     return $this->_handleSuccessfulRequest($result);
-                }else{
-                    throw new \Exception("Role with role_id($body->role_id) do not exists",404);
+                } else {
+                    throw new \Exception("Role with role_id($body->role_id) do not exists", 404);
                 }
-            }else{
-                throw new \Exception("role_id not set in request json",412);
+            } else {
+                throw new \Exception("role_id not set in request json", 412);
             }
-        }else{
+        } else {
             $this->_throwNoPermissionException();
         }
     }
-    
+
     /**
      * This api function will change the global edit user permission
      * 
@@ -780,28 +778,28 @@ class ApiController extends Controller {
      * @return type
      * @throws \Exception
      */
-    private function changeUserAndShareAppPermission(Request $request, $json){
+    private function changeUserAndShareAppPermission(Request $request, $json) {
         $user_permissions = $this->get('user_permissions');
-        if($user_permissions->getManageUserAndShareAppPermission()){
+        if ($user_permissions->getManageUserAndShareAppPermission()) {
             $body = $json->body;
-            if(isset($body->role_id) && isset($body->value)){
+            if (isset($body->role_id) && isset($body->value)) {
                 $em = $this->getDoctrine()->getManager();
                 $role = $em->getRepository("IntelligentUserBundle:Role")->find($body->role_id);
-                if($role->getGlobalPermission()->getManageUserAppPermission() == $body->value){
-                    throw new \Exception("value already $body->value",412);
-                }else{
+                if ($role->getGlobalPermission()->getManageUserAppPermission() == $body->value) {
+                    throw new \Exception("value already $body->value", 412);
+                } else {
                     $role->getGlobalPermission()->setManageUserAppPermission($body->value);
                     $em->flush();
                     return $this->_handleSuccessfulRequest();
                 }
-            }else{
-                throw new \Exception("role_id or value not set in request json",412);
+            } else {
+                throw new \Exception("role_id or value not set in request json", 412);
             }
-        }else{
+        } else {
             $this->_throwNoPermissionException();
         }
     }
-    
+
     /**
      * This api function will change the global edit app permission
      * 
@@ -810,32 +808,32 @@ class ApiController extends Controller {
      * @return type
      * @throws \Exception
      */
-    private function changeEditAppPermission(Request $request, $json){
+    private function changeEditAppPermission(Request $request, $json) {
         $user_permissions = $this->get('user_permissions');
-        if($user_permissions->getManageUserAndShareAppPermission()){
+        if ($user_permissions->getManageUserAndShareAppPermission()) {
             $body = $json->body;
-            if(isset($body->role_id) && isset($body->value)){
+            if (isset($body->role_id) && isset($body->value)) {
                 $em = $this->getDoctrine()->getManager();
                 $role = $em->getRepository("IntelligentUserBundle:Role")->find($body->role_id);
-                if($role){
-                    if($role->getGlobalPermission()->getEditAppStructurePermission() == $body->value){
-                        throw new \Exception("value already $body->value",412);
-                    }else{
+                if ($role) {
+                    if ($role->getGlobalPermission()->getEditAppStructurePermission() == $body->value) {
+                        throw new \Exception("value already $body->value", 412);
+                    } else {
                         $role->getGlobalPermission()->setEditAppStructurePermission($body->value);
                         $em->flush();
                         return $this->_handleSuccessfulRequest();
                     }
-                }else{
-                    throw new \Exception("Role with role_id($body->role_id) not found",404);
+                } else {
+                    throw new \Exception("Role with role_id($body->role_id) not found", 404);
                 }
-            }else{
-                throw new \Exception("role_id or value not set in request json",412);
+            } else {
+                throw new \Exception("role_id or value not set in request json", 412);
             }
-        }else{
+        } else {
             $this->_throwNoPermissionException();
         }
     }
-    
+
     /**
      * This api function will change the view permission for a module
      * 
@@ -844,18 +842,18 @@ class ApiController extends Controller {
      * @return type
      * @throws \Exception
      */
-    private function changeModuleViewPermission(Request $request, $json){
+    private function changeModuleViewPermission(Request $request, $json) {
         $user_permissions = $this->get('user_permissions');
-        if($user_permissions->getManageUserAndShareAppPermission()){
+        if ($user_permissions->getManageUserAndShareAppPermission()) {
             $body = $json->body;
-            if(isset($body->role_id) && isset($body->value) && isset($body->module_id)){
+            if (isset($body->role_id) && isset($body->value) && isset($body->module_id)) {
                 $em = $this->getDoctrine()->getManager();
                 $role = $em->getRepository("IntelligentUserBundle:Role")->find($body->role_id);
-                if($role){
+                if ($role) {
                     # Check if the module exists
-                    if($user_permissions->isModuleExists($body->module_id)){
+                    if ($user_permissions->isModuleExists($body->module_id)) {
                         $already_existing_module_permission_object = $role->getSingleModulePermission($body->module_id);
-                        if(is_null($already_existing_module_permission_object)){
+                        if (is_null($already_existing_module_permission_object)) {
                             # Add a new row
                             $new_module_permission_object = new RoleModulePermission();
                             $new_module_permission_object->setRole($role);
@@ -868,29 +866,29 @@ class ApiController extends Controller {
                             $em->persist($new_module_permission_object);
                             $em->flush();
                             return $this->_handleSuccessfulRequest();
-                        }else{
-                            if($already_existing_module_permission_object->getViewPermission() == $body->value){
+                        } else {
+                            if ($already_existing_module_permission_object->getViewPermission() == $body->value) {
                                 throw new \Exception("Value is already $body->value", 412);
-                            }else{
+                            } else {
                                 $already_existing_module_permission_object->setViewPermission($body->value);
                                 $em->flush();
                                 return $this->_handleSuccessfulRequest();
                             }
                         }
-                    }else{
-                        throw new \Exception("Module with module_id($body->module_id) not found",404);
+                    } else {
+                        throw new \Exception("Module with module_id($body->module_id) not found", 404);
                     }
-                }else{
-                    throw new \Exception("Role with role_id($body->role_id) not found",404);
+                } else {
+                    throw new \Exception("Role with role_id($body->role_id) not found", 404);
                 }
-            }else{
-                throw new \Exception("role_id or value or module_id not set in request json",412);
+            } else {
+                throw new \Exception("role_id or value or module_id not set in request json", 412);
             }
-        }else{
+        } else {
             $this->_throwNoPermissionException();
         }
     }
-    
+
     /**
      * This api function will change the edit permission for a module
      * 
@@ -899,18 +897,18 @@ class ApiController extends Controller {
      * @return type
      * @throws \Exception
      */
-    private function changeModuleEditPermission(Request $request, $json){
+    private function changeModuleEditPermission(Request $request, $json) {
         $user_permissions = $this->get('user_permissions');
-        if($user_permissions->getManageUserAndShareAppPermission()){
+        if ($user_permissions->getManageUserAndShareAppPermission()) {
             $body = $json->body;
-            if(isset($body->role_id) && isset($body->value) && isset($body->module_id)){
+            if (isset($body->role_id) && isset($body->value) && isset($body->module_id)) {
                 $em = $this->getDoctrine()->getManager();
                 $role = $em->getRepository("IntelligentUserBundle:Role")->find($body->role_id);
-                if($role){
+                if ($role) {
                     # Check if the module exists
-                    if($user_permissions->isModuleExists($body->module_id)){
+                    if ($user_permissions->isModuleExists($body->module_id)) {
                         $already_existing_module_permission_object = $role->getSingleModulePermission($body->module_id);
-                        if(is_null($already_existing_module_permission_object)){
+                        if (is_null($already_existing_module_permission_object)) {
                             # Add a new row
                             $new_module_permission_object = new RoleModulePermission();
                             $new_module_permission_object->setRole($role);
@@ -923,29 +921,29 @@ class ApiController extends Controller {
                             $em->persist($new_module_permission_object);
                             $em->flush();
                             return $this->_handleSuccessfulRequest();
-                        }else{
-                            if($already_existing_module_permission_object->getModifyPermission() == $body->value){
+                        } else {
+                            if ($already_existing_module_permission_object->getModifyPermission() == $body->value) {
                                 throw new \Exception("Value is already $body->value", 412);
-                            }else{
+                            } else {
                                 $already_existing_module_permission_object->setModifyPermission($body->value);
                                 $em->flush();
                                 return $this->_handleSuccessfulRequest();
                             }
                         }
-                    }else{
-                        throw new \Exception("Module with module_id($body->module_id) not found",404);
+                    } else {
+                        throw new \Exception("Module with module_id($body->module_id) not found", 404);
                     }
-                }else{
-                    throw new \Exception("Role with role_id($body->role_id) not found",404);
+                } else {
+                    throw new \Exception("Role with role_id($body->role_id) not found", 404);
                 }
-            }else{
-                throw new \Exception("role_id or value or module_id not set in request json",412);
+            } else {
+                throw new \Exception("role_id or value or module_id not set in request json", 412);
             }
-        }else{
+        } else {
             $this->_throwNoPermissionException();
         }
     }
-    
+
     /**
      * This api function will change the add permission for a module
      * 
@@ -954,18 +952,18 @@ class ApiController extends Controller {
      * @return type
      * @throws \Exception
      */
-    private function changeModuleAddPermission(Request $request, $json){
+    private function changeModuleAddPermission(Request $request, $json) {
         $user_permissions = $this->get('user_permissions');
-        if($user_permissions->getManageUserAndShareAppPermission()){
+        if ($user_permissions->getManageUserAndShareAppPermission()) {
             $body = $json->body;
-            if(isset($body->role_id) && isset($body->value) && isset($body->module_id)){
+            if (isset($body->role_id) && isset($body->value) && isset($body->module_id)) {
                 $em = $this->getDoctrine()->getManager();
                 $role = $em->getRepository("IntelligentUserBundle:Role")->find($body->role_id);
-                if($role){
+                if ($role) {
                     # Check if the module exists
-                    if($user_permissions->isModuleExists($body->module_id)){
+                    if ($user_permissions->isModuleExists($body->module_id)) {
                         $already_existing_module_permission_object = $role->getSingleModulePermission($body->module_id);
-                        if(is_null($already_existing_module_permission_object)){
+                        if (is_null($already_existing_module_permission_object)) {
                             # Add a new row
                             $new_module_permission_object = new RoleModulePermission();
                             $new_module_permission_object->setRole($role);
@@ -978,29 +976,29 @@ class ApiController extends Controller {
                             $em->persist($new_module_permission_object);
                             $em->flush();
                             return $this->_handleSuccessfulRequest();
-                        }else{
-                            if($already_existing_module_permission_object->getAddPermission() == $body->value){
+                        } else {
+                            if ($already_existing_module_permission_object->getAddPermission() == $body->value) {
                                 throw new \Exception("Value is already $body->value", 412);
-                            }else{
+                            } else {
                                 $already_existing_module_permission_object->setAddPermission($body->value);
                                 $em->flush();
                                 return $this->_handleSuccessfulRequest();
                             }
                         }
-                    }else{
-                        throw new \Exception("Module with module_id($body->module_id) not found",404);
+                    } else {
+                        throw new \Exception("Module with module_id($body->module_id) not found", 404);
                     }
-                }else{
-                    throw new \Exception("Role with role_id($body->role_id) not found",404);
+                } else {
+                    throw new \Exception("Role with role_id($body->role_id) not found", 404);
                 }
-            }else{
-                throw new \Exception("role_id or value or module_id not set in request json",412);
+            } else {
+                throw new \Exception("role_id or value or module_id not set in request json", 412);
             }
-        }else{
+        } else {
             $this->_throwNoPermissionException();
         }
     }
-    
+
     /**
      * This api function will change the delete permission for a module
      * 
@@ -1009,18 +1007,18 @@ class ApiController extends Controller {
      * @return type
      * @throws \Exception
      */
-    private function changeModuleDeletePermission(Request $request, $json){
+    private function changeModuleDeletePermission(Request $request, $json) {
         $user_permissions = $this->get('user_permissions');
-        if($user_permissions->getManageUserAndShareAppPermission()){
+        if ($user_permissions->getManageUserAndShareAppPermission()) {
             $body = $json->body;
-            if(isset($body->role_id) && isset($body->value) && isset($body->module_id)){
+            if (isset($body->role_id) && isset($body->value) && isset($body->module_id)) {
                 $em = $this->getDoctrine()->getManager();
                 $role = $em->getRepository("IntelligentUserBundle:Role")->find($body->role_id);
-                if($role){
+                if ($role) {
                     # Check if the module exists
-                    if($user_permissions->isModuleExists($body->module_id)){
+                    if ($user_permissions->isModuleExists($body->module_id)) {
                         $already_existing_module_permission_object = $role->getSingleModulePermission($body->module_id);
-                        if(is_null($already_existing_module_permission_object)){
+                        if (is_null($already_existing_module_permission_object)) {
                             # Add a new row
                             $new_module_permission_object = new RoleModulePermission();
                             $new_module_permission_object->setRole($role);
@@ -1033,29 +1031,29 @@ class ApiController extends Controller {
                             $em->persist($new_module_permission_object);
                             $em->flush();
                             return $this->_handleSuccessfulRequest();
-                        }else{
-                            if($already_existing_module_permission_object->getDeletePermission() == $body->value){
+                        } else {
+                            if ($already_existing_module_permission_object->getDeletePermission() == $body->value) {
                                 throw new \Exception("Value is already $body->value", 412);
-                            }else{
+                            } else {
                                 $already_existing_module_permission_object->setDeletePermission($body->value);
                                 $em->flush();
                                 return $this->_handleSuccessfulRequest();
                             }
                         }
-                    }else{
-                        throw new \Exception("Module with module_id($body->module_id) not found",404);
+                    } else {
+                        throw new \Exception("Module with module_id($body->module_id) not found", 404);
                     }
-                }else{
-                    throw new \Exception("Role with role_id($body->role_id) not found",404);
+                } else {
+                    throw new \Exception("Role with role_id($body->role_id) not found", 404);
                 }
-            }else{
-                throw new \Exception("role_id or value or module_id not set in request json",412);
+            } else {
+                throw new \Exception("role_id or value or module_id not set in request json", 412);
             }
-        }else{
+        } else {
             $this->_throwNoPermissionException();
         }
     }
-    
+
     /**
      * This api function will change the delete permission for a module
      * 
@@ -1064,18 +1062,18 @@ class ApiController extends Controller {
      * @return type
      * @throws \Exception
      */
-    private function changeModuleCustomFieldPermission(Request $request, $json){
+    private function changeModuleCustomFieldPermission(Request $request, $json) {
         $user_permissions = $this->get('user_permissions');
-        if($user_permissions->getManageUserAndShareAppPermission()){
+        if ($user_permissions->getManageUserAndShareAppPermission()) {
             $body = $json->body;
-            if(isset($body->role_id) && isset($body->value) && isset($body->module_id)){
+            if (isset($body->role_id) && isset($body->value) && isset($body->module_id)) {
                 $em = $this->getDoctrine()->getManager();
                 $role = $em->getRepository("IntelligentUserBundle:Role")->find($body->role_id);
-                if($role){
+                if ($role) {
                     # Check if the module exists
-                    if($user_permissions->isModuleExists($body->module_id)){
+                    if ($user_permissions->isModuleExists($body->module_id)) {
                         $already_existing_module_permission_object = $role->getSingleModulePermission($body->module_id);
-                        if(is_null($already_existing_module_permission_object)){
+                        if (is_null($already_existing_module_permission_object)) {
                             # Add a new row
                             $new_module_permission_object = new RoleModulePermission();
                             $new_module_permission_object->setRole($role);
@@ -1088,29 +1086,29 @@ class ApiController extends Controller {
                             $em->persist($new_module_permission_object);
                             $em->flush();
                             return $this->_handleSuccessfulRequest();
-                        }else{
-                            if($already_existing_module_permission_object->getFieldPermission() == $body->value){
+                        } else {
+                            if ($already_existing_module_permission_object->getFieldPermission() == $body->value) {
                                 throw new \Exception("Value is already $body->value", 412);
-                            }else{
+                            } else {
                                 $already_existing_module_permission_object->setFieldPermission($body->value);
                                 $em->flush();
                                 return $this->_handleSuccessfulRequest();
                             }
                         }
-                    }else{
-                        throw new \Exception("Module with module_id($body->module_id) not found",404);
+                    } else {
+                        throw new \Exception("Module with module_id($body->module_id) not found", 404);
                     }
-                }else{
-                    throw new \Exception("Role with role_id($body->role_id) not found",404);
+                } else {
+                    throw new \Exception("Role with role_id($body->role_id) not found", 404);
                 }
-            }else{
-                throw new \Exception("role_id or value or module_id not set in request json",412);
+            } else {
+                throw new \Exception("role_id or value or module_id not set in request json", 412);
             }
-        }else{
+        } else {
             $this->_throwNoPermissionException();
         }
     }
-    
+
     /**
      * This api function will change the field level permission for a module
      * 
@@ -1119,18 +1117,18 @@ class ApiController extends Controller {
      * @return type
      * @throws \Exception
      */
-    private function changeModuleFieldPermission(Request $request, $json){
+    private function changeModuleFieldPermission(Request $request, $json) {
         $user_permissions = $this->get('user_permissions');
-        if($user_permissions->getManageUserAndShareAppPermission()){
+        if ($user_permissions->getManageUserAndShareAppPermission()) {
             $body = $json->body;
-            if(isset($body->role_id) && isset($body->value) && isset($body->module_id)){
+            if (isset($body->role_id) && isset($body->value) && isset($body->module_id)) {
                 $em = $this->getDoctrine()->getManager();
                 $role = $em->getRepository("IntelligentUserBundle:Role")->find($body->role_id);
-                if($role){
+                if ($role) {
                     # Check if the module exists
-                    if($user_permissions->isModuleExists($body->module_id)){
+                    if ($user_permissions->isModuleExists($body->module_id)) {
                         $already_existing_module_permission_object = $role->getSingleModulePermission($body->module_id);
-                        if(is_null($already_existing_module_permission_object)){
+                        if (is_null($already_existing_module_permission_object)) {
                             # Add a new row
                             $new_module_permission_object = new RoleModulePermission();
                             $new_module_permission_object->setRole($role);
@@ -1142,30 +1140,30 @@ class ApiController extends Controller {
                             $new_module_permission_object->setFieldPermission(RoleModulePermission::DEACTIVE);
                             $em->persist($new_module_permission_object);
                             $module_permission_obj = $new_module_permission_object;
-                        }else{
+                        } else {
                             $module_permission_obj = $already_existing_module_permission_object;
                         }
-                        
-                        if(is_bool($body->value)){
+
+                        if (is_bool($body->value)) {
                             $module_permission_obj->setFieldPermission($body->value);
                             $em->flush();
                             return $this->_handleSuccessfulRequest();
-                        }else if($body->value instanceof \stdClass){
+                        } else if ($body->value instanceof \stdClass) {
                             $value = $body->value;
-                            if(isset($value->field_id) && isset($value->permission)){
-                                if($user_permissions->isfieldExists($body->module_id,$value->field_id)){
+                            if (isset($value->field_id) && isset($value->permission)) {
+                                if ($user_permissions->isfieldExists($body->module_id, $value->field_id)) {
                                     $field_permission_obj = $module_permission_obj->getSingleFieldPermissions($value->field_id);
-                                    if(is_null($field_permission_obj)){
+                                    if (is_null($field_permission_obj)) {
                                         $field_permission_obj = new RoleModuleFieldPermission();
                                         $field_permission_obj->setModulePermission($module_permission_obj);
                                         $field_permission_obj->setFieldNameId($value->field_id);
                                         $field_permission_obj->setPermission($value->permission);
                                         $module_permission_obj->addFieldPermission($field_permission_obj);
                                         $em->persist($field_permission_obj);
-                                    }else{
-                                        if($field_permission_obj->getPermission() == $value->permission){
-                                            throw new \Exception("body.value.permission is already $value->permission",412);
-                                        }else{
+                                    } else {
+                                        if ($field_permission_obj->getPermission() == $value->permission) {
+                                            throw new \Exception("body.value.permission is already $value->permission", 412);
+                                        } else {
                                             $field_permission_obj->setPermission($value->permission);
                                         }
                                     }
@@ -1173,29 +1171,29 @@ class ApiController extends Controller {
                                     $module_permission_obj->setFieldPermission(RoleModulePermission::ACTIVE);
                                     $em->flush();
                                     return $this->_handleSuccessfulRequest();
-                                }else{
-                                    throw new \Exception("body.value.field_id ($value->field_id) do not exists",404);
+                                } else {
+                                    throw new \Exception("body.value.field_id ($value->field_id) do not exists", 404);
                                 }
-                            }else{
-                                throw new \Exception("body.value.field_id or body.value.permission do not exists in request json",412);
+                            } else {
+                                throw new \Exception("body.value.field_id or body.value.permission do not exists in request json", 412);
                             }
-                        }else{
-                            throw new \Exception("value parameter type is not valid",412);
+                        } else {
+                            throw new \Exception("value parameter type is not valid", 412);
                         }
-                    }else{
-                        throw new \Exception("Module with module_id($body->module_id) not found",404);
+                    } else {
+                        throw new \Exception("Module with module_id($body->module_id) not found", 404);
                     }
-                }else{
-                    throw new \Exception("Role with role_id($body->role_id) not found",404);
+                } else {
+                    throw new \Exception("Role with role_id($body->role_id) not found", 404);
                 }
-            }else{
-                throw new \Exception("role_id or value or module_id not set in request json",412);
+            } else {
+                throw new \Exception("role_id or value or module_id not set in request json", 412);
             }
-        }else{
+        } else {
             $this->_throwNoPermissionException();
         }
     }
-    
+
     /**
      * This function will convert the exception into a json response object 
      * 
@@ -1203,7 +1201,7 @@ class ApiController extends Controller {
      * @param type $responseCode
      * @return Response
      */
-    private function _handleException(\Exception $exception, $trace=null) {
+    private function _handleException(\Exception $exception, $trace = null) {
         $error_response_arr = array(
             'head' => array(
                 'status' => 'error'
@@ -1212,11 +1210,11 @@ class ApiController extends Controller {
                 'error_msg' => $exception->getMessage()
             )
         );
-        if(!is_null($trace)){
+        if (!is_null($trace)) {
             $error_response_arr['body']['trace'] = $trace;
         }
         $response = new Response(json_encode($error_response_arr));
-        $http_code = $exception->getCode()? $exception->getCode() :500;
+        $http_code = $exception->getCode() ? $exception->getCode() : 500;
         $response->setStatusCode($http_code);
         $response->headers->set("Content-Type", "application/json");
         return $response;
@@ -1229,13 +1227,13 @@ class ApiController extends Controller {
      * @return Response
      */
     private function _handleSuccessfulRequest($responseData = null) {
-        if(is_null($responseData)){
+        if (is_null($responseData)) {
             $final_response = array(
                 'head' => array(
                     'status' => 'success'
                 )
             );
-        }else{
+        } else {
             $final_response = array(
                 'head' => array(
                     'status' => 'success'
@@ -1281,7 +1279,7 @@ class ApiController extends Controller {
                 ->setBody($body, "text/html");
         $this->get('mailer')->send($message);
     }
-    
+
     /**
      * This method determine which api actions could be
      * called without login
@@ -1289,18 +1287,18 @@ class ApiController extends Controller {
      * @param type $actionName
      * @return boolean
      */
-    private function _isAllowed($actionName){
-        if(in_array($actionName,array("forgetPassword","resetPassword","registerUser"))){
+    private function _isAllowed($actionName) {
+        if (in_array($actionName, array("forgetPassword", "resetPassword", "registerUser"))) {
             return true;
-        }else{
-            if($this->getUser()){
+        } else {
+            if ($this->getUser()) {
                 return true;
-            }else{
+            } else {
                 return false;
             }
         }
     }
-    
+
     /**
      * This function will check if any role ids passed is
      * not available or inactive
@@ -1308,30 +1306,29 @@ class ApiController extends Controller {
      * @param type $rolesArr array of role ids
      * @throws \Exception if any role ids passed is not active
      */
-    private function _checkRoles($rolesArr){
-        if(!is_array($rolesArr)){
+    private function _checkRoles($rolesArr) {
+        if (!is_array($rolesArr)) {
             $rolesArr = array($rolesArr);
         }
         $repo = $this->getDoctrine()->getManager()->getRepository("IntelligentUserBundle:Role");
         $all_roles = $repo->findAll();
         $role_ids = array();
-        foreach($all_roles as $role){
+        foreach ($all_roles as $role) {
             $role_ids[] = $role->getId();
         }
-        
+
         $not_available_roles = array();
-        foreach($rolesArr as $role_id){
-            if(!in_array($role_id,$role_ids)){
+        foreach ($rolesArr as $role_id) {
+            if (!in_array($role_id, $role_ids)) {
                 $not_available_roles[] = $role_id;
             }
         }
-        if(count($not_available_roles) > 0){
+        if (count($not_available_roles) > 0) {
             $not_available_roles_str = implode(", ", $not_available_roles);
             throw new \Exception("role ids ($not_available_roles_str) not available", 412);
         }
-        
     }
-    
+
     /**
      * This function will check if all the status ids
      * are correct
@@ -1339,24 +1336,24 @@ class ApiController extends Controller {
      * @param mived $statusArr 
      * @throws \Exception
      */
-    private function _checkStatus($statusArr){
-        if(!is_array($statusArr)){
+    private function _checkStatus($statusArr) {
+        if (!is_array($statusArr)) {
             $statusArr = array($statusArr);
         }
-        
-        $valid_status_id_arr = array(1,2,3,4,5,6);
+
+        $valid_status_id_arr = array(1, 2, 3, 4, 5, 6);
         $not_valid_status_id_arr = array();
-        foreach($statusArr as $status_id){
-            if(!in_array($status_id,$valid_status_id_arr)){
+        foreach ($statusArr as $status_id) {
+            if (!in_array($status_id, $valid_status_id_arr)) {
                 $not_valid_status_id_arr[] = $status_id;
             }
         }
-        if(count($not_valid_status_id_arr) > 0){
+        if (count($not_valid_status_id_arr) > 0) {
             $not_valid_status_id_str = implode(", ", $not_valid_status_id_arr);
             throw new \Exception("status ids ($not_valid_status_id_str) not available or inactive", 412);
         }
     }
-    
+
     /**
      * The function will check the permitted order by values
      * 
@@ -1364,34 +1361,34 @@ class ApiController extends Controller {
      * @param type $permittedValues
      * @throws \Exception
      */
-    private function _checkOrderBy($orderByKey, $permittedValues){
-        if(!in_array($orderByKey,$permittedValues)){
-            throw new \Exception("body.order_by value($orderByKey) is invalid",412);
+    private function _checkOrderBy($orderByKey, $permittedValues) {
+        if (!in_array($orderByKey, $permittedValues)) {
+            throw new \Exception("body.order_by value($orderByKey) is invalid", 412);
         }
     }
-    
+
     /**
      * This function will check the type of order_type
      * 
      * @param type $orderType
      * @throws \Exception
      */
-    private function _checkOrderType($orderType){
-        if($orderType  !== 'asc' && $orderType !== 'desc'){
-            throw new \Exception("body.order_type value($orderType) is invalid",412);
+    private function _checkOrderType($orderType) {
+        if ($orderType !== 'asc' && $orderType !== 'desc') {
+            throw new \Exception("body.order_type value($orderType) is invalid", 412);
         }
     }
-    
+
     /**
      * This function will return the array of roles
      * 
      * @return array
      */
-    private function _getActiveRoles(){
+    private function _getActiveRoles() {
         $roles_arr = array();
         $repo = $this->getDoctrine()->getManager()->getRepository("IntelligentUserBundle:Role");
         $all_active_roles = $repo->findAll();
-        foreach($all_active_roles as $role){
+        foreach ($all_active_roles as $role) {
             $roles_arr[] = array(
                 "id" => $role->getId(),
                 "name" => $role->getName(),
@@ -1400,13 +1397,13 @@ class ApiController extends Controller {
         }
         return $roles_arr;
     }
-    
+
     /**
      * This function will return the array of status
      * 
      * @return array
      */
-    private function _getUsedStatus(){
+    private function _getUsedStatus() {
         return array(
             array("id" => User::REGISTERED, "name" => "Registered"),
             array("id" => User::UNREGISTERED, "name" => "Unregistered"),
@@ -1416,23 +1413,14 @@ class ApiController extends Controller {
             array("id" => User::PASSWORD_RESET, "name" => "Password Reset"),
         );
     }
+
     /**
      * This function throws exception of no user permission
      * 
      * @throws \Exception
      */
-    private function _throwNoPermissionException(){
+    private function _throwNoPermissionException() {
         throw new \Exception("Current user has no access to do this action", 403);
     }
-    
-    private function _getModuleFieldsArr($moduleDetails){
-        $result = array();
-        foreach($moduleDetails as $field){
-            $result[] = array(
-                "id" => $field['module_field_name'],
-                "name" => $field['module_field_display_name']
-            );
-        }
-        return $result;
-    }
+
 }
