@@ -68,8 +68,17 @@ class DefaultController extends Controller {
     }
     
     public function resetPasswordAction($resetPasswordId){
+        $em = $this->getDoctrine()->getManager();
+        $user = $em->getRepository("IntelligentUserBundle:User")->findOneBy(array("passwordResetId" => $resetPasswordId));
+        if($user){
+            $status = 1;
+        }else{
+            $status = 0;
+        }
+        
         return $this->render('IntelligentUserBundle:Default:reset.html.twig', array(
-            'resetPasswordId' => $resetPasswordId
+            'resetPasswordId' => $resetPasswordId,
+            'status' => $status
         ));
     }
     public function changePasswordAction(Request $request){
