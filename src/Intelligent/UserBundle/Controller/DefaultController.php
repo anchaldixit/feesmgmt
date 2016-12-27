@@ -98,9 +98,9 @@ class DefaultController extends Controller {
         return $this->render('IntelligentUserBundle:Default:mypreferences.html.twig', array());
     }
     
-    public function rolePermissionsAction(Request $request){
+    public function rolePermissionsAction($roleId){
         
-        return $this->render('IntelligentUserBundle:Default:rolepermissions.html.twig', array());
+        return $this->render('IntelligentUserBundle:Default:rolepermissions.html.twig', array('roleId',$roleId));
         
     }
     
