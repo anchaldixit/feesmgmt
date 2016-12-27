@@ -39,7 +39,7 @@ intelligent_roles:
     path: /roles
     defaults: { _controller: IntelligentUserBundle:Default:roles }
 intelligent_rolePermissions:
-    path: /rolePermissions
+    path: /rolePermissions/{roleId}
     defaults: { _controller: IntelligentUserBundle:Default:rolePermissions }
 intelligent_noaccess:
     path: /noaccess
