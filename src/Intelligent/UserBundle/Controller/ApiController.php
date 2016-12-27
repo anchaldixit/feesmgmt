@@ -715,12 +715,13 @@ class ApiController extends Controller {
                     $module_permissions = array();
                     foreach($modules as $module_id => $module_name){
                         $module_permission_obj = $role->getSingleModulePermission($module_id);
-                        
+                        $module_fields = $user_permissions->getSetting()->fetch(array("module" => $module_id));
                         # Get global permissions and info
                         $module_permission = array(
                             'module' => array(
                                 'id' => $module_id,
-                                'name' => $module_name
+                                'name' => $module_name,
+                                'fields' => $this->_getModuleFieldsArr($module_fields)
                             ),
                             'viewPermission' => (is_null($module_permission_obj)? false:$module_permission_obj->getViewPermission()),
                             'editPermission' => (is_null($module_permission_obj)? false:$module_permission_obj->getModifyPermission()),
@@ -730,7 +731,6 @@ class ApiController extends Controller {
                         if(!is_null($module_permission_obj) && $module_permission_obj->getFieldPermission() == RoleModulePermission::ACTIVE){
                             // Get fields permissions
                             $field_permissions = array();
-                            $module_fields = $user_permissions->getSetting()->fetch(array("module" => $module_id));
                             foreach($module_fields as $module_field){
                                 if(is_null($module_permission_obj)){
                                     $field_permission_obj = null;
@@ -739,7 +739,6 @@ class ApiController extends Controller {
                                 }
                                 $field_permissions[] = array(
                                     'id' => $module_field['module_field_name'],
-                                    'name' => $module_field['module_field_display_name'],
                                     'permission' => (is_null($field_permission_obj)? RoleModuleFieldPermission::VIEW: $field_permission_obj->getPermission()) 
                                 );
                             }
@@ -1424,5 +1423,16 @@ class ApiController extends Controller {
      */
     private function _throwNoPermissionException(){
         throw new \Exception("Current user has no access to do this action", 403);
+    }
+    
+    private function _getModuleFieldsArr($moduleDetails){
+        $result = array();
+        foreach($moduleDetails as $field){
+            $result[] = array(
+                "id" => $field['module_field_name'],
+                "name" => $field['module_field_display_name']
+            );
+        }
+        return $result;
     }
 }
