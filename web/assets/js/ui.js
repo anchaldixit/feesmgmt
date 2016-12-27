@@ -13,19 +13,18 @@ function User() {
 function Role() {
 }
 
-function Permission(){
+function Permission() {
 }
 
-$.extend(Login,{
+$.extend(Login, {
     ajaxLink: window.location.origin + '/api/v1/general',
     ajaxLink2: window.location.origin + '/api/v1',
     role: new Role(),
     user: new User()
 });
 
-$.extend(Login.prototype,{
-    
-    init: function(){
+$.extend(Login.prototype, {
+    init: function () {
         var that = this;
         that.bindForgetPasswordAction();
         that.flipForm();
@@ -38,6 +37,9 @@ $.extend(Login.prototype,{
         }
         if ($('#registration').length) {
             that.registration();
+        }
+        if ($('#reset_password').length) {
+            that.resetPassword();
         }
     },
     getForgetPassword: function (_val) {
@@ -235,6 +237,52 @@ $.extend(Login.prototype,{
 
         });
     },
+    resetPassword: function () {
+        var that = this;
+        var error = '';
+        var flag = true;
+
+        $('#reset_password_btn').click(function () {
+            var new_pass = $('#reset_new_password').val();
+            var re_new_pass = $('#reset_re_new_password').val();
+
+            if ($.trim(new_pass) == '') {
+                error = 'Password can not empty';
+                var pass = $('#reset_new_password');
+                var errDiv = pass.next('.validation_msg2');
+                errDiv.html(error);
+            }
+            else if ($.trim(re_new_pass) == '') {
+                error = 'Retype Password can not empty';
+                var pass = $('#reset_re_new_password');
+                var errDiv = pass.next('.validation_msg2');
+                errDiv.html(error);
+            }
+            else if (new_pass != re_new_pass) {
+                error = 'ReType Password is not matching';
+                var pass = $('#reset_re_new_password');
+                var errDiv = pass.next('.validation_msg2');
+                errDiv.html(error);
+            }
+            else {
+                var obj = {
+                    head: {
+                        action: "resetPassword"
+                    },
+                    body: {
+                        "reset_password_id": resetId,
+                        "new_password": new_pass
+                    }
+                }
+            }
+            var _obj = JSON.stringify(obj);
+            Login.user.getAjaxData(Login.ajaxLink, _obj, function () {
+                window.location.href = 'http://' + window.location.hostname + '/login?reset_pass=1';
+            });
+
+        });
+
+    },
     fieldValidate: function (valobj, field) {
 
         var that = this;
@@ -267,7 +315,7 @@ $.extend(Login.prototype,{
         var regex = /^([a-zA-Z0-9_.+-])+\@(([a-zA-Z0-9-])+\.)+([a-zA-Z0-9]{2,4})+$/;
         return regex.test(email);
     }
-    
+
 });
 
 $.extend(User, {
@@ -280,7 +328,7 @@ $.extend(User, {
 $.extend(User.prototype, {
     init: function () {
         var that = this;
-        
+
         User.role.init();
         User.login.init();
         that.featureSlider();
@@ -289,7 +337,6 @@ $.extend(User.prototype, {
         }
 
     },
-    
     featureSlider: function () {
         if ($('.feature-list').length) {
             var li_width = 30;
@@ -323,8 +370,6 @@ $.extend(User.prototype, {
             });
         }
     },
-    
-    
     createUserPage: function () {
         var that = this;
         that.flag = true;
@@ -351,7 +396,8 @@ $.extend(User.prototype, {
         that.addUserFilter();
         that.changeRole();
         that.sortUserTable();
-
+        User.role.openPopup('.add-popup');
+        User.role.closePopup();
     },
     disableUser: function () {
         var that = this;
@@ -550,26 +596,26 @@ $.extend(User.prototype, {
         $('.sort_table').click(function () {
             var order_by = $(this).attr('data-order-by');
             var order_type = $(this).attr('data-order-type');
-            $('#userList .sort_table').each(function(){
+            $('#userList .sort_table').each(function () {
                 var _orderType = $(this).attr('data-order-type');
-                if(_orderType != 'desc'){
+                if (_orderType != 'desc') {
                     $(this).find('.fa').removeClass('fa-caret-up').addClass('fa-caret-down');
                     $(this).removeClass('active_sort');
                     $(this).attr('data-order-type', 'asc');
                 }
             });
-            
-            if(order_type == 'asc'){
+
+            if (order_type == 'asc') {
                 $(this).find('.fa').addClass('fa-caret-down').removeClass('fa-caret-up');
                 $(this).attr('data-order-type', 'desc');
                 $(this).addClass('active_sort');
             }
-            else{
+            else {
                 $(this).find('.fa').removeClass('fa-caret-down').addClass('fa-caret-up');
                 $(this).attr('data-order-type', 'asc');
                 $(this).addClass('active_sort');
             }
-            
+
             var checkedroles = that.getSelectedRoles();
             var checkedStatus = that.getSelectedStatus();
             var searchText = $.trim($('#search_user').val());
@@ -598,7 +644,7 @@ $.extend(User.prototype, {
         if ($('#userList .active_sort').length) {
             var oderby = $('#userList .active_sort').attr('data-order-by');
             var ordertype = $('#userList .active_sort').attr('data-order-type');
-            ordertype = (ordertype == 'desc' ? 'asc':'desc');
+            ordertype = (ordertype == 'desc' ? 'asc' : 'desc');
             sortby.push(oderby);
             sortby.push(ordertype);
         }
@@ -687,6 +733,14 @@ $.extend(User.prototype, {
 
         });
     },
+    inviteUsers: function(){
+        $('#invite-users-action').click(function(){
+            var useremail = $('#useremail').val();
+            var selectedrole = $('#selected_role :selected').val();
+            
+            
+        });
+    },
     getSelectedRoles: function () {
         var that = this;
         that.checkedRoles = [];
@@ -773,7 +827,7 @@ $.extend(User.prototype, {
             }
         });
     }
-    
+
 });
 
 $.extend(Role, {
@@ -942,52 +996,52 @@ $.extend(Role.prototype, {
         });
     },
     openPopup: function (_Id) {
-        $(_Id).click(function(){
+        $(_Id).click(function () {
             var modalId = $(this).attr('data-modal-id');
             $(modalId).show();
             return false;
         });
     },
     closePopup: function () {
-        $('.close-popup').click(function(){
-          $('.popup-wrapper').hide();
-          return false;
-            
+        $('.close-popup').click(function () {
+            $('.popup-wrapper').hide();
+            return false;
+
         });
     },
-    createRole: function(){
+    createRole: function () {
         var that = this;
         var error = '';
         var ajaxLink = User.ajaxLink2;
-        $('#create_role').click(function(){
+        $('#create_role').click(function () {
             $('.validation_msg').html('');
             var _roleName = $.trim($('#role_name').val());
             var _roleDesc = $.trim($('#role_description').val());
-            
-            if(_roleName == ''){
+
+            if (_roleName == '') {
                 errDiv = $('#role_name').next('.validation_msg');
                 error = 'Role Name Field can be empty';
                 errDiv.html(error);
             }
-            
-            else if(_roleDesc == ''){
+
+            else if (_roleDesc == '') {
                 errDiv = $('#role_description').next('.validation_msg');
                 error = 'Role Description can be empty';
                 errDiv.html(error);
             }
-            else{
+            else {
                 var obj = {
-                        head:{
-                            action:"createRole"
-                        },
-                        body:{
-                            name:_roleName,
-                            description: _roleDesc
-                        }
+                    head: {
+                        action: "createRole"
+                    },
+                    body: {
+                        name: _roleName,
+                        description: _roleDesc
                     }
+                }
                 var _obj = JSON.stringify(obj);
-                user.getAjaxData(ajaxLink, _obj, function(_data){
-                    window.location.href = 'http://'+window.location.hostname+'/roles?new_role='+_data.body.role_id;
+                user.getAjaxData(ajaxLink, _obj, function (_data) {
+                    window.location.href = 'http://' + window.location.hostname + '/roles?new_role=' + _data.body.role_id;
                 });
             }
         });
@@ -996,17 +1050,16 @@ $.extend(Role.prototype, {
 
 
 
-$.extend(Permission,{
-    
+$.extend(Permission, {
 });
 
-$.extend(Permission.prototype,{
-    init: function(){
-        
+$.extend(Permission.prototype, {
+    init: function () {
+
     },
-    createTabs: function(){
-        if($('#createTab').length){
-            
+    createTabs: function () {
+        if ($('#createTab').length) {
+
         }
     }
 });
