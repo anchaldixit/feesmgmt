@@ -19,7 +19,7 @@ security:
             pattern: ^/(_(profiler|wdt)|css|images|js)/
             security: false
         not_secured:
-            pattern: ^/(resetPassword|api/v1/general|login|inviteUser)
+            pattern: ^/(resetPassword|api/v1/general|login|inviteUser)$
             security: false
         secured_area:
             pattern: ^/

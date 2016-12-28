@@ -634,9 +634,7 @@ class ApiController extends Controller {
      * @throws \Exception
      */
     private function disableRole(Request $request, $json) {
-        /**
-         * @var Intelligent\UserBundle\Services\UserPermissions
-         */
+        
         $user_permissions = $this->get('user_permissions');
         if ($user_permissions->getManageUserAndShareAppPermission()) {
             $body = $json->body;
@@ -716,7 +714,6 @@ class ApiController extends Controller {
                     $module_permissions = array();
                     foreach ($modules as $module_id => $module_name) {
                         $module_permission_obj = $role->getSingleModulePermission($module_id);
-                        $module_fields = $user_permissions->getSetting()->fetch(array("module" => $module_id));
                         # Get global permissions and info
                         $module_permission = array(
                             'module' => array(
@@ -730,22 +727,22 @@ class ApiController extends Controller {
                             'fieldPermission' => (is_null($module_permission_obj) ? false : $module_permission_obj->getFieldPermission())
                         );
                         
-                        $field_permissions = array();
-                        foreach ($module_fields as $module_field) {
-                            if (is_null($module_permission_obj)) {
-                                $field_permission_obj = null;
-                            } else {
-                                $field_permission_obj = $module_permission_obj->getSingleFieldPermissions($module_field['module_field_name']);
-                            }
-                            $field_permissions[] = array(
-                                'id' => $module_field['module_field_name'],
-                                'name' => $module_field['module_field_display_name'],
-                                'permission' => (is_null($field_permission_obj) ? RoleModuleFieldPermission::VIEW : $field_permission_obj->getPermission())
-                            );
-                        }
-
-                        # Combine the two
-                        $module_permission['customFieldPermission'] = $field_permissions;
+//                        $field_permissions = array();
+//                        foreach ($module_fields as $module_field) {
+//                            if (is_null($module_permission_obj)) {
+//                                $field_permission_obj = null;
+//                            } else {
+//                                $field_permission_obj = $module_permission_obj->getSingleFieldPermissions($module_field['module_field_name']);
+//                            }
+//                            $field_permissions[] = array(
+//                                'id' => $module_field['module_field_name'],
+//                                'name' => $module_field['module_field_display_name'],
+//                                'permission' => (is_null($field_permission_obj) ? RoleModuleFieldPermission::VIEW : $field_permission_obj->getPermission())
+//                            );
+//                        }
+//
+//                        # Combine the two
+//                        $module_permission['customFieldPermission'] = $field_permissions;
                         $module_permissions[] = $module_permission;
                     }
                     $result = array(

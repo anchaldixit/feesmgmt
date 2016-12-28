@@ -37,8 +37,8 @@ class UserPermissions {
     public function getUser() {
         return $this->user;
     }
-    
-    public function getSetting(){
+
+    public function getSetting() {
         return $this->settings;
     }
 
@@ -151,54 +151,56 @@ class UserPermissions {
     }
 
     /**
-     * This function will return the permissions user have for
-     * individual fields in the module row
+     * This function returns the permission of fields in the module
      * 
-     * @param string $module Name of the module
-     * @param string $field  Name of the field
-     * @return mixed false => if module or field do not exists
-     *               0 => if no view or edit access,
-     *               1 => if only view access is enabled
-     *               2 => if view and edit both permissions are enabled
+     * @param type $module
+     * @param type $userFieldIdAsKey
+     * @return mixed It returns array of field and permission if module exists
+     * and returns false if module dont exists
      */
-    public function getFieldPermissionFor($module, $field) {
-        # First check if the module and field exists
-        if ($this->isfieldExists($module,$field)) {
-            # Then see if the module permission exists then we have to see
-            # if we have explicit information on the fields or not 
-            # First get the module permission object
+    public function getAllFieldPermissions($module,$userFieldIdAsKey=true) {
+        $fields_permission = array();
+        $fields = $this->getSetting()->fetch(array("module" => $module));
+        if ($fields) {
             $module_permission = $this->role->getSingleModulePermission($module);
-            if ($module_permission instanceof RoleModulePermission) {
-                # Let's see if the custom permission is on or not
-                $custom_field_permission = $module_permission->getFieldPermission();
-                if ($custom_field_permission === FALSE) {
-                    # Then it will fall back on the global module permission
-                    if ($module_permission->getModifyPermission()) {
-                        return 2; // give edit permission
-                    } else if ($module_permission->getViewPermission()) {
-                        return 1; // give read permission
-                    } else {
-                        return 0; // no permission
-                    }
-                } else {
-                    $field_permission = $module_permission->getSingleFieldPermissions($field);
-                    if ($field_permission instanceof RoleModuleFieldPermission) {
-                        return $field_permission->getPermission();
-                    } else {
-                        # Again it will fall back on the global module permission
-                        if ($module_permission->getModifyPermission()) {
-                            return 2; // give edit permission
-                        } else if ($module_permission->getViewPermission()) {
-                            return 1; // give read permission
-                        } else {
-                            return 0; // no permission
+            foreach ($fields as $field) {
+                if(!($module_permission instanceof RoleModulePermission)){
+                    $permission = 0; // Not even a view access;
+                }else{
+                    $view_permission = $module_permission->getViewPermission();
+                    $edit_permission = $module_permission->getModifyPermission();
+                    // If custom field permission exists
+                    if($module_permission->getFieldPermission()){
+                        // If we have a explicit field permission
+                        $explicit_field_permission = $module_permission->getSingleFieldPermissions($fieldName);
+                        if($explicit_field_permission){
+                            $permission = $explicit_field_permission->getPermission();
+                        }else{
+                            $permission = 0;
+                        }
+                    }else{
+                        if($edit_permission && $view_permission){
+                            $permission = 2; // Edit pemission
+                        }else if($view_permission){
+                            $permission = 1; // View permission
+                        }else{
+                            $permission = 0; // Not even view permission
                         }
                     }
                 }
-            } else {
-                return 0; // Not even a view access
+                // Chose return format;
+                if($userFieldIdAsKey){
+                    $fields_permission[$field['module_field_name']] = $permission;
+                }else{
+                    $fields_permission[] = array(
+                        'id' => $field['module_field_name'],
+                        'name' => $field['module_field_display_name'],
+                        'permission' => $permission
+                    );
+                }
             }
-        } else {
+            return $fields_permission;
+        }else{
             return false;
         }
     }
@@ -208,7 +210,7 @@ class UserPermissions {
     }
 
     public function isfieldExists($moduleName, $fieldName) {
-        if($this->isModuleExists($moduleName)){
+        if ($this->isModuleExists($moduleName)) {
             return false;
         }
         $fields = $this->settings->fetch(array('module' => $moduleName));
