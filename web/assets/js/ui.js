@@ -230,7 +230,7 @@ $.extend(Login.prototype, {
                     }
                 }
                 var _obj = JSON.stringify(obj);
-                Login.user.getAjaxData(Login.ajaxLink2, _obj, function () {
+                Login.user.getAjaxData(Login.ajaxLink, _obj, function () {
                     window.location.href = 'http://' + window.location.hostname + '/login?new_registration=1';
                 });
             }
@@ -320,7 +320,6 @@ $.extend(Login.prototype, {
 
 $.extend(User, {
     ajaxLink2: Login.ajaxLink2,
-    ajaxLink1: Login.ajaxLink,
     roles: ['Registered', 'Unregistered', 'Unverified', 'Deactivated', 'Denied', 'Password Reset'],
     role: new Role(),
     login: new Login(),
@@ -826,7 +825,7 @@ $.extend(User.prototype, {
                 }
                 var _obj = JSON.stringify(obj);
 
-                that.getAjaxData(User.ajaxLink1, _obj, function (_data) {
+                that.getAjaxData(User.ajaxLink2, _obj, function (_data) {
                     $('#inviteUsers').hide();
                     window.location.href = 'http://' + window.location.hostname + '/users?invitation_send=' + useremail;
 
