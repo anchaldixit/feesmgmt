@@ -993,5 +993,31 @@ input[type="submit"]:focus, input[type="button"]:focus {
           margin-bottom: 0; }
         .popup-wrapper .popup .popup-body ul li:last-child {
           margin-bottom: 0; }
+      .popup-wrapper .popup .popup-body .custom-field-table {
+        border: 1px solid #cacaca;
+        width: 100%; }
+        .popup-wrapper .popup .popup-body .custom-field-table tr th {
+          width: 70%;
+          padding: 10px;
+          border: 1px solid #cacaca;
+          border-collapse: collapse;
+          background-color: #ebe9e9;
+          text-align: left; }
+        .popup-wrapper .popup .popup-body .custom-field-table tr th + th {
+          width: 30%;
+          text-align: center; }
+        .popup-wrapper .popup .popup-body .custom-field-table tr td {
+          width: 70%;
+          padding: 10px;
+          border-collapse: collapse;
+          border: 1px solid #cacaca;
+          text-align: left; }
+          .popup-wrapper .popup .popup-body .custom-field-table tr td:nth-child(2n) {
+            background-color: #fafafa; }
+          .popup-wrapper .popup .popup-body .custom-field-table tr td:nth-child(2n+1) {
+            background-color: #ffffff; }
+        .popup-wrapper .popup .popup-body .custom-field-table tr td + td {
+          width: 30%;
+          text-align: center; }
   .popup-wrapper .popup2 {
     width: 650px; }

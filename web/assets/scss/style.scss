@@ -1264,6 +1264,44 @@ input[type="submit"],input[type="button"]{
                     }
                 }
             }
+            .custom-field-table{
+                border: 1px solid #cacaca;
+                width:100%;
+                tr{
+                    th{
+                        width: 70%;
+                        padding: 10px;
+                        border: 1px solid #cacaca;
+                        border-collapse: collapse;
+                        background-color: #ebe9e9;
+                        text-align: left;
+                    }
+                    th+th{
+                        width: 30%;
+                        text-align: center;
+                    }
+                }
+                tr{
+                    td{
+                        width: 70%;
+                        padding: 10px;
+                        border-collapse: collapse;
+                        border: 1px solid #cacaca;
+                        text-align:left;
+                        &:nth-child(2n){
+                            background-color: #fafafa;
+                        }
+                        &:nth-child(2n+1){
+                            background-color: #ffffff;
+                        }
+                        
+                    }
+                    td+td{
+                        width: 30%;
+                        text-align: center;
+                    }
+                }
+            }
         }
     }
     .popup2{

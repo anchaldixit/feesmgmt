@@ -1079,7 +1079,7 @@ $.extend(Role.prototype, {
         });
     },
     openPopup: function (_Id) {
-        $(_Id).click(function () {
+        $(_Id).click(function () { alert(222222222);
             var modalId = $(this).attr('data-modal-id');
             $(modalId).show();
             return false;
@@ -1141,7 +1141,8 @@ $.extend(Permission, {
         '<i class="fa fa-envelope"></i>',
         '<i class="fa fa-desktop"></i>'
     ],
-    user: new User()
+    user: new User(),
+    role: new Role()
 });
 
 $.extend(Permission.prototype, {
@@ -1155,7 +1156,9 @@ $.extend(Permission.prototype, {
         that.changeModuleDeletePermission();
         that.appStructurePermission();
         that.shareAppPermission();
-
+        that.changeModuleFieldPermission();
+        that.customFieldPopup();
+        
     },
     createTabs: function () {
         if ($('#createTab').length) {
@@ -1175,6 +1178,7 @@ $.extend(Permission.prototype, {
         if ($('#createTab').length) {
             that.createTabs();
             that.getPermissionsByRole();
+            that.changeFieldPermission();
 
         }
 
@@ -1201,7 +1205,7 @@ $.extend(Permission.prototype, {
             var deletePermission = '';
             var icon = '';
             $.each(_data, function (index) {
-                //console.log(data.body);
+                //console.log(_data[index]);
                 if (Permission.moduleIcon[index] !== undefined) {
                     icon = Permission.moduleIcon[index];
                 }
@@ -1245,10 +1249,16 @@ $.extend(Permission.prototype, {
                 html += '<td>' + editPermission + '</td>';
                 html += '<td>' + deletePermission + '</td>';
                 html += '<td>';
-                html += '<select disabled>';
-                html += '<option value="full_access">Full Access</option>';
-                html += '<option value="no_access">No Access</option>';
+                html += '<select class="changeModuleFieldPermission" data-module-id="'+_data[index].module.id+'">';
+                html += '<option value="false"'+ (_data[index].fieldPermission == false ? 'selected' : '') +'>Full Access</option>';
+                html += '<option value="true"'+ (_data[index].fieldPermission == true ? 'selected' : '') +'>Custom Access</option>';
                 html += '</select>';
+                if(_data[index].fieldPermission == true){
+                    html += '&nbsp;&nbsp;<span class="pencil"><a href="#" data-module-id="'+_data[index].module.id+'" data-modal-pop-id="#customPermissionPop" class="open-popup"><i class="fa fa-pencil"></i></a></span>';
+                }
+                else{
+                    html += '&nbsp;&nbsp;<span class="pencil"></span>';
+                }
                 html += '</td>';
                 html += '</tr>';
             });
@@ -1264,10 +1274,14 @@ $.extend(Permission.prototype, {
                 $("#app_structure_permission").prop("checked", appStructurePermission);
                 $("#app_structure_permission").attr('data-role-id', roleId);
             }
+            
+            
+            Permission.role.closePopup();
 
         });
 
-
+        
+        
     },
     changeModuleViewPermission: function () {
         var roleId = '';
@@ -1449,7 +1463,46 @@ $.extend(Permission.prototype, {
 
     },
     changeModuleFieldPermission: function () {
-
+        $('#permissionsTable').on('change','.changeModuleFieldPermission',function(){
+            var sel = $(this);
+            var _val = $(this).val();
+            var flag = '';
+            var moduleId = $(this).attr('data-module-id');
+            if(_val == 'true'){
+                flag = true;}
+            else{
+                flag = false;}
+            var obj = {
+                    head:{
+                        action:"changeModuleFieldPermission"
+                    },
+                    body:{
+                        "role_id":parseInt(roleId),
+                        "module_id" :moduleId,
+                        "value": flag
+                    }
+                }
+                
+            var _obj = JSON.stringify(obj);
+            Permission.user.getAjaxData(User.ajaxLink2,_obj, function(data){
+                var ajax_msg = 'Custom Field Permission changed';
+                $('.info-notice').html(ajax_msg);
+                $('.notify').addClass('n-animation');
+                setTimeout(function () {
+                    $('.notify').removeClass('n-animation');
+                }, 2500);
+                var td = sel.parent('td');
+                if(sel.val() == 'true'){
+                
+                var pen = td.find('.pencil');
+                pen.html('<a href="#" data-module-id="'+moduleId+'" data-modal-pop-id="#customPermissionPop" class="open-popup"><i class="fa fa-pencil"></i></a>');
+            }
+            else{
+               var pen = td.find('.pencil');
+                pen.html(''); 
+            }
+            });
+        });
     },
     shareAppPermission: function () {
         $("#share_app_permission").click(function () {
@@ -1491,6 +1544,76 @@ $.extend(Permission.prototype, {
             var _obj = JSON.stringify(obj);
             Permission.user.getAjaxData(User.ajaxLink2, _obj, function (data) {
                 var ajax_msg = 'App Structure Permission changed';
+                $('.info-notice').html(ajax_msg);
+                $('.notify').addClass('n-animation');
+                setTimeout(function () {
+                    $('.notify').removeClass('n-animation');
+                }, 2500);
+            });
+        });
+    },
+    customFieldPopup: function(){
+        $('#permissionsTable').on('click', '.open-popup', function(){
+            var modalPopId = $(this).attr('data-modal-pop-id');
+            var moduleId = $(this).attr('data-module-id');
+            var obj = {
+                    head:{
+                        action:"getModuleFieldPermissions"
+                    },
+                    body:{
+                        module_id:moduleId
+                    }
+                };
+            var _obj = JSON.stringify(obj);
+            Permission.user.getAjaxData(User.ajaxLink2, _obj, function (data) {
+                var html = '';
+                //console.log(data);
+                var _data = data.body.fields;
+                $.each(_data, function(index){
+                    html += '<tr>';
+                    html += '<td>'+_data[index].name+'</td>';
+                    html += '<td>'
+                    html += '<select class="setFieldPermission" data-module-id="'+moduleId+'" data-field-id="'+ _data[index].id +'">';
+                    html += '<option value="0" '+(_data[index].permission == 0 ? 'selected':'')+'>No View</option>';
+                    html += '<option value="1" '+(_data[index].permission == 1 ? 'selected':'')+'>View</option>';
+                    html += '<option value="2" '+(_data[index].permission == 2 ? 'selected':'')+'>Edit</option>';
+                    html += '</select>';
+                    html += '</td>';
+                    html += '</tr>';
+                });
+                
+                $('.custom-field-table tbody').html('');
+                $('.custom-field-table tbody').html(html);
+                $(modalPopId).show();
+            });
+            
+            return false;
+        });
+    },
+    changeFieldPermission : function (){
+        $('#customPermissionPop').on('change','.setFieldPermission',function(){
+            var _val = $(this).val();
+            var moduleId = $(this).attr('data-module-id');
+            var fieldId = $(this).attr('data-field-id');
+            
+            var obj = {
+                head:{
+                    action:"changeModuleFieldPermission"
+                },
+                body:{
+                    role_id:parseInt(roleId),
+                    module_id :moduleId,
+                    value:{
+                        field_id:fieldId,
+                        permission:_val
+                    }
+                }
+            }
+            console.log(obj);
+            var _obj = JSON.stringify(obj);
+            Permission.user.getAjaxData(User.ajaxLink2, _obj, function (data) {
+                $('.popup-wrapper').hide();
+                var ajax_msg = 'Field Permission changed';
                 $('.info-notice').html(ajax_msg);
                 $('.notify').addClass('n-animation');
                 setTimeout(function () {
