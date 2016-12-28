@@ -304,19 +304,21 @@ class ApiController extends Controller {
                     }
                     if (isset($body->filter) && $body->filter === true) {
                         return $this->_handleSuccessfulRequest(array(
-                                    'data' => $users,
-                                    "order_by" => $body->order_by,
-                                    "order_type" => $body->order_type,
-                                    "filters" => array(
-                                        "roles" => $this->_getActiveRoles(),
-                                        "status" => $this->_getUsedStatus()
-                                    )
+                            "loggedin_user_id" => $this->getUser()->getId(),   
+                            'data' => $users,
+                            "order_by" => $body->order_by,
+                            "order_type" => $body->order_type,
+                            "filters" => array(
+                                "roles" => $this->_getActiveRoles(),
+                                "status" => $this->_getUsedStatus()
+                            )
                         ));
                     } else {
                         return $this->_handleSuccessfulRequest(array(
-                                    'data' => $users,
-                                    "order_by" => $body->order_by,
-                                    "order_type" => $body->order_type
+                            "loggedin_user_id" => $this->getUser()->getId(),
+                            'data' => $users,
+                            "order_by" => $body->order_by,
+                            "order_type" => $body->order_type
                         ));
                     }
                 }
@@ -624,7 +626,43 @@ class ApiController extends Controller {
             $this->_throwNoPermissionException();
         }
     }
+    
+    /**
+     * This method will edit a role
+     * 
+     * @param Request $request
+     * @param type $json
+     * @return type
+     * @throws \Exception
+     */
+    private function editRole(Request $request, $json) {
+        $user_permissions = $this->get('user_permissions');
+        if ($user_permissions->getManageUserAndShareAppPermission()) {
+            $body = $json->body;
+            if (isset($body->role_id) && isset($body->name) && isset($body->description)) {
+                $em = $this->getDoctrine()->getManager();
+                $repo = $em->getRepository("IntelligentUserBundle:Role");
+                $present_role = $repo->find($body->role_id);
+                if (!$present_role) {
+                    throw new \Exception("Role with role_id($body->role_id) do not exists", 404);
+                } else {
+                    # Edit role
+                    $present_role->setName($body->name);
+                    $present_role->setDescription($body->description);
+                    
+                    $em->persist($present_role);
+                    $em->flush();
+                    return $this->_handleSuccessfulRequest();
+                }
+            } else {
+                throw new \Exception("role_id or name or description is not set in the request json", 400);
+            }
+        } else {
+            $this->_throwNoPermissionException();
+        }
+    }
 
+    
     /**
      * This method will disable a role
      * 
@@ -1191,6 +1229,14 @@ class ApiController extends Controller {
         }
     }
 
+    /**
+     * This api function will get the field level permission for a module
+     * 
+     * @param Request $request
+     * @param type $json
+     * @return type
+     * @throws \Exception
+     */
     private function getModuleFieldPermissions(Request $request, $json){
         $user_permissions = $this->get('user_permissions');
         if ($user_permissions->getManageUserAndShareAppPermission()) {

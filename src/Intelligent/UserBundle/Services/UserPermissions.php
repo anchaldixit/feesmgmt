@@ -34,10 +34,11 @@ class UserPermissions {
         $this->role = $tokenStorage->getToken()->getUser()->getRole();
     }
 
-    public function getUser() {
-        return $this->user;
-    }
-
+    /**
+     * Get the seetings
+     * 
+     * @return Intelligent\SettingBundle\Lib\Settings
+     */
     public function getSetting() {
         return $this->settings;
     }
@@ -173,7 +174,7 @@ class UserPermissions {
                     if($module_permission->getFieldPermission()){
                         // If we have a explicit field permission
                         $explicit_field_permission = $module_permission->getSingleFieldPermissions($field['module_field_name']);
-                        if($explicit_field_permission){
+                        if($explicit_field_permission instanceof RoleModuleFieldPermission){
                             $permission = $explicit_field_permission->getPermission();
                         }else{
                             $permission = 0;
@@ -205,10 +206,23 @@ class UserPermissions {
         }
     }
 
+    /**
+     * Check is the module with the module name exists
+     * 
+     * @param type $moduleName
+     * @return bool
+     */
     public function isModuleExists($moduleName) {
         return in_array($moduleName, array_keys($this->settings->getModule()));
     }
 
+    /**
+     * Check is the field exists in a module
+     * 
+     * @param type $moduleName
+     * @param type $fieldName
+     * @return boolean
+     */
     public function isfieldExists($moduleName, $fieldName) {
         if ($this->isModuleExists($moduleName)) {
             return false;
