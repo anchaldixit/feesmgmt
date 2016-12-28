@@ -431,6 +431,7 @@ $.extend(User.prototype, {
                 $('.info-notice').html(ajax_msg);
                 var tr = td.closest('tr');
                 tr.find('.status').text('Deactivated');
+                tr.find('.change_role').prop('disabled', 'disabled');
                 tr.css('background-color', '#ffc0cc');
                 td.removeClass('disable_user');
                 td.addClass('activate_user');
@@ -469,7 +470,7 @@ $.extend(User.prototype, {
                 $('.info-notice').html(ajax_msg);
                 var tr = td.closest('tr');
                 tr.find('.status').text(User.roles[_data.body.status - 1]);
-
+                tr.find('.change_role').prop('disabled', false);
                 tr.css('background-color', '');
                 td.removeClass('activate_user');
                 td.addClass('disable_user');
@@ -693,10 +694,12 @@ $.extend(User.prototype, {
         var that = this;
 
         that.getAjaxData(User.ajaxLink2, _obj, function (responseData) {
+            //console.log(responseData);
             var html = '';
             var status = '';
             var status_ul = '';
             var roles = '';
+            var logged_user_id = responseData.body.loggedin_user_id;
             var _data = responseData.body.data;
             var allstatus = responseData.body.filters.status;
             var allroles = responseData.body.filters.roles;
@@ -725,7 +728,12 @@ $.extend(User.prototype, {
 
                     var userrole = _data[index].role.id;
                     var selectbox = '';
-                    selectbox += '<select class="change_role" data-user-id="' + _data[index].id + '">';
+                    if (_data[index].status == 4) {
+                    selectbox += '<select class="change_role" data-user-id="' + _data[index].id + '" disabled>';
+                }
+                else{
+                    selectbox += '<select class="change_role" data-user-id="' + _data[index].id + '" '+ (_data[index].id == logged_user_id?'disabled':'') +'>';
+                }
                     $.each(allroles, function (index) {
                         selectbox += '<option ' + (userrole == allroles[index].id ? 'selected' : '') + ' value = "' + allroles[index].id + '" ' + (allroles[index].status == 1 ? "" : 'disabled') + '>' + allroles[index].name + '</option>';
                     });
@@ -739,14 +747,20 @@ $.extend(User.prototype, {
                     else {
                         html += '<tr>';
                     }
-                    html += '<td><a href="#">' + (_data[index].name == null ? _data[index].email : _data[index].name) + '</a></td>';
+                    html += '<td><a href="mailto:'+_data[index].email+'">' + (_data[index].name == null ? _data[index].email : _data[index].name) + '</a>';
+                    html += (_data[index].id == logged_user_id?'<i class="fa fa-check"></i>':''); 
+                    html += '</td>';
                     html += '<td>' + selectbox + '</td>';
                     html += '<td class="status">' + status + '</td>';
                     html += '<td>' + _data[index].last_login + '</td>';
                     if (_data[index].status == 4)
                         html += '<td><a class="activate_user" href="#"  data-id="' + _data[index].id + '"><i class="fa fa-check green"></i></a></td>';
                     else {
-                        html += '<td><a class="disable_user" href="#"  data-id="' + _data[index].id + '"><i class="fa fa-times red"></i></a></td>';
+                        html += '<td>';
+                        if(_data[index].id != logged_user_id){
+                            html += '<a class="disable_user" href="#"  data-id="' + _data[index].id + '"><i class="fa fa-times red"></i></a>';
+                        }
+                        html += '</td>';
                     }
                     html += '</tr>';
                 });
@@ -1079,7 +1093,8 @@ $.extend(Role.prototype, {
         });
     },
     openPopup: function (_Id) {
-        $(_Id).click(function () { alert(222222222);
+        $(_Id).click(function () {
+            
             var modalId = $(this).attr('data-modal-id');
             $(modalId).show();
             return false;
@@ -1150,15 +1165,8 @@ $.extend(Permission.prototype, {
         var that = this;
 
         that.createPermissionPage();
-        that.changeModuleViewPermission();
-        that.changeModuleAddPermission();
-        that.changeModuleEditPermission();
-        that.changeModuleDeletePermission();
-        that.appStructurePermission();
-        that.shareAppPermission();
-        that.changeModuleFieldPermission();
-        that.customFieldPopup();
         
+
     },
     createTabs: function () {
         if ($('#createTab').length) {
@@ -1176,10 +1184,18 @@ $.extend(Permission.prototype, {
     createPermissionPage: function () {
         var that = this;
         if ($('#createTab').length) {
+            that.changeModuleViewPermission();
+            that.changeModuleAddPermission();
+            that.changeModuleEditPermission();
+            that.changeModuleDeletePermission();
+            that.appStructurePermission();
+            that.shareAppPermission();
+            that.changeModuleFieldPermission();
+            that.customFieldPopup();
             that.createTabs();
             that.getPermissionsByRole();
             that.changeFieldPermission();
-
+            that.editRole();
         }
 
     },
@@ -1198,12 +1214,15 @@ $.extend(Permission.prototype, {
             var _data = data.body.modulePermissions;
             var shareAppPermission = data.body.globalPermissions.userPermission;
             var appStructurePermission = data.body.globalPermissions.appChangePermission;
+            var roleName = data.body.name;
+            var roleDesc = data.body.description;
             var html = '';
             var viewPermission = '';
             var addPermission = '';
             var editPermission = '';
             var deletePermission = '';
             var icon = '';
+            if(_data.length > 0){
             $.each(_data, function (index) {
                 //console.log(_data[index]);
                 if (Permission.moduleIcon[index] !== undefined) {
@@ -1245,24 +1264,30 @@ $.extend(Permission.prototype, {
                 html += '<tr>';
                 html += '<td>' + icon + _data[index].module.name + '</td>';
                 html += '<td>' + viewPermission + '</td>';
-                html += '<td>' + addPermission + '</td>';
                 html += '<td>' + editPermission + '</td>';
+                html += '<td>' + addPermission + '</td>';
                 html += '<td>' + deletePermission + '</td>';
                 html += '<td style="width:15%">';
-                html += '<select class="changeModuleFieldPermission" data-module-id="'+_data[index].module.id+'">';
-                html += '<option value="false"'+ (_data[index].fieldPermission == false ? 'selected' : '') +'>Full Access</option>';
-                html += '<option value="true"'+ (_data[index].fieldPermission == true ? 'selected' : '') +'>Custom Access</option>';
+                html += '<select class="changeModuleFieldPermission" data-module-id="' + _data[index].module.id + '">';
+                html += '<option value="false"' + (_data[index].fieldPermission == false ? 'selected' : '') + '>Full Access</option>';
+                html += '<option value="true"' + (_data[index].fieldPermission == true ? 'selected' : '') + '>Custom Access</option>';
                 html += '</select>';
-                if(_data[index].fieldPermission == true){
-                    html += '&nbsp;&nbsp;<span class="pencil" style="width:20px; display:inline-block;"><a href="#" data-module-id="'+_data[index].module.id+'" data-modal-pop-id="#customPermissionPop" class="open-popup"><i class="fa fa-pencil"></i></a></span>';
+                if (_data[index].fieldPermission == true) {
+                    html += '&nbsp;&nbsp;<span class="pencil" style="width:20px; display:inline-block;"><a href="#" data-module-id="' + _data[index].module.id + '" data-modal-pop-id="#customPermissionPop" class="open-popup"><i class="fa fa-pencil"></i></a></span>';
                 }
-                else{
+                else {
                     html += '&nbsp;&nbsp;<span class="pencil" style="width:20px; display:inline-block;"></span>';
                 }
                 html += '</td>';
                 html += '</tr>';
             });
-
+            }
+            else{
+                html += '<tr>';
+                html += '<td colospan="6">No data found</td>';
+                html += '</tr>';
+            }
+            $('#loader').hide();
             $('#permissionsTable tbody').html(html);
 
             // Set global permissions
@@ -1274,14 +1299,15 @@ $.extend(Permission.prototype, {
                 $("#app_structure_permission").prop("checked", appStructurePermission);
                 $("#app_structure_permission").attr('data-role-id', roleId);
             }
-            
-            
+
+            $('#roleName').val(roleName);
+            $('#roleDescription').val(roleDesc);
             Permission.role.closePopup();
 
         });
 
-        
-        
+
+
     },
     changeModuleViewPermission: function () {
         var roleId = '';
@@ -1463,28 +1489,30 @@ $.extend(Permission.prototype, {
 
     },
     changeModuleFieldPermission: function () {
-        $('#permissionsTable').on('change','.changeModuleFieldPermission',function(){
+        $('#permissionsTable').on('change', '.changeModuleFieldPermission', function () {
             var sel = $(this);
             var _val = $(this).val();
             var flag = '';
             var moduleId = $(this).attr('data-module-id');
-            if(_val == 'true'){
-                flag = true;}
-            else{
-                flag = false;}
+            if (_val == 'true') {
+                flag = true;
+            }
+            else {
+                flag = false;
+            }
             var obj = {
-                    head:{
-                        action:"changeModuleFieldPermission"
-                    },
-                    body:{
-                        "role_id":parseInt(roleId),
-                        "module_id" :moduleId,
-                        "value": flag
-                    }
+                head: {
+                    action: "changeModuleFieldPermission"
+                },
+                body: {
+                    "role_id": parseInt(roleId),
+                    "module_id": moduleId,
+                    "value": flag
                 }
-                
+            }
+
             var _obj = JSON.stringify(obj);
-            Permission.user.getAjaxData(User.ajaxLink2,_obj, function(data){
+            Permission.user.getAjaxData(User.ajaxLink2, _obj, function (data) {
                 var ajax_msg = 'Custom Field Permission changed';
                 $('.info-notice').html(ajax_msg);
                 $('.notify').addClass('n-animation');
@@ -1492,15 +1520,15 @@ $.extend(Permission.prototype, {
                     $('.notify').removeClass('n-animation');
                 }, 2500);
                 var td = sel.parent('td');
-                if(sel.val() == 'true'){
-                
-                var pen = td.find('.pencil');
-                pen.html('<a href="#" data-module-id="'+moduleId+'" data-modal-pop-id="#customPermissionPop" class="open-popup"><i class="fa fa-pencil"></i></a>');
-            }
-            else{
-               var pen = td.find('.pencil');
-                pen.html(''); 
-            }
+                if (sel.val() == 'true') {
+
+                    var pen = td.find('.pencil');
+                    pen.html('<a href="#" data-module-id="' + moduleId + '" data-modal-pop-id="#customPermissionPop" class="open-popup"><i class="fa fa-pencil"></i></a>');
+                }
+                else {
+                    var pen = td.find('.pencil');
+                    pen.html('');
+                }
             });
         });
     },
@@ -1552,67 +1580,73 @@ $.extend(Permission.prototype, {
             });
         });
     },
-    customFieldPopup: function(){
-        $('#permissionsTable').on('click', '.open-popup', function(){
+    customFieldPopup: function () {
+        $('#permissionsTable').on('click', '.open-popup', function () {
             var modalPopId = $(this).attr('data-modal-pop-id');
             var moduleId = $(this).attr('data-module-id');
             var obj = {
-                    head:{
-                        action:"getModuleFieldPermissions"
-                    },
-                    body:{
-                        module_id:moduleId
-                    }
-                };
+                head: {
+                    action: "getModuleFieldPermissions"
+                },
+                body: {
+                    module_id: moduleId
+                }
+            };
             var _obj = JSON.stringify(obj);
             Permission.user.getAjaxData(User.ajaxLink2, _obj, function (data) {
                 var html = '';
                 //console.log(data);
                 var _data = data.body.fields;
-                $.each(_data, function(index){
+                if (_data.length > 0) {
+                    $.each(_data, function (index) {
+                        html += '<tr>';
+                        html += '<td>' + _data[index].name + '</td>';
+                        html += '<td>'
+                        html += '<select class="setFieldPermission" data-module-id="' + moduleId + '" data-field-id="' + _data[index].id + '">';
+                        html += '<option value="0" ' + (_data[index].permission == 0 ? 'selected' : '') + '>No View</option>';
+                        html += '<option value="1" ' + (_data[index].permission == 1 ? 'selected' : '') + '>View</option>';
+                        html += '<option value="2" ' + (_data[index].permission == 2 ? 'selected' : '') + '>Edit</option>';
+                        html += '</select>';
+                        html += '</td>';
+                        html += '</tr>';
+                    });
+                }
+                else {
                     html += '<tr>';
-                    html += '<td>'+_data[index].name+'</td>';
-                    html += '<td>'
-                    html += '<select class="setFieldPermission" data-module-id="'+moduleId+'" data-field-id="'+ _data[index].id +'">';
-                    html += '<option value="0" '+(_data[index].permission == 0 ? 'selected':'')+'>No View</option>';
-                    html += '<option value="1" '+(_data[index].permission == 1 ? 'selected':'')+'>View</option>';
-                    html += '<option value="2" '+(_data[index].permission == 2 ? 'selected':'')+'>Edit</option>';
-                    html += '</select>';
-                    html += '</td>';
-                    html += '</tr>';
-                });
-                
+                    html += '<td colspan="2">No data Found</td>';
+                    html += '<tr>';
+                }
                 $('.custom-field-table tbody').html('');
                 $('.custom-field-table tbody').html(html);
                 $(modalPopId).show();
             });
-            
+
             return false;
         });
     },
-    changeFieldPermission : function (){
-        $('#customPermissionPop').on('change','.setFieldPermission',function(){
+    changeFieldPermission: function () {
+        $('#customPermissionPop').on('change', '.setFieldPermission', function () {
             var _val = $(this).val();
             var moduleId = $(this).attr('data-module-id');
             var fieldId = $(this).attr('data-field-id');
-            
+
             var obj = {
-                head:{
-                    action:"changeModuleFieldPermission"
+                head: {
+                    action: "changeModuleFieldPermission"
                 },
-                body:{
-                    role_id:parseInt(roleId),
-                    module_id :moduleId,
-                    value:{
-                        field_id:fieldId,
-                        permission:_val
+                body: {
+                    role_id: parseInt(roleId),
+                    module_id: moduleId,
+                    value: {
+                        field_id: fieldId,
+                        permission: _val
                     }
                 }
             }
-            console.log(obj);
+            //console.log(obj);
             var _obj = JSON.stringify(obj);
             Permission.user.getAjaxData(User.ajaxLink2, _obj, function (data) {
-                
+
                 var ajax_msg = 'Field Permission changed';
                 $('.info-notice').html(ajax_msg);
                 $('.notify').addClass('n-animation');
@@ -1620,6 +1654,42 @@ $.extend(Permission.prototype, {
                     $('.notify').removeClass('n-animation');
                 }, 2500);
             });
+        });
+    },
+    editRole: function(){
+        $('#editRole').click(function(){ 
+            var error = '';
+            var _roleName = $('#roleName').val();
+            var _roleDesc = $('textarea#roleDescription').val();
+            if($.trim(_roleName) == ''){
+                error = 'Role Name can not empty';
+                var ele = $('#roleName').next('.validation_msg');
+                ele.html(error);
+            }
+            else if($.trim(_roleDesc) == ''){
+                error = 'Role Description can not empty';
+                var ele = $('#roleDescription').next('.validation_msg');
+                ele.html(error);
+            }
+            else{
+                $('.validation_msg').html('');
+                var obj = {
+                        head:{
+                            action:"editRole"
+                        },
+                        body:{
+                            role_id:parseInt(roleId),
+                            name: _roleName,
+                            description: _roleDesc
+                        }
+                    };
+                var _obj = JSON.stringify(obj);
+                Permission.user.getAjaxData(User.ajaxLink2, _obj, function (data) {
+                    $('#resp-msg').html('Role has been updated successfully');
+                    $('#loader').hide();
+                    
+                });
+            }
         });
     }
 });
