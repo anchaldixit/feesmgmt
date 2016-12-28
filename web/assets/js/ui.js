@@ -1350,7 +1350,14 @@ $.extend(Permission.prototype, {
                     td.html('');
                     td.html('<i class="fa fa-times red"></i>');
                     td.attr('data-value', 'true');
+                    
                 }
+                var ajax_msg = 'View Permission changed';
+                $('.info-notice').html(ajax_msg);
+                $('.notify').addClass('n-animation');
+                setTimeout(function () {
+                    $('.notify').removeClass('n-animation');
+                }, 2500);
             });
 
             return false;
@@ -1397,6 +1404,12 @@ $.extend(Permission.prototype, {
                     td.html('<i class="fa fa-times red"></i>');
                     td.attr('data-value', 'true');
                 }
+                var ajax_msg = 'Add Permission changed';
+                $('.info-notice').html(ajax_msg);
+                $('.notify').addClass('n-animation');
+                setTimeout(function () {
+                    $('.notify').removeClass('n-animation');
+                }, 2500);
             });
             return false;
         });
@@ -1441,6 +1454,12 @@ $.extend(Permission.prototype, {
                     td.html('<i class="fa fa-times red"></i>');
                     td.attr('data-value', 'true');
                 }
+                var ajax_msg = 'Edit Permission changed';
+                $('.info-notice').html(ajax_msg);
+                $('.notify').addClass('n-animation');
+                setTimeout(function () {
+                    $('.notify').removeClass('n-animation');
+                }, 2500);
             });
             return false;
         });
@@ -1485,6 +1504,12 @@ $.extend(Permission.prototype, {
                     td.html('<i class="fa fa-times red"></i>');
                     td.attr('data-value', 'true');
                 }
+                var ajax_msg = 'Delete Permission changed';
+                $('.info-notice').html(ajax_msg);
+                $('.notify').addClass('n-animation');
+                setTimeout(function () {
+                    $('.notify').removeClass('n-animation');
+                }, 2500);
             });
             return false;
         });
