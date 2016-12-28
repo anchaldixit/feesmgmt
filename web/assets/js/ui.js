@@ -1269,12 +1269,12 @@ $.extend(Permission.prototype, {
                 html += '<td>' + addPermission + '</td>';
                 html += '<td>' + deletePermission + '</td>';
                 html += '<td style="width:15%">';
-                html += '<select class="changeModuleFieldPermission" data-module-id="' + _data[index].module.id + '">';
+                html += '<select class="changeModuleFieldPermission" data-module-id="' + _data[index].module.id + '" data-role-id="' + roleId +'">';
                 html += '<option value="false"' + (_data[index].fieldPermission == false ? 'selected' : '') + '>Full Access</option>';
                 html += '<option value="true"' + (_data[index].fieldPermission == true ? 'selected' : '') + '>Custom Access</option>';
                 html += '</select>';
                 if (_data[index].fieldPermission == true) {
-                    html += '&nbsp;&nbsp;<span class="pencil" style="width:20px; display:inline-block;"><a href="#" data-module-id="' + _data[index].module.id + '" data-modal-pop-id="#customPermissionPop" class="open-popup"><i class="fa fa-pencil"></i></a></span>';
+                    html += '&nbsp;&nbsp;<span class="pencil" style="width:20px; display:inline-block;"><a href="#" data-module-id="' + _data[index].module.id + '" data-role-id="' + roleId + '" data-modal-pop-id="#customPermissionPop" class="open-popup"><i class="fa fa-pencil"></i></a></span>';
                 }
                 else {
                     html += '&nbsp;&nbsp;<span class="pencil" style="width:20px; display:inline-block;"></span>';
@@ -1551,7 +1551,7 @@ $.extend(Permission.prototype, {
                 if (sel.val() == 'true') {
 
                     var pen = td.find('.pencil');
-                    pen.html('<a href="#" data-module-id="' + moduleId + '" data-modal-pop-id="#customPermissionPop" class="open-popup"><i class="fa fa-pencil"></i></a>');
+                    pen.html('<a href="#" data-module-id="' + moduleId + '" data-role-id="' + roleId + '" data-modal-pop-id="#customPermissionPop" class="open-popup"><i class="fa fa-pencil"></i></a>');
                 }
                 else {
                     var pen = td.find('.pencil');
@@ -1614,12 +1614,14 @@ $.extend(Permission.prototype, {
         $('#permissionsTable').on('click', '.open-popup', function () {
             var modalPopId = $(this).attr('data-modal-pop-id');
             var moduleId = $(this).attr('data-module-id');
+            var role_id  = $(this).attr('data-role-id');
             var obj = {
                 head: {
                     action: "getModuleFieldPermissions"
                 },
                 body: {
-                    module_id: moduleId
+                    module_id: moduleId,
+                    role_id: role_id
                 }
             };
             var _obj = JSON.stringify(obj);
