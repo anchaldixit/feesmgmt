@@ -320,6 +320,7 @@ $.extend(Login.prototype, {
 
 $.extend(User, {
     ajaxLink2: Login.ajaxLink2,
+    ajaxLink1: Login.ajaxLink,
     roles: ['Registered', 'Unregistered', 'Unverified', 'Deactivated', 'Denied', 'Password Reset'],
     role: new Role(),
     login: new Login(),
@@ -825,7 +826,7 @@ $.extend(User.prototype, {
                 }
                 var _obj = JSON.stringify(obj);
 
-                that.getAjaxData(User.ajaxLink2, _obj, function (_data) {
+                that.getAjaxData(User.ajaxLink1, _obj, function (_data) {
                     $('#inviteUsers').hide();
                     window.location.href = 'http://' + window.location.hostname + '/users?invitation_send=' + useremail;
 
@@ -1211,6 +1212,7 @@ $.extend(Permission.prototype, {
 
         var _obj = JSON.stringify(obj);
         Permission.user.getAjaxData(User.ajaxLink2, _obj, function (data) {
+            $('#loader').hide();
             var _data = data.body.modulePermissions;
             var shareAppPermission = data.body.globalPermissions.userPermission;
             var appStructurePermission = data.body.globalPermissions.appChangePermission;
@@ -1339,8 +1341,7 @@ $.extend(Permission.prototype, {
             var _obj = JSON.stringify(obj);
             var td = $(this);
             Permission.user.getAjaxData(User.ajaxLink2, _obj, function (data) {
-                //console.log(data);
-                //alert(accessFlag);
+                $('#loader').hide();
                 if (accessFlag == 'true') {
                     td.html('');
                     td.html('<i class="fa fa-check green"></i>');
@@ -1386,7 +1387,7 @@ $.extend(Permission.prototype, {
             var _obj = JSON.stringify(obj);
             var td = $(this);
             Permission.user.getAjaxData(User.ajaxLink2, _obj, function (data) {
-
+                $('#loader').hide();
                 if (accessFlag == 'true') {
                     td.html('');
                     td.html('<i class="fa fa-check green"></i>');
@@ -1430,6 +1431,7 @@ $.extend(Permission.prototype, {
             var _obj = JSON.stringify(obj);
             var td = $(this);
             Permission.user.getAjaxData(User.ajaxLink2, _obj, function (data) {
+                $('#loader').hide();
                 if (accessFlag == 'true') {
                     td.html('');
                     td.html('<i class="fa fa-check green"></i>');
@@ -1473,6 +1475,7 @@ $.extend(Permission.prototype, {
             var _obj = JSON.stringify(obj);
             var td = $(this);
             Permission.user.getAjaxData(User.ajaxLink2, _obj, function (data) {
+                $('#loader').hide();
                 if (accessFlag == 'true') {
                     td.html('');
                     td.html('<i class="fa fa-check green"></i>');
@@ -1513,6 +1516,7 @@ $.extend(Permission.prototype, {
 
             var _obj = JSON.stringify(obj);
             Permission.user.getAjaxData(User.ajaxLink2, _obj, function (data) {
+                $('#loader').hide();
                 var ajax_msg = 'Custom Field Permission changed';
                 $('.info-notice').html(ajax_msg);
                 $('.notify').addClass('n-animation');
@@ -1547,6 +1551,7 @@ $.extend(Permission.prototype, {
             };
             var _obj = JSON.stringify(obj);
             Permission.user.getAjaxData(User.ajaxLink2, _obj, function (data) {
+                $('#loader').hide();
                 var ajax_msg = 'Sharing App Permission changed';
                 $('.info-notice').html(ajax_msg);
                 $('.notify').addClass('n-animation');
@@ -1571,6 +1576,7 @@ $.extend(Permission.prototype, {
             };
             var _obj = JSON.stringify(obj);
             Permission.user.getAjaxData(User.ajaxLink2, _obj, function (data) {
+                $('#loader').hide();
                 var ajax_msg = 'App Structure Permission changed';
                 $('.info-notice').html(ajax_msg);
                 $('.notify').addClass('n-animation');
@@ -1594,6 +1600,7 @@ $.extend(Permission.prototype, {
             };
             var _obj = JSON.stringify(obj);
             Permission.user.getAjaxData(User.ajaxLink2, _obj, function (data) {
+                $('#loader').hide();
                 var html = '';
                 //console.log(data);
                 var _data = data.body.fields;
@@ -1646,7 +1653,7 @@ $.extend(Permission.prototype, {
             //console.log(obj);
             var _obj = JSON.stringify(obj);
             Permission.user.getAjaxData(User.ajaxLink2, _obj, function (data) {
-
+                $('#loader').hide();
                 var ajax_msg = 'Field Permission changed';
                 $('.info-notice').html(ajax_msg);
                 $('.notify').addClass('n-animation');
