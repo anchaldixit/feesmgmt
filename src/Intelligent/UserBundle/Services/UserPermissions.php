@@ -177,7 +177,13 @@ class UserPermissions {
                         if($explicit_field_permission instanceof RoleModuleFieldPermission){
                             $permission = $explicit_field_permission->getPermission();
                         }else{
-                            $permission = 0;
+                            if($edit_permission && $view_permission){
+                                $permission = 2; // Edit pemission
+                            }else if($view_permission){
+                                $permission = 1; // View permission
+                            }else{
+                                $permission = 0; // Not even view permission
+                            }
                         }
                     }else{
                         if($edit_permission && $view_permission){
