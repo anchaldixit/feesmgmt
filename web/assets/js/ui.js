@@ -1612,7 +1612,7 @@ $.extend(Permission.prototype, {
             console.log(obj);
             var _obj = JSON.stringify(obj);
             Permission.user.getAjaxData(User.ajaxLink2, _obj, function (data) {
-                $('.popup-wrapper').hide();
+                
                 var ajax_msg = 'Field Permission changed';
                 $('.info-notice').html(ajax_msg);
                 $('.notify').addClass('n-animation');
