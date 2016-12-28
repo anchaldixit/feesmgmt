@@ -10,10 +10,21 @@ use Intelligent\UserBundle\Entity\User;
 
 class DefaultController extends Controller {
 
+    /**
+     * This is an index page of the site
+     * 
+     * @return Response
+     */
     public function indexAction() {
         return $this->render('IntelligentUserBundle:Default:index.html.twig');
     }
 
+    /**
+     * This is a login page
+     * 
+     * @param Request $request
+     * @return Response
+     */
     public function loginAction(Request $request) {
         $session = $request->getSession();
         // get the login error if there is one
@@ -38,9 +49,14 @@ class DefaultController extends Controller {
             'error' => $error,
         ));
     }
-    public function registerAction(Request $request){
-        return $this->render('IntelligentUserBundle:Default:userregistration.html.twig', array());
-    }
+     
+    /**
+     * This is the page where invited users will land by the 
+     * link sent to their emails and will register themselves
+     * 
+     * @param type $emailVerifyId
+     * @return type
+     */
     public function inviteUserAction($emailVerifyId){
         $email = $status = $role = '';
         /**
@@ -67,6 +83,12 @@ class DefaultController extends Controller {
         ));
     }
     
+    /**
+     * Reset password
+     * 
+     * @param type $resetPasswordId
+     * @return Response
+     */
     public function resetPasswordAction($resetPasswordId){
         $em = $this->getDoctrine()->getManager();
         $user = $em->getRepository("IntelligentUserBundle:User")->findOneBy(array("passwordResetId" => $resetPasswordId));
@@ -81,30 +103,66 @@ class DefaultController extends Controller {
             'status' => $status
         ));
     }
+    
+    /**
+     * Change password
+     * 
+     * @param Request $request
+     * @return Response
+     */
     public function changePasswordAction(Request $request){
         return $this->render('IntelligentUserBundle:Default:changepassword.html.twig', array());
     }
     
+    /**
+     * Show list of users
+     * 
+     * @param Request $request
+     * @return Response
+     */
     public function usersAction(Request $request){
         return $this->render('IntelligentUserBundle:Default:users.html.twig', array());
     }
     
+    /**
+     * Show list of roles
+     * 
+     * @param Request $request
+     * @return type
+     */
     public function rolesAction(Request $request){
         return $this->render('IntelligentUserBundle:Default:roles.html.twig', array());
     }
     
+    /**
+     * Show MyPreference page
+     *  
+     * @param Request $request
+     * @return type
+     */
     public function mypreferencesAction(Request $request){
         
         return $this->render('IntelligentUserBundle:Default:mypreferences.html.twig', array());
     }
     
+    /**
+     * Show RolePermissions page
+     * 
+     * @param type $roleId
+     * @return Response
+     */
     public function rolePermissionsAction($roleId){
         return $this->render('IntelligentUserBundle:Default:rolepermissions.html.twig', array('roleId' => $roleId));
         
     }
     
+    /**
+     * This is an action to show AccessDenied page
+     * 
+     * @param Request $request
+     * @return Response
+     */
     public function noaccessAction(Request $request){
-        
         return $this->render('IntelligentUserBundle:Default:noaccess.html.twig', array());
     }
 
