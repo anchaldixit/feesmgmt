@@ -30,7 +30,7 @@
                                 <div class="app-control">
                                     <input type="checkbox" name="app-control"/><label for="app-control">Disable access to app for users with this role</label>
                                 </div>-->
-                                <p>Grant other permissions</p>
+                                <p>Global permissions</p>
                                 <div class="app-control">
                                     <input type="checkbox" name="share-app" id="share_app_permission" /><label for="share-app">Manage users and share the app</label><br/>
                                     <input type="checkbox" name="app-structure" id="app_structure_permission" /><label for="app-structure">Edit app structure and permissions</label>
@@ -42,171 +42,14 @@
                                         <tr>
                                             <th>Table</th>
                                             <th>View</th>
-                                            <th>Add</th>
                                             <th>Edit</th>
+                                            <th>Add</th>
                                             <th>Delete</th>
                                             <th>Field Access</th>
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <!--<tr>
-                                            <td><i class="fa fa-users"></i>Customer</td>
-                                            <td><a href="#"><i class="fa fa-check green"></i></a></td>
-                                            <td><a href="#"><i class="fa fa-check green"></i></a></td>
-                                            <td><a href="#"><i class="fa fa-check green"></i></a></td>
-                                            <td><a href="#"><i class="fa fa-check green"></i></a></td>
-                                            <td>
-                                                <select>
-                                                    <option value="full_access">Full Access</option>
-                                                    <option value="no_access">No Access</option>
-                                                </select>
-                                            </td>
-
-                                        </tr>
-                                        <tr>
-                                            <td><i class="fa fa-list-alt"></i>Marketing Projects</td>
-                                            <td><a href="#"><i class="fa fa-check green"></i></a></td>
-                                            <td><a href="#"><i class="fa fa-check green"></i></a></td>
-                                            <td><a href="#"><i class="fa fa-check green"></i></a></td>
-                                            <td><a href="#"><i class="fa fa-check green"></i></a></td>
-                                            <td>
-                                                <select>
-                                                    <option value="full_access">Full Access</option>
-                                                    <option value="no_access">No Access</option>
-                                                </select>
-                                            </td>
-
-                                        </tr>
-                                        <tr>
-                                            <td><i class="fa fa-gears"></i>Initiatives</td>
-                                            <td><a href="#"><i class="fa fa-check green"></i></a></td>
-                                            <td><a href="#"><i class="fa fa-check green"></i></a></td>
-                                            <td><a href="#"><i class="fa fa-check green"></i></a></td>
-                                            <td><a href="#"><i class="fa fa-check green"></i></a></td>
-                                            <td>
-                                                <select>
-                                                    <option value="full_access">Full Access</option>
-                                                    <option value="no_access">No Access</option>
-                                                </select>
-                                            </td>
-
-                                        </tr>
-                                        <tr>
-                                            <td><i class="fa fa-bullhorn"></i>Campaign</td>
-                                            <td><a href="#"><i class="fa fa-check green"></i></a></td>
-                                            <td><a href="#"><i class="fa fa-check green"></i></a></td>
-                                            <td><a href="#"><i class="fa fa-check green"></i></a></td>
-                                            <td><a href="#"><i class="fa fa-check green"></i></a></td>
-                                            <td>
-                                                <select>
-                                                    <option value="full_access">Full Access</option>
-                                                    <option value="no_access">No Access</option>
-                                                </select>
-                                            </td>
-
-                                        </tr>
-                                        <tr>
-                                            <td><i class="fa fa-address-book"></i>Campaign Contacts</td>
-                                            <td><a href="#"><i class="fa fa-check green"></i></a></td>
-                                            <td><a href="#"><i class="fa fa-check green"></i></a></td>
-                                            <td><a href="#"><i class="fa fa-check green"></i></a></td>
-                                            <td><a href="#"><i class="fa fa-check green"></i></a></td>
-                                            <td>
-                                                <select>
-                                                    <option value="full_access">Full Access</option>
-                                                    <option value="no_access">No Access</option>
-                                                </select>
-                                            </td>
-
-                                        </tr>
-                                        <tr>
-                                            <td><i class="fa fa-envelope"></i>Psuedo Email Accounts</td>
-                                            <td><a href="#"><i class="fa fa-check green"></i></a></td>
-                                            <td><a href="#"><i class="fa fa-check green"></i></a></td>
-                                            <td><a href="#"><i class="fa fa-check green"></i></a></td>
-                                            <td><a href="#"><i class="fa fa-check green"></i></a></td>
-                                            <td>
-                                                <select>
-                                                    <option value="full_access">Full Access</option>
-                                                    <option value="no_access">No Access</option>
-                                                </select>
-                                            </td>
-
-                                        </tr>
-                                        <tr>
-                                            <td><i class="fa fa-desktop"></i>Assign Psuedo</td>
-                                            <td><a href="#"><i class="fa fa-check green"></i></a></td>
-                                            <td><a href="#"><i class="fa fa-check green"></i></a></td>
-                                            <td><a href="#"><i class="fa fa-check green"></i></a></td>
-                                            <td><a href="#"><i class="fa fa-check green"></i></a></td>
-                                            <td>
-                                                <select>
-                                                    <option value="full_access">Full Access</option>
-                                                    <option value="no_access">No Access</option>
-                                                </select>
-                                            </td>
-
-                                        </tr>
-
-                                        <tr>
-                                            <td><i class="fa fa-user-circle"></i>Agents</td>
-                                            <td><a href="#"><i class="fa fa-check green"></i></a></td>
-                                            <td><a href="#"><i class="fa fa-check green"></i></a></td>
-                                            <td><a href="#"><i class="fa fa-check green"></i></a></td>
-                                            <td><a href="#"><i class="fa fa-check green"></i></a></td>
-                                            <td>
-                                                <select>
-                                                    <option value="full_access">Full Access</option>
-                                                    <option value="no_access">No Access</option>
-                                                </select>
-                                            </td>
-
-                                        </tr>
-
-                                        <tr>
-                                            <td><i class="fa fa-folder-open"></i>Agent Assignments</td>
-                                            <td><a href="#"><i class="fa fa-check green"></i></a></td>
-                                            <td><a href="#"><i class="fa fa-check green"></i></a></td>
-                                            <td><a href="#"><i class="fa fa-check green"></i></a></td>
-                                            <td><a href="#"><i class="fa fa-check green"></i></a></td>
-                                            <td>
-                                                <select>
-                                                    <option value="full_access">Full Access</option>
-                                                    <option value="no_access">No Access</option>
-                                                </select>
-                                            </td>
-
-                                        </tr>
-
-                                        <tr>
-                                            <td><i class="fa fa-dollar"></i>Links</td>
-                                            <td><a href="#"><i class="fa fa-check green"></i></a></td>
-                                            <td><a href="#"><i class="fa fa-check green"></i></a></td>
-                                            <td><a href="#"><i class="fa fa-check green"></i></a></td>
-                                            <td><a href="#"><i class="fa fa-check green"></i></a></td>
-                                            <td>
-                                                <select>
-                                                    <option value="full_access">Full Access</option>
-                                                    <option value="no_access">No Access</option>
-                                                </select>
-                                            </td>
-
-                                        </tr>
-
-                                        <tr>
-                                            <td><i class="fa fa-tachometer"></i>Link Rates</td>
-                                            <td><a href="#"><i class="fa fa-check green"></i></a></td>
-                                            <td><a href="#"><i class="fa fa-check green"></i></a></td>
-                                            <td><a href="#"><i class="fa fa-check green"></i></a></td>
-                                            <td><a href="#"><i class="fa fa-check green"></i></a></td>
-                                            <td>
-                                                <select>
-                                                    <option value="full_access">Full Access</option>
-                                                    <option value="no_access">No Access</option>
-                                                </select>
-                                            </td>
-
-                                        </tr>-->
+                                        
                                     </tbody>
                                 </table>
                             </div>
@@ -216,28 +59,32 @@
 
                             <div class="my-properties">
                                 <div class="pref-header">
-                                    <h4>My Properties</h4>
+                                    <h4>Role Properties</h4>
                                 </div>
                                 <div class="my-pref-body">
                                     <ul>
                                         <li>
-                                            <label>Name</label>
-                                            <div class="field-wrap">
-                                                <input type="text" name="first-name" placeholder="Name">
+                                            <label>Role Name</label>
+                                            <div class="field-wrap" style="float:left;">
+                                                <input type="text" name="role-name" id="roleName" placeholder="Role Name">
+                                                <span class="validation_msg" style="margin-top:10px;"></span>
                                             </div>
                                         </li>
                                         <li>
-                                            <label>Description</label>
-                                            <div class="field-wrap">
-                                                <textarea cols="4" rows="8"></textarea>
+                                            <label>Role Description</label>
+                                            <div class="field-wrap" style="float:left;">
+                                                <textarea cols="4" rows="8" id="roleDescription" style="float:none;"></textarea>
+                                                <span class="validation_msg" style="margin-top:10px;"></span>
                                             </div>
                                         </li>
 
                                         <li>
                                             <label>&nbsp;</label>
-                                            <div class="field-wrap">
-                                                <input type="submit" name="submit" value="Submit">
+                                            <div class="field-wrap" style="float:left;">
+                                                <input type="submit" name="submit" id="editRole" value="Submit">
+                                                <p id="loader" style="display:none; text-align: right"><i class="fa fa-refresh fa-spin fa-1x fa-fw"></i></p>
                                             </div>
+                                            <p id="resp-msg" style="color: green;clear:both; padding-top: 10px;"></p>
                                         </li>
                                     </ul>
                                 </div>
