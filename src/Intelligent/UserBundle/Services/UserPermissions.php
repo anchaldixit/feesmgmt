@@ -159,12 +159,16 @@ class UserPermissions {
      * @return mixed It returns array of field and permission if module exists
      * and returns false if module dont exists
      */
-    public function getAllFieldPermissions($module,$userFieldIdAsKey=true) {
+    public function getAllFieldPermissions($module,Role $role = null, $userFieldIdAsKey=true) {
+        // If no role is given use internal role
+        if(is_null($role)){
+            $role = $this->role;
+        }
         $fields_permission = array();
         if ($this->isModuleExists($module)) {
             $fields = $this->getSetting()->fetch(array("module" => $module));
             if(count($fields) > 0){
-                $module_permission = $this->role->getSingleModulePermission($module);
+                $module_permission = $role->getSingleModulePermission($module);
                 foreach ($fields as $field) {
                     if(!($module_permission instanceof RoleModulePermission)){
                         $permission = 0; // Not even a view access;

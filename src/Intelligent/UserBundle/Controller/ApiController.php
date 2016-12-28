@@ -1241,12 +1241,17 @@ class ApiController extends Controller {
         $user_permissions = $this->get('user_permissions');
         if ($user_permissions->getManageUserAndShareAppPermission()) {
             $body = $json->body;
-            if(isset($body->module_id)){
-                $field_permissions = $user_permissions->getAllFieldPermissions($body->module_id, false);
-                if($field_permissions === false){
-                    throw new \Exception("Module with module_id($body->module_id) not found", 404);
+            if(isset($body->module_id) && isset($body->role_id)){
+                $role = $this->getDoctrine()->getManager()->getRepository("IntelligentUserBundle:Role")->find($body->role_id);
+                if($role){
+                    $field_permissions = $user_permissions->getAllFieldPermissions($body->module_id, $role, false);
+                    if($field_permissions === false){
+                        throw new \Exception("Module with module_id($body->module_id) not found", 404);
+                    }else{
+                        return $this->_handleSuccessfulRequest(array('fields' => $field_permissions));
+                    }
                 }else{
-                    return $this->_handleSuccessfulRequest(array('fields' => $field_permissions));
+                    throw new \Exception("Role with role_id($body->role_id) do not exists",404);
                 }
             }else{
                 throw new \Exception("module_id not set in request json", 412);
