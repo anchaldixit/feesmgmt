@@ -431,6 +431,7 @@ $.extend(User.prototype, {
                 $('.info-notice').html(ajax_msg);
                 var tr = td.closest('tr');
                 tr.find('.status').text('Deactivated');
+                tr.find('.change_role').prop('disabled', 'disabled');
                 tr.css('background-color', '#ffc0cc');
                 td.removeClass('disable_user');
                 td.addClass('activate_user');
@@ -469,7 +470,7 @@ $.extend(User.prototype, {
                 $('.info-notice').html(ajax_msg);
                 var tr = td.closest('tr');
                 tr.find('.status').text(User.roles[_data.body.status - 1]);
-
+                tr.find('.change_role').prop('disabled', false);
                 tr.css('background-color', '');
                 td.removeClass('activate_user');
                 td.addClass('disable_user');
@@ -727,7 +728,12 @@ $.extend(User.prototype, {
 
                     var userrole = _data[index].role.id;
                     var selectbox = '';
+                    if (_data[index].status == 4) {
+                    selectbox += '<select class="change_role" data-user-id="' + _data[index].id + '" disabled>';
+                }
+                else{
                     selectbox += '<select class="change_role" data-user-id="' + _data[index].id + '" '+ (_data[index].id == logged_user_id?'disabled':'') +'>';
+                }
                     $.each(allroles, function (index) {
                         selectbox += '<option ' + (userrole == allroles[index].id ? 'selected' : '') + ' value = "' + allroles[index].id + '" ' + (allroles[index].status == 1 ? "" : 'disabled') + '>' + allroles[index].name + '</option>';
                     });
