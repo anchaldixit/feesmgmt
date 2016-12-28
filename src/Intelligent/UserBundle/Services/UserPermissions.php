@@ -172,7 +172,7 @@ class UserPermissions {
                     // If custom field permission exists
                     if($module_permission->getFieldPermission()){
                         // If we have a explicit field permission
-                        $explicit_field_permission = $module_permission->getSingleFieldPermissions($fieldName);
+                        $explicit_field_permission = $module_permission->getSingleFieldPermissions($field['module_field_name']);
                         if($explicit_field_permission){
                             $permission = $explicit_field_permission->getPermission();
                         }else{
