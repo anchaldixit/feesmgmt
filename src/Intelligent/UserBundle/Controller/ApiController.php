@@ -1191,6 +1191,24 @@ class ApiController extends Controller {
         }
     }
 
+    private function getModuleFieldPermissions(Request $request, $json){
+        $user_permissions = $this->get('user_permissions');
+        if ($user_permissions->getManageUserAndShareAppPermission()) {
+            $body = $json->body;
+            if(isset($body->module_id)){
+                $field_permissions = $user_permissions->getAllFieldPermissions($body->module_id, false);
+                if($field_permissions === false){
+                    throw new \Exception("Module with module_id($body->module_id) not found", 404);
+                }else{
+                    return $this->_handleSuccessfulRequest(array('fields' => $field_permissions));
+                }
+            }else{
+                throw new \Exception("module_id not set in request json", 412);
+            }
+        }else{
+            $this->_throwNoPermissionException();
+        }
+    }
     /**
      * This function will convert the exception into a json response object 
      * 
