@@ -161,21 +161,31 @@ class UserPermissions {
      */
     public function getAllFieldPermissions($module,$userFieldIdAsKey=true) {
         $fields_permission = array();
-        $fields = $this->getSetting()->fetch(array("module" => $module));
-        if ($fields) {
-            $module_permission = $this->role->getSingleModulePermission($module);
-            foreach ($fields as $field) {
-                if(!($module_permission instanceof RoleModulePermission)){
-                    $permission = 0; // Not even a view access;
-                }else{
-                    $view_permission = $module_permission->getViewPermission();
-                    $edit_permission = $module_permission->getModifyPermission();
-                    // If custom field permission exists
-                    if($module_permission->getFieldPermission()){
-                        // If we have a explicit field permission
-                        $explicit_field_permission = $module_permission->getSingleFieldPermissions($field['module_field_name']);
-                        if($explicit_field_permission instanceof RoleModuleFieldPermission){
-                            $permission = $explicit_field_permission->getPermission();
+        if ($this->isModuleExists($module)) {
+            $fields = $this->getSetting()->fetch(array("module" => $module));
+            if(count($fields) > 0){
+                $module_permission = $this->role->getSingleModulePermission($module);
+                foreach ($fields as $field) {
+                    if(!($module_permission instanceof RoleModulePermission)){
+                        $permission = 0; // Not even a view access;
+                    }else{
+                        $view_permission = $module_permission->getViewPermission();
+                        $edit_permission = $module_permission->getModifyPermission();
+                        // If custom field permission exists
+                        if($module_permission->getFieldPermission()){
+                            // If we have a explicit field permission
+                            $explicit_field_permission = $module_permission->getSingleFieldPermissions($field['module_field_name']);
+                            if($explicit_field_permission instanceof RoleModuleFieldPermission){
+                                $permission = $explicit_field_permission->getPermission();
+                            }else{
+                                if($edit_permission && $view_permission){
+                                    $permission = 2; // Edit pemission
+                                }else if($view_permission){
+                                    $permission = 1; // View permission
+                                }else{
+                                    $permission = 0; // Not even view permission
+                                }
+                            }
                         }else{
                             if($edit_permission && $view_permission){
                                 $permission = 2; // Edit pemission
@@ -185,25 +195,17 @@ class UserPermissions {
                                 $permission = 0; // Not even view permission
                             }
                         }
-                    }else{
-                        if($edit_permission && $view_permission){
-                            $permission = 2; // Edit pemission
-                        }else if($view_permission){
-                            $permission = 1; // View permission
-                        }else{
-                            $permission = 0; // Not even view permission
-                        }
                     }
-                }
-                // Chose return format;
-                if($userFieldIdAsKey){
-                    $fields_permission[$field['module_field_name']] = $permission;
-                }else{
-                    $fields_permission[] = array(
-                        'id' => $field['module_field_name'],
-                        'name' => $field['module_field_display_name'],
-                        'permission' => $permission
-                    );
+                    // Chose return format;
+                    if($userFieldIdAsKey){
+                        $fields_permission[$field['module_field_name']] = $permission;
+                    }else{
+                        $fields_permission[] = array(
+                            'id' => $field['module_field_name'],
+                            'name' => $field['module_field_display_name'],
+                            'permission' => $permission
+                        );
+                    }
                 }
             }
             return $fields_permission;
