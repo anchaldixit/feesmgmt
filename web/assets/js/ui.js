@@ -694,7 +694,7 @@ $.extend(User.prototype, {
         var that = this;
 
         that.getAjaxData(User.ajaxLink2, _obj, function (responseData) {
-            console.log(responseData);
+            //console.log(responseData);
             var html = '';
             var status = '';
             var status_ul = '';
@@ -1643,7 +1643,7 @@ $.extend(Permission.prototype, {
                     }
                 }
             }
-            console.log(obj);
+            //console.log(obj);
             var _obj = JSON.stringify(obj);
             Permission.user.getAjaxData(User.ajaxLink2, _obj, function (data) {
 
