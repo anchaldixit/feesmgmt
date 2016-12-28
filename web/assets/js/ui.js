@@ -1248,16 +1248,16 @@ $.extend(Permission.prototype, {
                 html += '<td>' + addPermission + '</td>';
                 html += '<td>' + editPermission + '</td>';
                 html += '<td>' + deletePermission + '</td>';
-                html += '<td>';
+                html += '<td style="width:15%">';
                 html += '<select class="changeModuleFieldPermission" data-module-id="'+_data[index].module.id+'">';
                 html += '<option value="false"'+ (_data[index].fieldPermission == false ? 'selected' : '') +'>Full Access</option>';
                 html += '<option value="true"'+ (_data[index].fieldPermission == true ? 'selected' : '') +'>Custom Access</option>';
                 html += '</select>';
                 if(_data[index].fieldPermission == true){
-                    html += '&nbsp;&nbsp;<span class="pencil"><a href="#" data-module-id="'+_data[index].module.id+'" data-modal-pop-id="#customPermissionPop" class="open-popup"><i class="fa fa-pencil"></i></a></span>';
+                    html += '&nbsp;&nbsp;<span class="pencil" style="width:20px; display:inline-block;"><a href="#" data-module-id="'+_data[index].module.id+'" data-modal-pop-id="#customPermissionPop" class="open-popup"><i class="fa fa-pencil"></i></a></span>';
                 }
                 else{
-                    html += '&nbsp;&nbsp;<span class="pencil"></span>';
+                    html += '&nbsp;&nbsp;<span class="pencil" style="width:20px; display:inline-block;"></span>';
                 }
                 html += '</td>';
                 html += '</tr>';
