@@ -230,7 +230,7 @@ class UserPermissions {
      * @return boolean
      */
     public function isfieldExists($moduleName, $fieldName) {
-        if ($this->isModuleExists($moduleName)) {
+        if (!$this->isModuleExists($moduleName)) {
             return false;
         }
         $fields = $this->settings->fetch(array('module' => $moduleName));
