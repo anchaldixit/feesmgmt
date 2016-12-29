@@ -48,3 +48,7 @@ intelligent_noaccess:
 intelligent_my_preferences:
     path: /myPreferences
     defaults: { _controller: IntelligentUserBundle:Default:mypreferences }
+    
+intelligent_choosecustomer:
+    path: /chooseCustomer
+    defaults: { _controller: IntelligentUserBundle:Default:choosecustomer }
