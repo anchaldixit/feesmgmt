@@ -165,5 +165,15 @@ class DefaultController extends Controller {
     public function noaccessAction(Request $request){
         return $this->render('IntelligentUserBundle:Default:noaccess.html.twig', array());
     }
+    
+    /**
+     * This is an action to choose Customer page
+     * 
+     * @param Request $request
+     * @return Response
+     */
+    public function choosecustomerAction(Request $request){
+        return $this->render('IntelligentUserBundle:Default:choosecustomer.html.twig', array());
+    }
 
 }
