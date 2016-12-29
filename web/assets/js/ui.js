@@ -1234,28 +1234,28 @@ $.extend(Permission.prototype, {
                 }
 
 
-                if (!_data[index].viewPermission) {
+                if (_data[index].viewPermission) {
                     viewPermission = '<a data-value="' + _data[index].viewPermission + '" data-module-id="' + _data[index].module.id + '" data-role-id="' + roleId + '" class="view_permission" href="#"><i class="fa fa-check green"></i></a>';
                 }
                 else {
                     viewPermission = '<a data-value="' + _data[index].viewPermission + '" data-module-id="' + _data[index].module.id + '" data-role-id="' + roleId + '" class="view_permission" href="#"><i class="fa fa-times red"></i></a>';
                 }
 
-                if (!_data[index].addPermission) {
+                if (_data[index].addPermission) {
                     addPermission = '<a data-value="' + _data[index].addPermission + '" data-module-id="' + _data[index].module.id + '" data-role-id="' + roleId + '" class="add_permission" href="#"><i class="fa fa-check green"></i></a>';
                 }
                 else {
                     addPermission = '<a data-value="' + _data[index].addPermission + '" data-module-id="' + _data[index].module.id + '" data-role-id="' + roleId + '" class="add_permission" href="#"><i class="fa fa-times red"></i></a>';
                 }
 
-                if (!_data[index].editPermission) {
+                if (_data[index].editPermission) {
                     editPermission = '<a data-value="' + _data[index].editPermission + '" data-module-id="' + _data[index].module.id + '" data-role-id="' + roleId + '" class="edit_permission" href="#"><i class="fa fa-check green"></i></a>';
                 }
                 else {
                     editPermission = '<a data-value="' + _data[index].editPermission + '" data-module-id="' + _data[index].module.id + '" data-role-id="' + roleId + '" class="edit_permission" href="#"><i class="fa fa-times red"></i></a>';
                 }
 
-                if (!_data[index].deletePermission) {
+                if (_data[index].deletePermission) {
                     deletePermission = '<a data-value="' + _data[index].deletePermission + '" data-module-id="' + _data[index].module.id + '" data-role-id="' + roleId + '" class="delete_permission" href="#"><i class="fa fa-check green"></i></a>';
                 }
                 else {
@@ -1343,12 +1343,12 @@ $.extend(Permission.prototype, {
                 $('#loader').hide();
                 if (accessFlag == 'true') {
                     td.html('');
-                    td.html('<i class="fa fa-check green"></i>');
+                    td.html('<i class="fa fa-times red"></i>');
                     td.attr('data-value', 'false');
                 }
                 else {
                     td.html('');
-                    td.html('<i class="fa fa-times red"></i>');
+                    td.html('<i class="fa fa-check green"></i>');
                     td.attr('data-value', 'true');
                     
                 }
@@ -1396,12 +1396,12 @@ $.extend(Permission.prototype, {
                 $('#loader').hide();
                 if (accessFlag == 'true') {
                     td.html('');
-                    td.html('<i class="fa fa-check green"></i>');
+                    td.html('<i class="fa fa-times red"></i>');
                     td.attr('data-value', 'false');
                 }
                 else {
                     td.html('');
-                    td.html('<i class="fa fa-times red"></i>');
+                    td.html('<i class="fa fa-check green"></i>');
                     td.attr('data-value', 'true');
                 }
                 var ajax_msg = 'Add Permission changed';
@@ -1446,12 +1446,12 @@ $.extend(Permission.prototype, {
                 $('#loader').hide();
                 if (accessFlag == 'true') {
                     td.html('');
-                    td.html('<i class="fa fa-check green"></i>');
+                    td.html('<i class="fa fa-times red"></i>');
                     td.attr('data-value', 'false');
                 }
                 else {
                     td.html('');
-                    td.html('<i class="fa fa-times red"></i>');
+                    td.html('<i class="fa fa-check green"></i>');
                     td.attr('data-value', 'true');
                 }
                 var ajax_msg = 'Edit Permission changed';
@@ -1496,12 +1496,12 @@ $.extend(Permission.prototype, {
                 $('#loader').hide();
                 if (accessFlag == 'true') {
                     td.html('');
-                    td.html('<i class="fa fa-check green"></i>');
+                    td.html('<i class="fa fa-times red"></i>');
                     td.attr('data-value', 'false');
                 }
                 else {
                     td.html('');
-                    td.html('<i class="fa fa-times red"></i>');
+                    td.html('<i class="fa fa-check green"></i>');
                     td.attr('data-value', 'true');
                 }
                 var ajax_msg = 'Delete Permission changed';
