@@ -281,6 +281,35 @@ input[type="submit"],input[type="button"]{
         }
     }
 }
+.MenuDd{
+    position: absolute; 
+    top: 35px; 
+    right:0;
+    min-width: 308px;
+    border:7px solid rgba(54,54,54,0.8);
+    border-radius:3px;
+    box-shadow: 0px 0px 4px #343434;
+    display:none;
+    z-index:99; 
+    ol{
+        background-color: #fafafa;
+        li{
+            color: #383838;
+            border-bottom: 1px solid #cacaca;
+            padding: 10px 20px;
+            text-align: left;
+            display:block !important;
+            a{
+                color: #343434;
+                font-size: 16px;
+                text-decoration:none;
+                &:hover{
+                    color: #5aa3ff;
+                }
+            }
+        }
+    }
+}
 .PopMenu{
     position: absolute; 
     top: 35px; 
