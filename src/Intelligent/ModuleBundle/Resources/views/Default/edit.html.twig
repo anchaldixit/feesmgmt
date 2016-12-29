@@ -1,0 +1,87 @@
+{# Intelligent/ModuleBundle/Resources/views/Marketingprojects/edit.html.twig #}
+{% extends "base.html.twig"  %}
+{% block stylesheets %}
+    <link href="/assets/js/jquery-ui/jquery-ui.min.css" rel="stylesheet" type="text/css"/>jquery-ui.theme.min
+    <link href="/assets/js/jquery-ui/jquery-ui.theme.min.css" rel="stylesheet" type="text/css"/>
+
+{% endblock %}
+{% block javascripts %}
+    {{ parent() }}
+    <script src="/assets/js/jquery-ui/jquery-ui.min.js" type="text/javascript"></script>
+    <script>
+        jQuery(document).ready(function ($) {
+            $(".datepicker").datepicker();
+
+        });
+
+    </script>
+{% endblock %}    
+{% block body %}
+    <div class="bottom-sec">
+        <div class="bread-crumb">
+            <span>{{module_name}}</span>
+            <i class="fa fa-long-arrow-right"></i>
+            <span>Edit</span>
+        </div>
+        <div class="custom-feature">
+            {% if permissions['add'] %}
+                <a href="{{ path('intelligent_'~module~'_edit', {'edit_id': 'new'}) }}"><i class="fa "></i>New</a>
+            {% endif %}
+            <a href="{{ path('intelligent_'~module~'_view') }}"><i class="fa"></i>Back</a>
+
+
+        </div>
+    </div>
+
+    <div class="form-control-outer">
+        <div class="form-control">
+            <div class="form-header">
+                <h4>Edit/View</h4>
+            </div>
+            <form action="" method="POST">
+                <ul>
+                    {% for field_settings in schema %}
+
+                        {% if field_settings.module_field_datatype == 'relationship' %}
+
+                        {{ include('IntelligentModuleBundle:Default:edit/'~field_settings.module_field_datatype~'.html.twig', { 'field_settings': field_settings,'data': data[field_settings.relationship_field_name] is defined ? data[field_settings.relationship_field_name] : ''}) }}   
+
+                        {% elseif field_settings.module_field_datatype == 'user' %}
+
+                        {{ include('IntelligentModuleBundle:Default:edit/'~field_settings.module_field_datatype~'.html.twig', { 'field_settings': field_settings,'data': data[field_settings.module_field_name] is defined ? data[field_settings.module_field_name] : '','users':users }) }}
+
+                    {% else %}
+
+                        {{ include('IntelligentModuleBundle:Default:edit/'~field_settings.module_field_datatype~'.html.twig', { 'field_settings': field_settings,'data': data[field_settings.module_field_name] is defined ? data[field_settings.module_field_name] : '' }) }}
+
+                        {% endif %}
+                            {% endfor %}
+                                <li>
+                                    <div class="field-wrap">
+
+                                        {% if id is defined and id is not empty %}
+
+                                            <input type="hidden" name="id" id="edit_id_hidden_field" value="{{id}}">
+
+                                            {% if permissions['edit'] %}
+                                                <input type="submit" name="edit_submit" value="Save" > 
+                                            {% endif %}
+                                            {% if permissions['delete'] %}
+                                                <input type="submit" name="delete_submit" value="Delete" id="delete_action" onsubmit="return confirm('Are you sure to delete the column with data, this step cannot be rollbacked')">
+                                            {% endif %}
+                                        {% else %}
+                                            {% if permissions['add'] %}
+                                                <input type="submit" name="add_submit" value="Add" >
+                                            {% endif %}
+                                        {% endif %}
+                                    </div>
+                                </li>
+
+                            </ul>
+                        </form>
+                    </div>
+                </div>
+
+
+
+                {% endblock %}

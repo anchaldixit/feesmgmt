@@ -1,0 +1,28 @@
+<div class="selected_fitlers_container">
+
+    {% if selected_filters.filter is defined %}
+
+        {% for type,selected_filter in selected_filters.filter %}
+
+            {% for selected_filter_name,selected_filter_value in selected_filter %}
+                {% if type == 'text'%}
+
+                    <div class="selected_filter">
+                        {{schema[selected_filter_name]['module_field_display_name']}} like {{selected_filter_value}} <span data-resetfilter="{{selected_filter_name}}">X</span> 
+                    </div>
+
+                {% elseif type == 'match' %}
+
+                    <div class="selected_filter" >
+                        {{schema[selected_filter_name]['module_field_display_name']}}: {{schema[selected_filter_name]['module_field_datatype'] == 'user'? users[selected_filter_value]:selected_filter_value}} <span data-resetfilter="{{selected_filter_name}}">X</span> 
+                    </div>
+
+                {% endif %}
+
+            {% endfor %}
+
+        {% endfor %}
+
+    {% endif %}
+
+</div>

@@ -4,27 +4,31 @@ namespace Intelligent\ModuleBundle\Controller;
 
 use Intelligent\ModuleBundle\Controller\ModulebaseController;
 
-class CustomerController extends ModulebaseController {
 
+class MarketingprojectsController extends ModulebaseController {
+    
+    
     public function __construct() {
-
+        
         $this->setModuleName();
-
+        
         parent::__construct();
     }
-
-    function setModuleName() {
-
-        $this->module_name = 'customer';
+    
+    function setModuleName(){
+        
+        $this->module_name = 'marketing_projects';
     }
 
     public function indexAction() {
         return $this->render('IntelligentModuleBundle:Customer:index.html.twig');
     }
 
-    public function autocompleteAction() {
 
-        return new JsonResponse(array(array('id' => 1, 'label' => 'first Label', 'value' => 'fist_label')));
+    public function autocompleteAction(){
+        
+        return new JsonResponse(array('name' => 'shashank'));
+
     }
 
 }

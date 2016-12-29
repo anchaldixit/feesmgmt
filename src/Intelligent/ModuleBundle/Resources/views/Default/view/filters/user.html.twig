@@ -1,0 +1,14 @@
+<div class="filter-box">
+    <h6><a href="#"><i class="fa fa-caret-down"></i>{{field_settings.module_field_display_name}}</a></h6>
+
+    <ul>
+        {% for key,name in users %}
+            <li>
+                <input type="radio" name="filter[match][{{field_settings.module_field_name}}]"  value="{{key}}"
+                       {{selected_filters.filter.match[field_settings.module_field_name] is defined and selected_filters.filter.match[field_settings.module_field_name] == key? 'CHECKED':'' }}>
+                <label>{{name}}</label> 
+            </li>
+                
+        {% endfor %}
+    </ul>
+</div>

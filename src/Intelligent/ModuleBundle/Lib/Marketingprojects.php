@@ -10,14 +10,14 @@ namespace Intelligent\ModuleBundle\Lib;
 
 use Intelligent\ModuleBundle\Lib\Module;
 
-class Customer extends Module {
+class Marketingprojects extends Module {
 
     function __construct($conn) {
 
         parent::__construct($conn);
 
-        $this->table = 'customer';
-        $this->module = 'customer';
+        $this->table = 'marketing_projects';
+        $this->module = 'marketing_projects';
     }
 
 

@@ -33,7 +33,7 @@ class Settings {
         'link' => 'Link',
         'user' => 'User',
         'date' => 'Date',
-        'datetime' => 'Datetime',
+//        'datetime' => 'Datetime',
         'relationship' => 'Relationship'
     );
     private $last_insert_id; //initilized after new field created
@@ -213,18 +213,34 @@ class Settings {
                 } elseif ($post_data['relationship_module'] == $post_data['module']) {
 
                     $error[] = "Relationship Module cannot be same as module name.";
-                } else {
-                    //check the field name id db for relationship module
+                } elseif(empty($post_data['relationship_module_unique_field'])){
+                    $error[] = "Relationship Module unique field cannot be empty.";
+                    
+                }else {
+                    //check the field name exist in relationship module
                     $result1 = $this->fetch(
                             array(
                                 'module' => $post_data['relationship_module'],
                                 'module_field_name' => $data['module_field_name']));
+                    
+                    //check the field
+                    $result2 = $this->fetch(
+                            array(
+                                'module' => $post_data['relationship_module'],
+                                'module_field_name' => $data['relationship_module_unique_field']));
 
                     if (!count($result1)) {
                         //Field not found
                         $error[] = "{$data['module_field_name']} field not found for relationship module";
-                    } else {
+                    }elseif(!count($result2)){
+                        
+                        $error[] = "{$data['relationship_module_unique_field']} field not found for relationship module";
+                    
+                        
+                    }else {
+                    
                         $data['relationship_module'] = $post_data['relationship_module'];
+                        $data['relationship_module_unique_field'] = $post_data['relationship_module_unique_field'];
                     }
                 }
             }

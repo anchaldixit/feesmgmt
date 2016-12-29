@@ -1,0 +1,35 @@
+<li><label>{{field_settings.relationship_module_display_name }} (relationship):</label> 
+    <div class="field-wrap">
+        <div class="ui-widget">
+        <input name="{{field_settings.relationship_field_name}}" id="{{field_settings.relationship_field_name}}"  value="{{data is defined ? data : ''}}" type="text" data-url="{{ path('intelligent_'~field_settings.relationship_module | replace({'_':''}) ~'_autocomplete') }}" data-field="{{field_settings.relationship_module_unique_field}}">
+        </div><br>
+    </div>
+    <script>
+
+        jQuery(document).ready(function ($) {
+            
+            $( "#{{field_settings.relationship_field_name}}" ).autocomplete({
+      source: function( request, response ) {
+        $.ajax( {
+          url: $( "#{{field_settings.relationship_field_name}}" ).attr('data-url'),
+          dataType: "jsonp",
+          data: {
+            term: request.term,
+            field: $( "#{{field_settings.relationship_field_name}}" ).attr('data-field'),
+            
+    
+          },
+          success: function( data ) {
+            response( data );
+          }
+        } );
+      },
+      minLength: 2,
+      select: function( event, ui ) {
+        //log( "Selected: " + ui.item.value + " aka " + ui.item.id );
+      }
+    } );
+
+        });
+    </script>
+</li>

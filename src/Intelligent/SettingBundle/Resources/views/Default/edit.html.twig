@@ -33,29 +33,31 @@
                 } else {
                     $('#enable_filter_row').slideDown('slow')
                 }
-                if ($(this).val() == 'varchar' || $(this).val() == 'number' ) {
+                if ($(this).val() == 'varchar' || $(this).val() == 'number') {
                     $('#unique_field_row').slideDown('slow')
                 } else {
                     $('#unique_field_row').slideUp('slow')
                 }
                 if ($(this).val() == 'relationship') {
-                    
+
                     $('#relationship_module_row').slideDown('slow')
+                    $('#relationship_module_unique_field_row').slideDown('slow')
                 } else {
                     $('#relationship_module_row').slideUp('slow')
+                    $('#relationship_module_unique_field_row').slideUp('slow')
                 }
-                   
+
             }).trigger('change');
 
             /*field_has_relationship').on('change', function () {
-
-                if ($(this).val() == 'Y') {
-                    $('#relationship_module_row').slideDown('slow');
-                } else {
-                    $('#relationship_module_row').slideUp('slow');
-                }
-
-            }).trigger('change');*/
+             
+             if ($(this).val() == 'Y') {
+             $('#relationship_module_row').slideDown('slow');
+             } else {
+             $('#relationship_module_row').slideUp('slow');
+             }
+             
+             }).trigger('change');*/
 
             if ($('#edit_id_hidden_field').length) {
                 $('#module_field_datatype').attr('DISABLED', true);
@@ -150,9 +152,15 @@
                                             <option value="{{keyname}}" {{config.relationship_module is defined and config.relationship_module == keyname ? 'SELECTED': ''}}>{{module}}</option>
                                         {% endfor %}
                                     </select>
-                                    
+
                                 </div>
                                 <small><i>Module Field Identifier should be same as Field Identifier of Relationship Module</i></small>
+                            </div>
+                        </li>
+                        <li id="relationship_module_unique_field_row"> 
+                            <label>Relationship Module Unique Field: </label>
+                            <div class="field-wrap">
+                                    <input name="relationship_module_unique_field" id="relationship_module_unique_field"  value="{{config.relationship_module_unique_field is defined ? config.relationship_module_unique_field : ''}}" type="text" ><br><small><i>This field of relationship table will be displayed on edit/add form for setting relation. </i></small>
                             </div>
                         </li>
                         <li><label>Display Position:</label> 
@@ -233,7 +241,7 @@
                             </div>
 
                         </li>
-                        
+
                         {% if config.modified_datetime is defined %}
                             <li> 
                                 <label>Last Modified:</label> 
@@ -249,25 +257,22 @@
                             </li>
                         {% endif %}
 
+                        <li>
+                            <div class="field-wrap">
+                                {% if id is defined and id is not empty %}
 
-                        {% if id is defined and id is not empty %}
-                            <li>
-                                <div class="field-wrap">
                                     <input type="hidden" name="id" id="edit_id_hidden_field" value="{{id}}">
                                     <input type="hidden" name="module_field_datatype" value="{{config.module_field_datatype}}">
                                     <input type="submit" name="edit_submit" value="Save" > 
                                     <input type="submit" name="delete_submit" value="Delete" id="delete_action" onsubmit="return confirm('Are you sure to delete the column with data, this step cannot be rollbacked')">
-                                    </li>
                                 {% else %}
-                                    <li>
-                                        <div class="field-wrap">
-                                            <input type="submit" name="add_submit" value="Add" > 
-                                        </div>
-                                    </li>
+                                    <input type="submit" name="add_submit" value="Add" > 
+
                                 {% endif %}
                             </div>
+                        </li>
 
-                        {% endfor %}
+                    {% endfor %}
 
                 </ul>
             </form>

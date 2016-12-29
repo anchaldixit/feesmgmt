@@ -1,0 +1,15 @@
+<li><label>{{field_settings.module_field_display_name}}(user):</label> 
+    <div class="field-wrap">
+        <div class="dropdown">
+            <select name="{{field_settings.module_field_name}}" id="{{field_settings.module_field_name}}"  class="selectbox">
+                <option value="">Select option...</option>
+                {% for id,name in users %}
+                    <option value="{{id}}" {{id == data ? 'SELECTED': ''}}>{{name}}</option>
+                {% endfor%}
+
+
+            </select><br>
+        </div>
+
+    </div>
+</li>

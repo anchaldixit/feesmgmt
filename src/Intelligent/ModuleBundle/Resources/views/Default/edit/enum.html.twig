@@ -1,0 +1,17 @@
+{# empty Twig template #}
+<li><label>{{field_settings.module_field_display_name}}:</label> 
+    {% set select_values = field_settings.value|split('|') %}
+    <div class="field-wrap">
+        <div class="dropdown">
+            <select name="{{field_settings.module_field_name}}" id="{{field_settings.module_field_name}}"  class="selectbox">
+                <option value="">Select option...</option>
+                {% for v in select_values %}
+                    <option value="{{v}}" {{v == data ? 'SELECTED': ''}}>{{v}}</option>
+                {% endfor%}
+
+
+            </select><br>
+        </div>
+
+    </div>
+</li>
