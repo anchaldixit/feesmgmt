@@ -3,6 +3,6 @@
     {% if i== pagination.active %}
         {{i}} 
     {% else %}
-        <a href="{{ path('intelligent_setting_view', {'page_no': i}) }}">{{i}}</a>
+        <a href="{{ path('intelligent_setting_view', app.request.query.all| merge( {'page_no': i})) }}">{{i}}</a>
     {% endif %}
 {% endfor %}

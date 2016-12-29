@@ -1,0 +1,23 @@
+{% if permissions.custom == false or  (permissions.custom == true and permissions.custom_field[field_settings.module_field_name]>0) %}
+{# if custom access setting id done then allowed only for view & editview is true that is 1 or 2  #}
+{% set field_permission = permissions.custom_field[field_settings.module_field_name] %}<li><label>{{field_settings.module_field_display_name}}:</label> 
+    {% set select_values = field_settings.value|split('|') %}
+    <div class="field-wrap">
+        {% if permissions.custom == false or field_permission == 2 %}
+            {# user has edit access   #}
+            <div class="dropdown">
+                <select name="{{field_settings.module_field_name}}" id="{{field_settings.module_field_name}}"  class="selectbox">
+                    <option value="">Select option...</option>
+                    {% for v in select_values %}
+                        <option value="{{v}}" {{v == data ? 'SELECTED': ''}}>{{v}}</option>
+                    {% endfor%}
+                </select><br>
+            </div>
+        {% else %}
+            {# user only has view access   #}
+            {{data is defined ? data : ''}}
+        {% endif %}
+
+    </div>
+</li>
+{% endif %}

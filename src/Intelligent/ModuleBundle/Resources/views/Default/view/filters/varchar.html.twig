@@ -1,0 +1,12 @@
+{% if permissions.custom == false or  (permissions.custom == true and permissions.custom_field[field_settings.module_field_name]>0) %}
+{# if custom access setting id done then allowed only for view & editview is true that is 1 or 2  #}
+<div class="filter-box">
+    <h6><a href="#"><i class="fa fa-caret-down"></i>{{field_settings.module_field_display_name}}</a></h6>
+    <ul>
+        <li>
+            <input name="filter[text][{{field_settings.module_field_name}}]" type="text" placeholder="Text search" value="{{selected.text[field_settings.module_field_name] is defined and selected.text[field_settings.module_field_name] is not empty ? selected.text[field_settings.module_field_name] | trim:'' }}">
+            <input type='submit' value=">>">
+        </li>
+    </ul>
+</div>
+{% endif %}

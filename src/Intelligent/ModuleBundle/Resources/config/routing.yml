@@ -1,6 +1,24 @@
-intelligent_module_homepage:
-    path:     /
-    defaults: { _controller: IntelligentModuleBundle:Default:index }
+intelligent_customer:
+    path:     /customer
+    defaults: { _controller: IntelligentModuleBundle:Customer:index }
 intelligent_customer_edit:
     path:     /customer/edit/{edit_id}
     defaults: { _controller: IntelligentModuleBundle:Customer:edit }
+intelligent_customer_view:
+    path:     /customer/view/{page_no}
+    defaults: { _controller: IntelligentModuleBundle:Customer:view , page_no: 1 }
+intelligent_customer_autocomplete:
+    path:     /customer/autocomplete
+    defaults: { _controller: IntelligentModuleBundle:Customer:autocomplete}
+intelligent_marketingprojects:
+    path:     /marketingprojects
+    defaults: { _controller: IntelligentModuleBundle:Marketingprojects:index }
+intelligent_marketingprojects_edit:
+    path:     /marketingprojects/edit/{edit_id}
+    defaults: { _controller: IntelligentModuleBundle:Marketingprojects:edit }
+intelligent_marketingprojects_view:
+    path:     /marketingprojects/view/{page_no}
+    defaults: { _controller: IntelligentModuleBundle:Marketingprojects:view , page_no: 1 }
+intelligent_marketingprojects_autocomplete:
+    path:     /marketingprojects/autocomplete
+    defaults: { _controller: IntelligentModuleBundle:Marketingprojects:autocomplete }
