@@ -25,18 +25,42 @@
                         <div class="tab-body" id="tab01">
                             <div class="access-options">
                                 <p>Set the access permissions to the app and individual tables for users with this role</p>
-                                <h3>App Access</h3>
+                                <h3>Global permissions</h3>
                                 <!--<p>By default, every role has basic access to view data and use app.</p>
                                 <div class="app-control">
                                     <input type="checkbox" name="app-control"/><label for="app-control">Disable access to app for users with this role</label>
                                 </div>-->
-                                <p>Global permissions</p>
+                                
                                 <div class="app-control">
                                     <input type="checkbox" name="share-app" id="share_app_permission" /><label for="share-app">Manage users and share the app</label><br/>
                                     <input type="checkbox" name="app-structure" id="app_structure_permission" /><label for="app-structure">Edit app structure and permissions</label>
                                 </div>
                             </div>
+                            
+                            <div class="customer-content">
+                                <h3>Customer permissions</h3>
+                                <div class="customer-list-outer">
+                                    <div class="customer-sec">
+                                        <p>Select Customer to give permission to access app:</p>
+                                        <select id="customerList">
+                                            <option value="">Select Customer</option>
+                                            <option value="expertise.com">Expertise.com</option>
+                                            <option value="intelligent.com">Intelligent.com</option>
+                                            <option value="thesimpledollar.com">Thesimpledollar.com</option>
+                                        </select>
+                                    </div>
+                                    <div class="added-customer-outer">
+                                        <p>Customer Added:</p>
+                                    <div class="added-customer">
+                                        
+                                        
+                                    </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
                             <div class="table-content user-table">
+                                <h3>Module permissions</h3>
                                 <table id="permissionsTable">
                                     <thead>
                                         <tr>
