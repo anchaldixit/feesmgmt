@@ -1196,6 +1196,8 @@ $.extend(Permission.prototype, {
             that.getPermissionsByRole();
             that.changeFieldPermission();
             that.editRole();
+            that.addCustomerInList();
+            that.removeCustomerFromList();
         }
 
     },
@@ -1723,6 +1725,28 @@ $.extend(Permission.prototype, {
                     
                 });
             }
+        });
+    },
+    addCustomerInList: function(){
+        $('#customerList').change(function(){
+            var _val = $(this).val();
+            var _text = $(this).find("option:selected").text();
+            
+            if(_val != ''){
+                var html = '';
+                $(this).find("option:selected").attr('disabled',true);
+                html = '<em class="cust_add"><span class="cc" data-value="'+_val+'">'+_text+'</span><i class="fa fa-times remove_customer"></i></em>';
+                $('.added-customer').append(html);
+            }
+            
+        });
+    },
+    removeCustomerFromList: function (){
+        $('.added-customer').on('click','.remove_customer',function(){
+            var _custObj = $(this).parent();
+            var _custVal = _custObj.find('.cc').attr('data-value');
+            $('#customerList option[value="'+_custVal+'"]').attr('disabled',false);
+            _custObj.remove();
         });
     }
 });

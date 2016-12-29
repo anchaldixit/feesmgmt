@@ -497,10 +497,66 @@ input[type="submit"]:focus, input[type="button"]:focus {
     float: right;
     width: calc(100% - 210px); }
 
+.customer-content {
+  padding: 0 15px;
+  margin-bottom: 30px; }
+  .customer-content h3 {
+    margin-bottom: 15px; }
+  .customer-content .customer-list-outer {
+    overflow: hidden; }
+    .customer-content .customer-list-outer .customer-sec {
+      float: left;
+      width: 400px;
+      padding-left: 25px; }
+      .customer-content .customer-list-outer .customer-sec p {
+        font-weight: 400;
+        margin-bottom: 15px; }
+      .customer-content .customer-list-outer .customer-sec select {
+        width: 65%; }
+    .customer-content .customer-list-outer .added-customer-outer {
+      width: 40%;
+      float: left; }
+      .customer-content .customer-list-outer .added-customer-outer p {
+        font-weight: 400;
+        margin-bottom: 15px; }
+      .customer-content .customer-list-outer .added-customer-outer .added-customer {
+        width: 100%;
+        border: 1px solid #cacaca;
+        padding: 15px 15px 7px 15px;
+        background-color: #fff;
+        line-height: 22px; }
+        .customer-content .customer-list-outer .added-customer-outer .added-customer .cust_add {
+          font-style: normal;
+          font-weight: 400;
+          background-color: #f5f5f5;
+          border: 1px solid #d9d9d9;
+          border-radius: 3px;
+          -webkit-border-radius: 3px;
+          -ms-border-radius: 3px;
+          -o-border-radius: 3px;
+          padding: 2px 10px 3px 10px;
+          margin-right: 5px;
+          margin-bottom: 8px;
+          display: inline-block; }
+          .customer-content .customer-list-outer .added-customer-outer .added-customer .cust_add span {
+            font-size: 12px;
+            color: #222222; }
+          .customer-content .customer-list-outer .added-customer-outer .added-customer .cust_add i {
+            font-size: 11px;
+            color: #b5b5b5;
+            margin-left: 10px;
+            cursor: pointer; }
+          .customer-content .customer-list-outer .added-customer-outer .added-customer .cust_add:hover {
+            border-color: #c2bfbf; }
+            .customer-content .customer-list-outer .added-customer-outer .added-customer .cust_add:hover i {
+              color: #999797; }
+
 .table-content {
   padding: 0 15px;
   margin-top: 30px;
   margin-bottom: 30px; }
+  .table-content h3 {
+    margin-bottom: 15px; }
   .table-content table {
     border-collapse: collapse;
     border: 1px solid #454545;
