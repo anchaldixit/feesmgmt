@@ -20,10 +20,6 @@ class MarketingprojectsController extends ModulebaseController {
         $this->module_name = 'marketing_projects';
     }
 
-    public function indexAction() {
-        return $this->render('IntelligentModuleBundle:Customer:index.html.twig');
-    }
-
 
     public function autocompleteAction(){
         

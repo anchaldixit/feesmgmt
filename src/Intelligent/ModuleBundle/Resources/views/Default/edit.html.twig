@@ -1,7 +1,7 @@
 {# Intelligent/ModuleBundle/Resources/views/Marketingprojects/edit.html.twig #}
 {% extends "base.html.twig"  %}
 {% block stylesheets %}
-    <link href="/assets/js/jquery-ui/jquery-ui.min.css" rel="stylesheet" type="text/css"/>jquery-ui.theme.min
+    <link href="/assets/js/jquery-ui/jquery-ui.min.css" rel="stylesheet" type="text/css"/>
     <link href="/assets/js/jquery-ui/jquery-ui.theme.min.css" rel="stylesheet" type="text/css"/>
 
 {% endblock %}
@@ -44,15 +44,15 @@
 
                         {% if field_settings.module_field_datatype == 'relationship' %}
 
-                        {{ include('IntelligentModuleBundle:Default:edit/'~field_settings.module_field_datatype~'.html.twig', { 'field_settings': field_settings,'data': data[field_settings.relationship_field_name] is defined ? data[field_settings.relationship_field_name] : ''}) }}   
+                        {{ include('IntelligentModuleBundle:Default:edit/'~field_settings.module_field_datatype~'.html.twig', { 'field_settings': field_settings,'data': data[field_settings.relationship_field_name] is defined ? data[field_settings.relationship_field_name] : '','permissions':permissions}) }}   
 
                         {% elseif field_settings.module_field_datatype == 'user' %}
 
-                        {{ include('IntelligentModuleBundle:Default:edit/'~field_settings.module_field_datatype~'.html.twig', { 'field_settings': field_settings,'data': data[field_settings.module_field_name] is defined ? data[field_settings.module_field_name] : '','users':users }) }}
+                        {{ include('IntelligentModuleBundle:Default:edit/'~field_settings.module_field_datatype~'.html.twig', { 'field_settings': field_settings,'data': data[field_settings.module_field_name] is defined ? data[field_settings.module_field_name] : '','users':users,'permissions':permissions }) }}
 
                     {% else %}
 
-                        {{ include('IntelligentModuleBundle:Default:edit/'~field_settings.module_field_datatype~'.html.twig', { 'field_settings': field_settings,'data': data[field_settings.module_field_name] is defined ? data[field_settings.module_field_name] : '' }) }}
+                        {{ include('IntelligentModuleBundle:Default:edit/'~field_settings.module_field_datatype~'.html.twig', { 'field_settings': field_settings,'data': data[field_settings.module_field_name] is defined ? data[field_settings.module_field_name] : '' ,'permissions':permissions}) }}
 
                         {% endif %}
                             {% endfor %}

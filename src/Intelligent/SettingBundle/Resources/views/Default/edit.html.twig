@@ -223,8 +223,8 @@
                             <div class="field-wrap">
                                 <div class="dropdown">
                                     <select name="required_field" id="required_field"  class="selectbox">
-                                        <option value="N" {{config.required_field is defined and config.required_field is empty ? 'SELECTED': ''}}>No</option>
-                                        <option value="Y" {{config.required_field is defined and config.required_field is not empty ? 'SELECTED': ''}}>Yes</option>
+                                        <option value="N" {{config.required_field is defined and config.required_field == 'N' ? 'SELECTED': ''}}>No</option>
+                                        <option value="Y" {{config.required_field is defined and config.required_field == 'Y' ? 'SELECTED': ''}}>Yes</option>
                                     </select><br>
                                 </div>
                             </div>
@@ -234,8 +234,8 @@
                             <div class="field-wrap">
                                 <div class="dropdown">
                                     <select name="is_" id="field_has_relationship"  class="selectbox">
-                                        <option value="N" {{config.relationship_module is defined and config.relationship_module is empty ? 'SELECTED': ''}}>No</option>
-                                        <option value="Y" {{config.relationship_module is defined and config.relationship_module is not empty ? 'SELECTED': ''}}>Yes</option>
+                                        <option value="N" {{config.relationship_module is defined and config.relationship_module == 'N' ? 'SELECTED': ''}}>No</option>
+                                        <option value="Y" {{config.relationship_module is defined and config.relationship_module == 'Y' ? 'SELECTED': ''}}>Yes</option>
                                     </select><br>
                                 </div>
                             </div>

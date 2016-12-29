@@ -51,8 +51,6 @@ abstract class ModulebaseController extends Controller {
             return $this->render('IntelligentUserBundle:Default:noaccess.html.twig', array());
         }
 
-
-
         $conn = $this->get('database_connection');
         #echo get_class($conn);
         #$module = new Marketingprojects($conn);
@@ -171,13 +169,10 @@ abstract class ModulebaseController extends Controller {
 
         $params = $this->prepareFilterCondtion($filters);
 
-
         //Set sort filter
         $sort = $this->prepareSort($filters);
         //Fetch the data
         $limit_plus_offset = $this->prepareLimit($page_no);
-
-
 
         $rows = $module->getRows($params, $sort, $limit_plus_offset);
 
@@ -265,10 +260,6 @@ abstract class ModulebaseController extends Controller {
     function initPermissionsDetails() {
 
 
-        // $permission = 0; // No view
-// $permission = 1; // Only view
-// $permission = 2; // Edit and view both
-
         $session = new Session();
 
         $cache_permission = $session->get($this->moduleSessionKey());
@@ -284,6 +275,8 @@ abstract class ModulebaseController extends Controller {
             $permission['custom'] = $user_permission->getCustomFieldPermission($this->module_name);
             $permission['custom_field'] = $user_permission->getAllFieldPermissions($this->module_name);
 
+            $this->permissionHack($permission);
+
             $session->set($this->moduleSessionKey(), $permission);
             $this->permissions = $permission;
         } else {
@@ -294,20 +287,73 @@ abstract class ModulebaseController extends Controller {
         return $permission;
     }
 
+    function permissionHack(&$permission) {
+
+        if ($permission['custom']) {
+
+            $only_values = array_unique(array_values($permission['custom_field']));
+
+            if (count($only_values) == 1) {
+                //Only one kind of access is there
+
+                $permission['custom'] = false;
+                switch ($only_values[0]) {
+                    case 0://NO access
+                        $permission['view'] = false;
+                        $permission['edit'] = false;
+                        break;
+                    case 1://only view access
+                        $permission['view'] = true;
+                        $permission['edit'] = false;
+                        break;
+                    case 2://view & edit
+                        $permission['view'] = true;
+                        $permission['edit'] = true;
+                        break;
+                }
+            } elseif (count($only_values) == 2) {
+
+                if (array_search(1, $only_values) === false) {
+                    //some field have edit access, so view/edit both should be true
+                    $permission['view'] = true;
+                    $permission['edit'] = true;
+                }
+                if (array_search(2, $only_values) === false) {
+                    //no edit access only vew
+                    $permission['view'] = true;
+                    $permission['edit'] = false;
+                }
+                if (array_search(0, $only_values) === false) {
+                    //some fields have view and edit access
+                    $permission['edit'] = true;
+                    $permission['view'] = true;
+                }
+            } else {//some fields have view and edit access
+                $permission['edit'] = true;
+                $permission['view'] = true;
+            }
+        }
+    }
+
     function noAccess($action) {
 
         return isset($this->permissions[$action]) ? !$this->permissions[$action] : true;
     }
 
     function noAccessPage() {
-        
+
         return $this->render('IntelligentUserBundle:Default:noaccess.html.twig', array());
-        
     }
 
     function moduleSessionKey() {
 
         return "access-key-{$this->module_name}-permission";
+    }
+    
+    public function indexAction() {
+
+        $classnamelike= ucfirst($this->module_route_identifier);
+        return $this->forward("IntelligentModuleBundle:$classnamelike:view",array('page_no'=>1));
     }
 
 }
