@@ -28,97 +28,123 @@
                     <a href="/">
                         <img src="/assets/images/aizan_logo2.png" width="120" alt=""/></a>
                 </div>
-            </div>
-            
-        </header>
-        <div class="feature-list">
                 <ul>
                     <li>
-                        <a href="#">
-                            <i class="fa fa-home"></i>
-                            <span>Home</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="/users">
-                            <i class="fa fa-user"></i>
-                            <span>Users</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="/customer/view">
-                            <i class="fa fa-users"></i>
-                            <span>Customer</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="/marketingprojects/view">
-                            <i class="fa fa-list-alt"></i>
-                            <span>Marketing Projects</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="#">
-                            <i class="fa fa-gears"></i>
-                            <span>Initiatives</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="#">
-                            <i class="fa fa-bullhorn"></i>
-                            <span>Campaign</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="#">
-                            <i class="fa fa-address-book"></i>
-                            <span>Campaign Contacts</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="#">
-                            <i class="fa fa-envelope"></i>
-                            <span>Psuedo Email Accounts</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="#">
-                            <i class="fa fa-desktop"></i>
-                            <span>Assign Psudeo</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="#">
-                            <i class="fa fa-user-circle "></i>
-                            <span>Agents</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="#">
-                            <i class="fa fa-folder-open"></i>
-                            <span>Agent Assignments</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="#">
-                            <i class="fa fa-dollar"></i>
-                            <span>Links</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="#">
-                            <i class="fa fa-tachometer"></i>
-                            <span>Link Rates</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="#">
-                            <i class="fa fa-list-alt"></i>
-                            <span>DNS List</span>
-                        </a>
+                        <a class="b-btn profile open-menu" href="#user_popup"><span class="fa fa-user"></span>{{ app.user.getName() }}<span class="fa-rt fa fa-caret-down"></span></a>
+                        <div class="PopMenu" id="user_popup">
+                            <ul>
+                                <li>
+                                    <h4>{{ app.user.getName() }}</h4>
+                                    <a class="e-mail" href="mailto:{{ app.user.getEmail() }}">{{ app.user.getEmail() }}</a>
+                                    <p><A href="/myPreferences">My Preferences</a></p>
+                                </li>
+                                <li>
+                                    <h4>Aizan</h4>
+                                    <span>My role in this app is {{ app.user.getRole().getName() }}</span>
+                                    <p><a href="#">My Personal setting in this app</a></p>
+                                </li>
+                                <li><a class="signout" href="/logout">Sign Out</a></li>
+                            </ul>
+                        </div>
                     </li>
                 </ul>
             </div>
+
+        </header>
+        <div class="feature-list">
+            <ul>
+                <li>
+                    <a href="#">
+                        <i class="fa fa-home"></i>
+                        <span>Home</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="/settings/view">
+                        <i class="fa fa-gears"></i>
+                        <span>Module Settings</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="/users">
+                        <i class="fa fa-user"></i>
+                        <span>Users</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="/customer/view">
+                        <i class="fa fa-users"></i>
+                        <span>Customer</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="/marketingprojects/view">
+                        <i class="fa fa-list-alt"></i>
+                        <span>Marketing Projects</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#">
+                        <i class="fa fa-gears"></i>
+                        <span>Initiatives</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#">
+                        <i class="fa fa-bullhorn"></i>
+                        <span>Campaign</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#">
+                        <i class="fa fa-address-book"></i>
+                        <span>Campaign Contacts</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#">
+                        <i class="fa fa-envelope"></i>
+                        <span>Psuedo Email Accounts</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#">
+                        <i class="fa fa-desktop"></i>
+                        <span>Assign Psudeo</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#">
+                        <i class="fa fa-user-circle "></i>
+                        <span>Agents</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#">
+                        <i class="fa fa-folder-open"></i>
+                        <span>Agent Assignments</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#">
+                        <i class="fa fa-dollar"></i>
+                        <span>Links</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#">
+                        <i class="fa fa-tachometer"></i>
+                        <span>Link Rates</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#">
+                        <i class="fa fa-list-alt"></i>
+                        <span>DNS List</span>
+                    </a>
+                </li>
+            </ul>
+        </div>
         {% for type, messages in app.session.flashbag.all() %}
             {% for message in messages %}
                 {% if type == 'success' %}
@@ -136,13 +162,13 @@
 
 </div>
 {% block footer %}
-<footer class="footer">
-    <div class="left-footer">
-        <p>&copy; aizan.com</p>
-    </div>
-    <div class="right-footer">
-        <p>
-            <a href="#">Privacy Policy</a>
+    <footer class="footer">
+        <div class="left-footer">
+            <p>&copy; aizan.com</p>
+        </div>
+        <div class="right-footer">
+            <p>
+                <a href="#">Privacy Policy</a>
             {% block footerlink %}{% endblock %}
         </p>
     </div>

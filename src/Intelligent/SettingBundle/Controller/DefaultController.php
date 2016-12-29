@@ -5,6 +5,8 @@ namespace Intelligent\SettingBundle\Controller;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Intelligent\SettingBundle\Lib\Settings;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Session\Session;
+
 
 class DefaultController extends Controller {
 
@@ -13,6 +15,11 @@ class DefaultController extends Controller {
     }
 
     public function editAction($edit_id) {
+        
+        $this->initPermissionsDetails();
+        if ($this->noAccess('view')) {
+            return $this->noAccessPage();
+        }
 
         $conn = $this->get('database_connection');
         #echo get_class($conn);
@@ -87,6 +94,13 @@ class DefaultController extends Controller {
     }
 
     public function viewAction($page_no) {
+        
+        $this->initPermissionsDetails();
+        if ($this->noAccess('view')) {
+            return $this->noAccessPage();
+        }
+        
+        $this->initPermissionsDetails();
 
         $conn = $this->get('database_connection');
 
@@ -155,6 +169,44 @@ class DefaultController extends Controller {
         
         $this->get('session')->getFlashBag()->add('success', "Row Deleted Successfully.");
         return $this->redirectToRoute('intelligent_setting_view');
+    }
+    function initPermissionsDetails() {
+
+
+        $session = new Session();
+
+        $cache_permission = $session->get($this->moduleSessionKey());
+
+        if (1 or ! count($cache_permission)) {
+
+            $user_permission = $this->get("user_permissions");
+
+            $permission['view'] = $user_permission->getManageUserAndShareAppPermission();
+            $permission['edit'] = $user_permission->getEditAppStructurePermission();
+            
+
+            $session->set($this->moduleSessionKey(), $permission);
+            $this->permissions = $permission;
+        } else {
+            $permission = $cache_permission;
+            $this->permissions = $permission;
+        }
+
+        return $permission;
+    }
+    function moduleSessionKey() {
+
+        return "access-key-settings-permission";
+    }
+    
+    function noAccess($action) {
+
+        return isset($this->permissions[$action]) ? !$this->permissions[$action] : true;
+    }
+
+    function noAccessPage() {
+
+        return $this->render('IntelligentUserBundle:Default:noaccess.html.twig', array());
     }
 
 }
