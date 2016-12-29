@@ -3,10 +3,12 @@
 namespace Intelligent\UserBundle\Services;
 
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage;
+use Intelligent\UserBundle\Entity\User;
 use Intelligent\UserBundle\Entity\Role;
 use Intelligent\UserBundle\Entity\RoleModulePermission;
 use Intelligent\UserBundle\Entity\RoleGlobalPermission;
 use Intelligent\UserBundle\Entity\RoleModuleFieldPermission;
+use Intelligent\UserBundle\Entity\RoleAllowedCustomer;
 use Intelligent\SettingBundle\Lib\Settings;
 
 /**
@@ -27,11 +29,19 @@ class UserPermissions {
      * @var Role
      */
     private $role;
+    
+    /**
+     * Current loggedin user
+     * 
+     * @var User
+     */
+    private $user;
 
     public function __construct(TokenStorage $tokenStorage, Settings $settings) {
         // Recieve other services
         $this->settings = $settings;
-        $this->role = $tokenStorage->getToken()->getUser()->getRole();
+        $this->user = $tokenStorage->getToken()->getUser();
+        $this->role = $this->user->getRole();
     }
 
     /**
@@ -151,6 +161,18 @@ class UserPermissions {
         }
     }
 
+    public function getCurrentViewCustomer(){
+        $current_customer = $this->user->getCurrentCustomer();
+        if($current_customer instanceof RoleAllowedCustomer){
+            if($current_customer->getIsDisabled()){
+                return null;
+            }else{
+                return $current_customer->getCustomer();
+            }
+        }else{
+            return null;
+        }
+    }
     /**
      * This function returns the permission of fields in the module
      * 

@@ -5,6 +5,7 @@ namespace Intelligent\UserBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\AdvancedUserInterface;
 use Intelligent\UserBundle\Entity\Role;
+use Intelligent\UserBundle\Entity\RoleAllowedCustomer;
 
 /**
  * User
@@ -82,10 +83,17 @@ class User implements AdvancedUserInterface, \Serializable
 
     /**
      * @var Role
-     * @ORM\OneToOne(targetEntity="Role")
+     * @ORM\ManyToOne(targetEntity="Role")
      * @ORM\JoinColumn(name="role_id", referencedColumnName="id")
      */
     private $role;
+    
+    /**
+     * @var RoleAllowedCustomer
+     * @ORM\ManyToOne(targetEntity="RoleAllowedCustomer")
+     * @ORM\JoinColumn(name="current_customer", referencedColumnName="id")
+     */
+    private $currentCustomer;
 
     /**
      * @var \DateTime
@@ -458,5 +466,28 @@ class User implements AdvancedUserInterface, \Serializable
     public function getRole()
     {
         return $this->role;
+    }
+
+    /**
+     * Set currentCustomer
+     *
+     * @param \Intelligent\UserBundle\Entity\RoleAllowedCustomer $currentCustomer
+     * @return User
+     */
+    public function setCurrentCustomer(\Intelligent\UserBundle\Entity\RoleAllowedCustomer $currentCustomer = null)
+    {
+        $this->currentCustomer = $currentCustomer;
+
+        return $this;
+    }
+
+    /**
+     * Get currentCustomer
+     *
+     * @return \Intelligent\UserBundle\Entity\RoleAllowedCustomer 
+     */
+    public function getCurrentCustomer()
+    {
+        return $this->currentCustomer;
     }
 }

@@ -10,6 +10,7 @@ use Intelligent\UserBundle\Entity\Role;
 use Intelligent\UserBundle\Entity\RoleGlobalPermission;
 use Intelligent\UserBundle\Entity\RoleModulePermission;
 use Intelligent\UserBundle\Entity\RoleModuleFieldPermission;
+use Intelligent\UserBundle\Entity\RoleAllowedCustomer;
 use Symfony\Component\Security\Core\Util\StringUtils;
 
 class ApiController extends Controller {
@@ -764,23 +765,6 @@ class ApiController extends Controller {
                             'deletePermission' => (is_null($module_permission_obj) ? false : $module_permission_obj->getDeletePermission()),
                             'fieldPermission' => (is_null($module_permission_obj) ? false : $module_permission_obj->getFieldPermission())
                         );
-                        
-//                        $field_permissions = array();
-//                        foreach ($module_fields as $module_field) {
-//                            if (is_null($module_permission_obj)) {
-//                                $field_permission_obj = null;
-//                            } else {
-//                                $field_permission_obj = $module_permission_obj->getSingleFieldPermissions($module_field['module_field_name']);
-//                            }
-//                            $field_permissions[] = array(
-//                                'id' => $module_field['module_field_name'],
-//                                'name' => $module_field['module_field_display_name'],
-//                                'permission' => (is_null($field_permission_obj) ? RoleModuleFieldPermission::VIEW : $field_permission_obj->getPermission())
-//                            );
-//                        }
-//
-//                        # Combine the two
-//                        $module_permission['customFieldPermission'] = $field_permissions;
                         $module_permissions[] = $module_permission;
                     }
                     $result = array(
@@ -791,7 +775,9 @@ class ApiController extends Controller {
                             "userPermission" => $role->getGlobalPermission()->getManageUserAppPermission(),
                             "appChangePermission" => $role->getGlobalPermission()->getEditAppStructurePermission()
                         ),
-                        "modulePermissions" => $module_permissions
+                        "modulePermissions" => $module_permissions,
+                        "attached_customers" => $this->_getAllCustomersForRoll($body->role_id),
+                        "all_customers" => $this->_getAllCustomers()
                     );
                     return $this->_handleSuccessfulRequest($result);
                 } else {
@@ -1260,6 +1246,65 @@ class ApiController extends Controller {
             $this->_throwNoPermissionException();
         }
     }
+    
+    
+    private function attachCustomerToRole(Request $request, $json){
+        $user_permissions = $this->get('user_permissions');
+        if ($user_permissions->getManageUserAndShareAppPermission()) {
+            $body = $json->body;
+            
+            if(isset($body->role_id) && isset($body->customer_id) && isset($body->value)){
+                $em = $this->getDoctrine()->getManager();
+                # Get role
+                $role = $em->getRepository("IntelligentUserBundle:Role")->find($body->role_id);
+                # Check role
+                if(!$role){
+                    throw new \Exception("Role with role_id($body->role_id) do not exists", 404);
+                }
+                # Get customer
+                $customer = $em->getRepository("IntelligentUserBundle:Customer")->find($body->customer_id);
+                # Check customer
+                if(!$customer){
+                    throw new \Exception("Customer with customer_id($body->customer_id) do not exists", 404);
+                }
+                
+                $allowed_customers = $role->getAllowedCustomers();
+                # Check if the customer is already attached to the role
+                $corresponding_allowed_customer = null;
+                foreach($allowed_customers as $allowed_customer){
+                    if($body->customer_id == $allowed_customer->getCustomer()->getId()){
+                        $corresponding_allowed_customer = $allowed_customer;
+                        break;
+                    }
+                }
+                # If there is no joining object
+                if(is_null($corresponding_allowed_customer)){
+                    $joining_object = new RoleAllowedCustomer();
+                    $joining_object->setCustomer($customer);
+                    $joining_object->setRole($role);
+                    $joining_object->setIsDisabled(!$body->value);
+                    $em->persist($joining_object);
+                }else{
+                    $is_disabled = $corresponding_allowed_customer->getIsDisabled();
+                    if($is_disabled && !$body->value){
+                        throw new \Exception("Customer is already detached",412);
+                    }else if($body->value && !$is_disabled){
+                        throw new \Exception("Customer is already attached",412);
+                    }else{
+                        $corresponding_allowed_customer->setIsDisabled(!$body->value);
+                    }
+                }
+                $em->flush();
+                return $this->_handleSuccessfulRequest();
+            }else{
+                throw new \Exception("role_id, customer_id or value not set in request json", 412);
+            }
+        }else{
+            $this->_throwNoPermissionException();
+        }
+    }
+    
+    
     /**
      * This function will convert the exception into a json response object 
      * 
@@ -1489,4 +1534,47 @@ class ApiController extends Controller {
         throw new \Exception("Current user has no access to do this action", 403);
     }
 
+    /**
+     * This function will return the array of customers 
+     * for a role
+     * 
+     * @param type $roleId
+     * @return array of customers
+     */
+    private function _getAllCustomersForRoll($roleId){
+        $repo = $this->getDoctrine()->getManager()->getRepository("IntelligentUserBundle:Role");
+        $role = $repo->find($roleId);
+        if($role){
+            $customer_pointers = $role->getAllowedCustomers(true);
+            $result = array();
+            foreach($customer_pointers as $customer_pointer){
+                $customer = $customer_pointer->getCustomer();
+                $result[] = array(
+                    'id' => $customer->getId(),
+                    'name' => $customer->getName()
+                );
+            }
+            return $result;
+        }else{
+            return array();
+        }
+    }
+    
+    /**
+     * This method will return all the customers
+     * 
+     * @return array
+     */
+    private function _getAllCustomers(){
+        $repo = $this->getDoctrine()->getManager()->getRepository("IntelligentUserBundle:Customer");
+        $customers = $repo->findAll();
+        $result = array();
+        foreach($customers as $customer){
+            $result[] = array(
+                'id' => $customer->getId(),
+                'name' => $customer->getName()
+            );
+        }
+        return $result;
+    }
 }
