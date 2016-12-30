@@ -29,6 +29,7 @@ class Settings {
         'text' => 'Long Text',
         'currency' => 'Currency',
         'decimal' => 'Decimal',
+        'number' => 'Number',
         'enum' => 'Value Set',
         'link' => 'Link',
         'user' => 'User',
@@ -368,7 +369,7 @@ class Settings {
             $type = 'text';
         } elseif ($datatype == 'link') {
             $type = 'varchar(400)';
-        } else if (in_array($datatype, array('integer', 'user'))) {
+        } else if (in_array($datatype, array('integer', 'user','number'))) {
             $type = 'int(11)';
         } else if (in_array($datatype, array('decimal'))) {
             $type = 'float(12,4)';

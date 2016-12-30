@@ -7,7 +7,7 @@
             {# user has edit access   #}
 
             <input name="{{field_settings.module_field_name}}" id="{{field_settings.module_field_name}}"  value="{{data is defined ? data : ''}}" type="text" ><br>
-            <small><i>Number will be save up to 4 decimal</i></small>
+            <small><i>Only Integer number allowed</i></small>
         {% else %}
             {# user only has view access   #}
             {{data is defined ? data : ''}}
