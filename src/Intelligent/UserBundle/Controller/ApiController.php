@@ -601,15 +601,25 @@ class ApiController extends Controller {
     private function getUserAssignedCustomers(Request $request, $json){
         $user_permissions = $this->get('user_permissions');
         if ($user_permissions->getManageUserAndShareAppPermission()) {
-            $user = $this->getUser();
-            return $this->_handleSuccessfulRequest(array(
-                "assigned_customers" => $this->_getAllCustomersForUser($user),
-                "all_customers" => $this->_getAllCustomers()
-            ));
+            $body = $json->body;
+            if(isset($body->user_id)){
+                $user = $this->getDoctrine()->getManager()->getRepository("IntelligentUserBundle:User")->find($body->user_id);
+                if($user){
+                    return $this->_handleSuccessfulRequest(array(
+                        "assigned_customers" => $this->_getAllCustomersForUser($user),
+                        "all_customers" => $this->_getAllCustomers()
+                    ));
+                }else{
+                    throw new \Exception("User with user_if($body->user_id) do not exists",404);
+                }
+            }else{
+                throw new \Exception("user_id do not exists in request json",412);
+            }
         }else{
             $this->_throwNoPermissionException();
         }
     }
+    
     /**
      * This api action will be used to change role of the user 
      * 
