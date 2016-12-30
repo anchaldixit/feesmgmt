@@ -5,9 +5,8 @@ namespace Intelligent\UserBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use Intelligent\UserBundle\Entity\RoleGlobalPermission;
 use Intelligent\UserBundle\Entity\RoleModulePermission;
-use Intelligent\UserBundle\Entity\RoleAllowedCustomer;
 use Doctrine\Common\Collections\Collection;
-use Doctrine\Common\Collections\Criteria;
+
 
 /**
  * Role

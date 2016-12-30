@@ -300,7 +300,8 @@ class ApiController extends Controller {
                                 'name' => $user->getRole()->getName()
                             ),
                             'status' => $user->getStatus(),
-                            'last_login' => (!is_null($user->getLastLogin()) ? $user->getLastLogin()->format("m/d/Y H:i:s") : "Not loggedin yet")
+                            'last_login' => (!is_null($user->getLastLogin()) ? $user->getLastLogin()->format("m/d/Y H:i:s") : "Not loggedin yet"),
+                            "attached_customers" => $this->_getAllCustomersForUser($user),
                         );
                     }
                     if (isset($body->filter) && $body->filter === true) {
@@ -663,7 +664,6 @@ class ApiController extends Controller {
         }
     }
 
-    
     /**
      * This method will disable a role
      * 
@@ -775,9 +775,7 @@ class ApiController extends Controller {
                             "userPermission" => $role->getGlobalPermission()->getManageUserAppPermission(),
                             "appChangePermission" => $role->getGlobalPermission()->getEditAppStructurePermission()
                         ),
-                        "modulePermissions" => $module_permissions,
-                        "attached_customers" => $this->_getAllCustomersForRoll($body->role_id),
-                        "all_customers" => $this->_getAllCustomers()
+                        "modulePermissions" => $module_permissions
                     );
                     return $this->_handleSuccessfulRequest($result);
                 } else {
@@ -1586,26 +1584,20 @@ class ApiController extends Controller {
      * This function will return the array of customers 
      * for a role
      * 
-     * @param type $roleId
+     * @param User $user
      * @return array of customers
      */
-    private function _getAllCustomersForRoll($roleId){
-        $repo = $this->getDoctrine()->getManager()->getRepository("IntelligentUserBundle:Role");
-        $role = $repo->find($roleId);
-        if($role){
-            $customer_pointers = $role->getAllowedCustomers(true);
-            $result = array();
-            foreach($customer_pointers as $customer_pointer){
-                $customer = $customer_pointer->getCustomer();
-                $result[] = array(
-                    'id' => $customer->getId(),
-                    'name' => $customer->getName()
-                );
-            }
-            return $result;
-        }else{
-            return array();
+    private function _getAllCustomersForUser(User $user){
+        $customer_pointers = $user->getAllowedCustomers(true);
+        $result = array();
+        foreach($customer_pointers as $customer_pointer){
+            $customer = $customer_pointer->getCustomer();
+            $result[] = array(
+                'id' => $customer->getId(),
+                'name' => $customer->getName()
+            );
         }
+        return $result;
     }
     
     /**

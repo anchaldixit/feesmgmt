@@ -8,7 +8,8 @@ use Intelligent\UserBundle\Entity\Role;
 use Intelligent\UserBundle\Entity\RoleModulePermission;
 use Intelligent\UserBundle\Entity\RoleGlobalPermission;
 use Intelligent\UserBundle\Entity\RoleModuleFieldPermission;
-use Intelligent\UserBundle\Entity\RoleAllowedCustomer;
+use Intelligent\UserBundle\Entity\UserAllowedCustomer;
+use Intelligent\UserBundle\Entity\Customer;
 use Intelligent\SettingBundle\Lib\Settings;
 
 /**
@@ -37,6 +38,12 @@ class UserPermissions {
      */
     private $user;
 
+    /**
+     * Constructor function
+     * 
+     * @param TokenStorage $tokenStorage
+     * @param Settings $settings
+     */
     public function __construct(TokenStorage $tokenStorage, Settings $settings) {
         // Recieve other services
         $this->settings = $settings;
@@ -161,9 +168,15 @@ class UserPermissions {
         }
     }
 
+    /**
+     * This function will return the current customer
+     * which is fixed to the view of the user
+     * 
+     * @return Intelligent\UserBundle\Entity\Customer
+     */
     public function getCurrentViewCustomer(){
         $current_customer = $this->user->getCurrentCustomer();
-        if($current_customer instanceof RoleAllowedCustomer){
+        if($current_customer instanceof UserAllowedCustomer){
             if($current_customer->getIsDisabled()){
                 return null;
             }else{
@@ -173,6 +186,7 @@ class UserPermissions {
             return null;
         }
     }
+    
     /**
      * This function returns the permission of fields in the module
      * 

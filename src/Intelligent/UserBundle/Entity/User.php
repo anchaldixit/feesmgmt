@@ -6,6 +6,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\AdvancedUserInterface;
 use Intelligent\UserBundle\Entity\Role;
 use Intelligent\UserBundle\Entity\UserAllowedCustomer;
+use Doctrine\Common\Collections\Criteria;
 
 /**
  * User
