@@ -541,7 +541,7 @@ class User implements AdvancedUserInterface, \Serializable
         
         if($activeOnly){
             $criteria = Criteria::create();
-            $criteria->where(Criteria::expr()->eq('isDisabled', false));
+            $criteria->where(Criteria::expr()->eq('isActive', true));
             return $this->allowedCustomers->matching($criteria);
         }else{
             return $this->allowedCustomers;

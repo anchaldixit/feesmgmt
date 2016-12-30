@@ -39,9 +39,9 @@ class UserAllowedCustomer {
     /**
      * @var boolean
      *
-     * @ORM\Column(name="is_disabled", type="boolean", nullable=false)
+     * @ORM\Column(name="is_active", type="boolean", nullable=false)
      */
-    private $isDisabled;
+    private $isActive;
 
     /**
      * Get id
@@ -54,26 +54,26 @@ class UserAllowedCustomer {
     }
 
     /**
-     * Set isDisabled
+     * Set isActive
      *
-     * @param boolean $isDisabled
+     * @param boolean $isActive
      * @return UserAllowedCustomer
      */
-    public function setIsDisabled($isDisabled)
+    public function setIsActive($isActive)
     {
-        $this->isDisabled = $isDisabled;
+        $this->isActive = $isActive;
 
         return $this;
     }
 
     /**
-     * Get isDisabled
+     * Get isActive
      *
      * @return boolean 
      */
-    public function getIsDisabled()
+    public function getIsActive()
     {
-        return $this->isDisabled;
+        return $this->isActive;
     }
 
     /**

@@ -177,10 +177,10 @@ class UserPermissions {
     public function getCurrentViewCustomer(){
         $current_customer = $this->user->getCurrentCustomer();
         if($current_customer instanceof UserAllowedCustomer){
-            if($current_customer->getIsDisabled()){
-                return null;
+            if($current_customer->getIsActive()){
+                return $current_customer->getCustomer();;
             }else{
-                return $current_customer->getCustomer();
+                return null;
             }
         }else{
             return null;

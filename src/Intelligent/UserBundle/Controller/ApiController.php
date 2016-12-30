@@ -10,7 +10,7 @@ use Intelligent\UserBundle\Entity\Role;
 use Intelligent\UserBundle\Entity\RoleGlobalPermission;
 use Intelligent\UserBundle\Entity\RoleModulePermission;
 use Intelligent\UserBundle\Entity\RoleModuleFieldPermission;
-use Intelligent\UserBundle\Entity\RoleAllowedCustomer;
+use Intelligent\UserBundle\Entity\UserAllowedCustomer;
 use Symfony\Component\Security\Core\Util\StringUtils;
 
 class ApiController extends Controller {
@@ -491,7 +491,125 @@ class ApiController extends Controller {
             $this->_throwNoPermissionException();
         }
     }
+    
+    /**
+     * This API will attach or detach a customer to a role
+     * 
+     * @param Request $request
+     * @param type $json
+     * @return Response
+     * @throws \Exception
+     */
+    private function attachCustomerToUser(Request $request, $json){
+        $user_permissions = $this->get('user_permissions');
+        if ($user_permissions->getManageUserAndShareAppPermission()) {
+            $body = $json->body;
+            
+            if(isset($body->user_id) && isset($body->customer_id) && isset($body->value)){
+                $em = $this->getDoctrine()->getManager();
+                # Get role
+                $user = $em->getRepository("IntelligentUserBundle:User")->find($body->user_id);
+                # Check role
+                if(!$user){
+                    throw new \Exception("User with user_id($body->user_id) do not exists", 404);
+                }
+                # Get customer
+                $customer = $em->getRepository("IntelligentUserBundle:Customer")->find($body->customer_id);
+                # Check customer
+                if(!$customer){
+                    throw new \Exception("Customer with customer_id($body->customer_id) do not exists", 404);
+                }
+                
+                $allowed_customers = $user->getAllowedCustomers();
+                # Check if the customer is already attached to the role
+                $corresponding_allowed_customer = null;
+                foreach($allowed_customers as $allowed_customer){
+                    if($body->customer_id == $allowed_customer->getCustomer()->getId()){
+                        $corresponding_allowed_customer = $allowed_customer;
+                        break;
+                    }
+                }
+                # If there is no joining object
+                if(is_null($corresponding_allowed_customer)){
+                    $joining_object = new UserAllowedCustomer();
+                    $joining_object->setCustomer($customer);
+                    $joining_object->setUser($user);
+                    $joining_object->setIsActive($body->value);
+                    $em->persist($joining_object);
+                }else{
+                    $is_active = $corresponding_allowed_customer->getIsActive();
+                    if(!$is_active && !$body->value){
+                        throw new \Exception("Customer is already detached",412);
+                    }else if($body->value && $is_active){
+                        throw new \Exception("Customer is already attached",412);
+                    }else{
+                        $corresponding_allowed_customer->setIsActive($body->value);
+                    }
+                }
+                $em->flush();
+                return $this->_handleSuccessfulRequest();
+            }else{
+                throw new \Exception("user_id, customer_id or value not set in request json", 412);
+            }
+        }else{
+            $this->_throwNoPermissionException();
+        }
+    }
+    
+    /**
+     * This API will attach a customer to the current
+     * loggedin user according to its role
+     * 
+     * @param Request $request
+     * @param type $json
+     * @return Response
+     * @throws \Exception
+     */
+    private function changeUserAssignedCustomer (Request $request, $json){
+        $user = $this->getUser();
+        $body = $json->body;
+        if(isset($body->customer_id)){
+            $em = $this->getDoctrine()->getManager();
+            
+            $customer = $em->getRepository("IntelligentUserBundle:Customer")->find($body->customer_id);
+            if($customer){
+                $allowed_customers = $user->getAllowedCustomers(true);
+                # Check if the current customer is in the allowed list or not
+                $required_allowed_customer = null;
+                foreach($allowed_customers as $allowed_customer){
+                    if($allowed_customer->getCustomer()->getId() == $body->customer_id){
+                        $required_allowed_customer = $allowed_customer;
+                        break;
+                    }
+                }
+                
+                if(is_null($required_allowed_customer)){
+                    throw new \Exception("This customer is not in user's role list", 412);
+                }else{
+                    $user->setCurrentCustomer($required_allowed_customer);
+                    $em->flush();
+                    return $this->_handleSuccessfulRequest();
+                }
+            }else{
+                throw new \Exception("Customer with customer_id($body->customer_id) not found",404);
+            }
+        }else{
+            throw new \Exception("customer_id is not set in request json", 412);
+        }
+    }
 
+    private function getUserAssignedCustomers(Request $request, $json){
+        $user_permissions = $this->get('user_permissions');
+        if ($user_permissions->getManageUserAndShareAppPermission()) {
+            $user = $this->getUser();
+            return $this->_handleSuccessfulRequest(array(
+                "assigned_customers" => $this->_getAllCustomersForUser($user),
+                "all_customers" => $this->_getAllCustomers()
+            ));
+        }else{
+            $this->_throwNoPermissionException();
+        }
+    }
     /**
      * This api action will be used to change role of the user 
      * 
@@ -1242,112 +1360,6 @@ class ApiController extends Controller {
             }
         }else{
             $this->_throwNoPermissionException();
-        }
-    }
-    
-    /**
-     * This API will attach or detach a customer to a role
-     * 
-     * @param Request $request
-     * @param type $json
-     * @return Response
-     * @throws \Exception
-     */
-    private function attachCustomerToRole(Request $request, $json){
-        $user_permissions = $this->get('user_permissions');
-        if ($user_permissions->getManageUserAndShareAppPermission()) {
-            $body = $json->body;
-            
-            if(isset($body->role_id) && isset($body->customer_id) && isset($body->value)){
-                $em = $this->getDoctrine()->getManager();
-                # Get role
-                $role = $em->getRepository("IntelligentUserBundle:Role")->find($body->role_id);
-                # Check role
-                if(!$role){
-                    throw new \Exception("Role with role_id($body->role_id) do not exists", 404);
-                }
-                # Get customer
-                $customer = $em->getRepository("IntelligentUserBundle:Customer")->find($body->customer_id);
-                # Check customer
-                if(!$customer){
-                    throw new \Exception("Customer with customer_id($body->customer_id) do not exists", 404);
-                }
-                
-                $allowed_customers = $role->getAllowedCustomers();
-                # Check if the customer is already attached to the role
-                $corresponding_allowed_customer = null;
-                foreach($allowed_customers as $allowed_customer){
-                    if($body->customer_id == $allowed_customer->getCustomer()->getId()){
-                        $corresponding_allowed_customer = $allowed_customer;
-                        break;
-                    }
-                }
-                # If there is no joining object
-                if(is_null($corresponding_allowed_customer)){
-                    $joining_object = new RoleAllowedCustomer();
-                    $joining_object->setCustomer($customer);
-                    $joining_object->setRole($role);
-                    $joining_object->setIsDisabled(!$body->value);
-                    $em->persist($joining_object);
-                }else{
-                    $is_disabled = $corresponding_allowed_customer->getIsDisabled();
-                    if($is_disabled && !$body->value){
-                        throw new \Exception("Customer is already detached",412);
-                    }else if($body->value && !$is_disabled){
-                        throw new \Exception("Customer is already attached",412);
-                    }else{
-                        $corresponding_allowed_customer->setIsDisabled(!$body->value);
-                    }
-                }
-                $em->flush();
-                return $this->_handleSuccessfulRequest();
-            }else{
-                throw new \Exception("role_id, customer_id or value not set in request json", 412);
-            }
-        }else{
-            $this->_throwNoPermissionException();
-        }
-    }
-    
-    /**
-     * This API will attach a customer to the current
-     * loggedin user according to its role
-     * 
-     * @param Request $request
-     * @param type $json
-     * @return Response
-     * @throws \Exception
-     */
-    private function attachCustomerToUser(Request $request, $json){
-        $user = $this->getUser();
-        $body = $json->body;
-        if(isset($body->customer_id)){
-            $em = $this->getDoctrine()->getManager();
-            
-            $customer = $em->getRepository("IntelligentUserBundle:Customer")->find($body->customer_id);
-            if($customer){
-                $allowed_customers = $user->getRole()->getAllowedCustomers(true);
-                # Check if the current customer is in the allowed list or not
-                $required_allowed_customer = null;
-                foreach($allowed_customers as $allowed_customer){
-                    if($allowed_customer->getCustomer()->getId() == $body->customer_id){
-                        $required_allowed_customer = $allowed_customer;
-                        break;
-                    }
-                }
-                
-                if(is_null($required_allowed_customer)){
-                    throw new \Exception("This customer is not in user's role list", 412);
-                }else{
-                    $user->setCurrentCustomer($required_allowed_customer);
-                    $em->flush();
-                    return $this->_handleSuccessfulRequest();
-                }
-            }else{
-                throw new \Exception("Customer with customer_id($body->customer_id) not found",404);
-            }
-        }else{
-            throw new \Exception("customer_id is not set in request json", 412);
         }
     }
     
