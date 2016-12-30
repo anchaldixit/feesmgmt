@@ -1,17 +1,17 @@
 <?php
 namespace Intelligent\UserBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
-use Intelligent\UserBundle\Entity\Role;
+use Intelligent\UserBundle\Entity\User;
 use Intelligent\UserBundle\Entity\Customer;
 
 
 /**
  * RoleAllowedCustomer
  *
- * @ORM\Table(name="role_allowed_customers")
+ * @ORM\Table(name="user_allowed_customers")
  * @ORM\Entity
  */
-class RoleAllowedCustomer {
+class UserAllowedCustomer {
     /**
      * @var integer
      *
@@ -24,10 +24,10 @@ class RoleAllowedCustomer {
     /**
      * Many RoleAllowedCustomers can point to one role
      * 
-     * @ORM\ManyToOne(targetEntity="Role", inversedBy="allowedCustomers")
-     * @ORM\JoinColumn(name="role_id", referencedColumnName="id")
+     * @ORM\ManyToOne(targetEntity="User", inversedBy="allowedCustomers")
+     * @ORM\JoinColumn(name="user_id", referencedColumnName="id")
      */
-    private $role;
+    private $user;
     
     /**
      * Many Users have One Address.
@@ -57,7 +57,7 @@ class RoleAllowedCustomer {
      * Set isDisabled
      *
      * @param boolean $isDisabled
-     * @return RoleAllowedCustomer
+     * @return UserAllowedCustomer
      */
     public function setIsDisabled($isDisabled)
     {
@@ -77,33 +77,33 @@ class RoleAllowedCustomer {
     }
 
     /**
-     * Set role
+     * Set user
      *
-     * @param \Intelligent\UserBundle\Entity\Role $role
-     * @return RoleAllowedCustomer
+     * @param \Intelligent\UserBundle\Entity\User $user
+     * @return UserAllowedCustomer
      */
-    public function setRole(\Intelligent\UserBundle\Entity\Role $role = null)
+    public function setUser(\Intelligent\UserBundle\Entity\User $user = null)
     {
-        $this->role = $role;
+        $this->user = $user;
 
         return $this;
     }
 
     /**
-     * Get role
+     * Get user
      *
-     * @return \Intelligent\UserBundle\Entity\Role 
+     * @return \Intelligent\UserBundle\Entity\User 
      */
-    public function getRole()
+    public function getUser()
     {
-        return $this->role;
+        return $this->user;
     }
 
     /**
      * Set customer
      *
      * @param \Intelligent\UserBundle\Entity\Customer $customer
-     * @return RoleAllowedCustomer
+     * @return UserAllowedCustomer
      */
     public function setCustomer(\Intelligent\UserBundle\Entity\Customer $customer = null)
     {

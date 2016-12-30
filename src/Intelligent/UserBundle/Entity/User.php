@@ -5,7 +5,7 @@ namespace Intelligent\UserBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\AdvancedUserInterface;
 use Intelligent\UserBundle\Entity\Role;
-use Intelligent\UserBundle\Entity\RoleAllowedCustomer;
+use Intelligent\UserBundle\Entity\UserAllowedCustomer;
 
 /**
  * User
@@ -89,11 +89,19 @@ class User implements AdvancedUserInterface, \Serializable
     private $role;
     
     /**
-     * @var RoleAllowedCustomer
-     * @ORM\ManyToOne(targetEntity="RoleAllowedCustomer")
+     * @var UserAllowedCustomer
+     * @ORM\ManyToOne(targetEntity="UserAllowedCustomer")
      * @ORM\JoinColumn(name="current_customer", referencedColumnName="id")
      */
     private $currentCustomer;
+    
+    /**
+     * @var Collection 
+     * 
+     * One role could have many allowed customers
+     * @ORM\OneToMany(targetEntity="UserAllowedCustomer", mappedBy="user")
+     */
+    private $allowedCustomers;
 
     /**
      * @var \DateTime
@@ -467,14 +475,21 @@ class User implements AdvancedUserInterface, \Serializable
     {
         return $this->role;
     }
+    /**
+     * Constructor
+     */
+    public function __construct()
+    {
+        $this->allowedCustomers = new \Doctrine\Common\Collections\ArrayCollection();
+    }
 
     /**
      * Set currentCustomer
      *
-     * @param \Intelligent\UserBundle\Entity\RoleAllowedCustomer $currentCustomer
+     * @param \Intelligent\UserBundle\Entity\UserAllowedCustomer $currentCustomer
      * @return User
      */
-    public function setCurrentCustomer(\Intelligent\UserBundle\Entity\RoleAllowedCustomer $currentCustomer = null)
+    public function setCurrentCustomer(\Intelligent\UserBundle\Entity\UserAllowedCustomer $currentCustomer = null)
     {
         $this->currentCustomer = $currentCustomer;
 
@@ -484,10 +499,52 @@ class User implements AdvancedUserInterface, \Serializable
     /**
      * Get currentCustomer
      *
-     * @return \Intelligent\UserBundle\Entity\RoleAllowedCustomer 
+     * @return \Intelligent\UserBundle\Entity\UserAllowedCustomer 
      */
     public function getCurrentCustomer()
     {
         return $this->currentCustomer;
+    }
+
+    /**
+     * Add allowedCustomers
+     *
+     * @param \Intelligent\UserBundle\Entity\UserAllowedCustomer $allowedCustomers
+     * @return User
+     */
+    public function addAllowedCustomer(\Intelligent\UserBundle\Entity\UserAllowedCustomer $allowedCustomers)
+    {
+        $this->allowedCustomers[] = $allowedCustomers;
+
+        return $this;
+    }
+
+    /**
+     * Remove allowedCustomers
+     *
+     * @param \Intelligent\UserBundle\Entity\UserAllowedCustomer $allowedCustomers
+     */
+    public function removeAllowedCustomer(\Intelligent\UserBundle\Entity\UserAllowedCustomer $allowedCustomers)
+    {
+        $this->allowedCustomers->removeElement($allowedCustomers);
+    }
+
+    /**
+     * Get allowedCustomers which are not disabled
+     *
+     * @param boolean $activeOnly 
+     * @return \Doctrine\Common\Collections\Collection 
+     */
+    public function getAllowedCustomers($activeOnly = false)
+    {
+        
+        if($activeOnly){
+            $criteria = Criteria::create();
+            $criteria->where(Criteria::expr()->eq('isDisabled', false));
+            return $this->allowedCustomers->matching($criteria);
+        }else{
+            return $this->allowedCustomers;
+        }
+        
     }
 }

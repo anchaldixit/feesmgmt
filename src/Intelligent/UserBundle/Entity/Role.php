@@ -77,15 +77,6 @@ class Role
      */
     private $modulePermissions;
     
-    /**
-     * @var Collection 
-     * 
-     * One role could have many allowed customers
-     * @ORM\OneToMany(targetEntity="RoleAllowedCustomer", mappedBy="role")
-     */
-    private $allowedCustomers;
-    
-    
     
     /**
      * Get id
@@ -285,55 +276,12 @@ class Role
         }
         return null;
     }
-    
     /**
      * Constructor
      */
     public function __construct()
     {
         $this->modulePermissions = new \Doctrine\Common\Collections\ArrayCollection();
-        $this->allowedCustomers = new \Doctrine\Common\Collections\ArrayCollection();
     }
 
-    /**
-     * Add allowedCustomers
-     *
-     * @param \Intelligent\UserBundle\Entity\RoleAllowedCustomer $allowedCustomers
-     * @return Role
-     */
-    public function addAllowedCustomer(\Intelligent\UserBundle\Entity\RoleAllowedCustomer $allowedCustomers)
-    {
-        $this->allowedCustomers[] = $allowedCustomers;
-
-        return $this;
-    }
-
-    /**
-     * Remove allowedCustomers
-     *
-     * @param \Intelligent\UserBundle\Entity\RoleAllowedCustomer $allowedCustomers
-     */
-    public function removeAllowedCustomer(\Intelligent\UserBundle\Entity\RoleAllowedCustomer $allowedCustomers)
-    {
-        $this->allowedCustomers->removeElement($allowedCustomers);
-    }
-
-    /**
-     * Get allowedCustomers which are not disabled
-     *
-     * @param boolean $activeOnly 
-     * @return \Doctrine\Common\Collections\Collection 
-     */
-    public function getAllowedCustomers($activeOnly = false)
-    {
-        
-        if($activeOnly){
-            $criteria = Criteria::create();
-            $criteria->where(Criteria::expr()->eq('isDisabled', false));
-            return $this->allowedCustomers->matching($criteria);
-        }else{
-            return $this->allowedCustomers;
-        }
-        
-    }
 }
