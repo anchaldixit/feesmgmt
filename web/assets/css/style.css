@@ -712,7 +712,8 @@ input[type="submit"]:focus, input[type="button"]:focus {
           width: 407px;
           border: 1px solid #dadbdd;
           overflow: hidden;
-          color: #000; }
+          color: #000;
+          z-index: 0; }
         .form-control-outer .form-control ul li .field-wrap .dropdown:before {
           width: 100%;
           right: 0px;
