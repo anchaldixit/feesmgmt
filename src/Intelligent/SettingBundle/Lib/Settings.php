@@ -29,6 +29,7 @@ class Settings {
         'text' => 'Long Text',
         'currency' => 'Currency',
         'decimal' => 'Decimal',
+        'number' => 'Number',
         'enum' => 'Value Set',
         'link' => 'Link',
         'user' => 'User',
@@ -227,14 +228,14 @@ class Settings {
                     $result2 = $this->fetch(
                             array(
                                 'module' => $post_data['relationship_module'],
-                                'module_field_name' => $data['relationship_module_unique_field']));
+                                'module_field_name' => $post_data['relationship_module_unique_field']));
 
                     if (!count($result1)) {
                         //Field not found
                         $error[] = "{$data['module_field_name']} field not found for relationship module";
                     }elseif(!count($result2)){
                         
-                        $error[] = "{$data['relationship_module_unique_field']} field not found for relationship module";
+                        $error[] = "{$post_data['relationship_module_unique_field']} field not found for relationship module";
                     
                         
                     }else {
@@ -368,7 +369,7 @@ class Settings {
             $type = 'text';
         } elseif ($datatype == 'link') {
             $type = 'varchar(400)';
-        } else if (in_array($datatype, array('integer', 'user'))) {
+        } else if (in_array($datatype, array('integer', 'user','number'))) {
             $type = 'int(11)';
         } else if (in_array($datatype, array('decimal'))) {
             $type = 'float(12,4)';

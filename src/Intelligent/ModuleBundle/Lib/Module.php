@@ -213,6 +213,7 @@ class Module {
 
                             break;
                         case 'decimal':
+                        case 'number':
 
                             if (!is_numeric($field_value)) {
                                 $error[] = "$field_display_name should be a number.";
