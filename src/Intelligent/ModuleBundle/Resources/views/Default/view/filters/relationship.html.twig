@@ -1,2 +1,3 @@
 {# relationship field need to pass further datatype field based on ['relationship_field_settings']['module_field_datatype'] array. this array belongs to relationship field datatype. NOt very complex   #}
-{{ include('IntelligentModuleBundle:Default:view/'~field_settings['relationship_field_settings']['module_field_datatype']~'.html.twig', { 'field_settings': field_settings,'data': data is not empty ? data : ''}) }}
+
+{{ include('IntelligentModuleBundle:Default:view/filters/'~field_settings['relationship_field_settings']['module_field_datatype']~'.html.twig', { 'field_settings': field_settings['relationship_field_settings'],'selected': selected}) }}

@@ -32,6 +32,8 @@
 
         </div>
     </div>
+            
+
 
     <div class="form-control-outer">
         <div class="form-control">
@@ -44,7 +46,7 @@
 
                         {% if field_settings.module_field_datatype == 'relationship' %}
 
-                        {{ include('IntelligentModuleBundle:Default:edit/'~field_settings.module_field_datatype~'.html.twig', { 'field_settings': field_settings,'data': data[field_settings.relationship_field_name] is defined ? data[field_settings.relationship_field_name] : '','permissions':permissions}) }}   
+                        {{ include('IntelligentModuleBundle:Default:edit/'~field_settings.module_field_datatype~'.html.twig', { 'field_settings': field_settings,'data': data,'permissions':permissions}) }}   
 
                         {% elseif field_settings.module_field_datatype == 'user' %}
 

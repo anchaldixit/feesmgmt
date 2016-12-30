@@ -235,7 +235,9 @@ abstract class ModulebaseController extends Controller {
         if (isset($filters['filter'])) {
             if (!empty($filters['filter']['text'])) {
                 foreach ($filters['filter']['text'] as $key => $value) {
-                    $params[$key]['like'] = "%{$value}%";
+                    if (!empty($value)) {
+                        $params[$key]['like'] = "%{$value}%";
+                    }
                 }
             }
             if (!empty($filters['filter']['match'])) {
@@ -349,11 +351,11 @@ abstract class ModulebaseController extends Controller {
 
         return "access-key-{$this->module_name}-permission";
     }
-    
+
     public function indexAction() {
 
-        $classnamelike= ucfirst($this->module_route_identifier);
-        return $this->forward("IntelligentModuleBundle:$classnamelike:view",array('page_no'=>1));
+        $classnamelike = ucfirst($this->module_route_identifier);
+        return $this->forward("IntelligentModuleBundle:$classnamelike:view", array('page_no' => 1));
     }
 
 }

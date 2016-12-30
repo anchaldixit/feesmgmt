@@ -47,15 +47,18 @@
                 var filter = $(this).attr('data-resetfilter');
                 if (filter == 'sort') {
                     $("#filter_form select[name='sort']").val('')
-                } else if ($(filter).attr('type') == 'text') {
-                    $("#filter_form input[name='filter[text][" + filter + "]'").val('')
                 } else {
-                    $("#filter_form input[name='filter[match][" + filter + "]'").prop('checked', false);
-
+                    field = $('.filter-' + filter)
+                    if (field.length) {
+                        if (field.attr('type') == 'text') {
+                            $("#filter_form input[name='filter[text][" + filter + "]'").val('')
+                        } else {
+                            $("#filter_form input[name='filter[match][" + filter + "]'").prop('checked', false);
+                        }
+                    }
                 }
                 $(this).parent().remove();
                 $("#filter_form").submit();
-
             })
         })
 

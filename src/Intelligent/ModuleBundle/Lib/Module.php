@@ -93,7 +93,7 @@ class Module {
 
 
         $sql = "SELECT $select_fields FROM {$this->table} $join_condition $extended_where $order_by limit $limit";
-        $this->last_sql_withoutlimit = "SELECT count(*) FROM {$this->table} $extended_where ";
+        $this->last_sql_withoutlimit = "SELECT count(*) FROM {$this->table} $join_condition $extended_where ";
         $this->last_sql_withoutlimit_params = $params;
         $result = $this->db->fetchAll($sql, $params);
         return $result;
@@ -375,7 +375,7 @@ class Module {
                             'module_field_name' => $value['module_field_name']
                         )
                 );
-                
+
                 # Add field setting to $fieldset only for if relationship settings found for it
                 if (count($result2)) {
                     $value['relationship_field_settings'] = $result2[0];
@@ -385,7 +385,7 @@ class Module {
                 $fieldset[$value['module_field_name']] = $value;
             }
         }
-        
+
         return $fieldset;
     }
 
@@ -412,14 +412,21 @@ class Module {
             if ($value['module_field_datatype'] !== 'relationship') {
                 $fieldset[] = $value;
             } else {
-                //In case there are multiple fields of same relationship table is there, do not send the all fields. Only send the one field.
-                if (!isset($dependencies[$value['relationship_module']])) {
+                //In case there are multiple fields of same relationship table is there, do not send  all fields. Only send the one field.
+                    if (!isset($dependencies[$value['relationship_module']])) {
 
-                    $dependencies[$value['relationship_module']] = 'set';
-                    $value['relationship_field_name'] = $this->module_settings->prepareforeignKeyName($value['relationship_module']);
-                    $value['relationship_module_display_name'] = $this->module_settings->getModule($value['relationship_module']);
+                        $value['relationship_foregin_key'] = 'set';
+                        $dependencies[$value['relationship_module']] = 'set';
+                        $value['relationship_field_name'] = $this->module_settings->prepareforeignKeyName($value['relationship_module']);
+                        $value['relationship_module_display_name'] = $this->module_settings->getModule($value['relationship_module']);
+                    } 
+                    $result2 = $this->module_settings->fetch(
+                            array('module' => $value['relationship_module'],
+                                'module_field_name' => $value['module_field_name']
+                            )
+                    );
+                    $value['relationship_field_settings'] = $result2[0];
                     $fieldset[] = $value;
-                }
             }
             //$fieldset[]
         }

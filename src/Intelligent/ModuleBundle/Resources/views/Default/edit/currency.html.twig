@@ -3,7 +3,8 @@
 {% set field_permission = permissions.custom_field[field_settings.module_field_name] %}
 <li><label>{{field_settings.module_field_display_name}}:</label> 
     <div class="field-wrap">
-        {% if permissions.custom == false or field_permission == 2 %}
+        {# this readonly parameter will only come thru edit relationship.html.twig. Already decided to show field in readonly way#}
+        {% if readonly is not defined and (permissions.custom == false or field_permission == 2 )%}
             {# user has edit access   #}
             <input name="{{field_settings.module_field_name}}" id="{{field_settings.module_field_name}}"  value="{{data is defined ? data | round (1.floor) : ''}}" type="text" ><br>
         {% else %}
