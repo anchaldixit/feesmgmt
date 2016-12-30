@@ -26,6 +26,8 @@
             padding: 5px 15px;
             margin: 5px 15px;
         }
+        
+        
 
 
 
@@ -59,8 +61,18 @@
                 }
                 $(this).parent().remove();
                 $("#filter_form").submit();
-            })
-        })
+            });
+            $('.delete-link').on('click',function(event){
+                
+                if(confirm('Are you sure to delete the row?')){
+                    
+                    event.stopPropagation();
+                    return true;
+                }
+                return false;
+            
+            });
+        });
 
     </script>
 {% endblock %}
@@ -162,7 +174,7 @@
                                                                                             | <a href="{{ path('intelligent_'~module~'_edit', {'edit_id': row.id}) }}">edit</a> 
                                                                                         {% endif %}
                                                                                         {% if permissions.delete %}     
-                                                                                            | <a href="{{ path('intelligent_'~module~'_view', {'delete_id': row.id}) }}">delete</a>
+                                                                                            | <a href="{{ path('intelligent_'~module~'_view', {'delete_id': row.id}) }}" class="delete-link">delete</a>
                                                                                         {% endif %}
                                                                                     </td>
                                                                                 </tr>

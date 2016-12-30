@@ -258,13 +258,15 @@ class Module {
             } elseif ($field_schema['module_field_datatype'] == 'relationship') {
                 //relationship field need to handled separately
 
-                $field_name = $field_schema['relationship_field_name'];
+                if (isset($field_schema['relationship_field_name'])) {
+                    $field_name = $field_schema['relationship_field_name'];
 
-                if ($field_schema['required_field'] == 'Y' and empty($post_data[$field_name])) {
-                    $error[] = "{$field_schema['relationship_module']} Relationship field cannot be empty";
-                } else {
-                    $field_value = $post_data[$field_name];
-                    $data[$field_name] = $field_value;
+                    if ($field_schema['required_field'] == 'Y' and empty($post_data[$field_name])) {
+                        $error[] = "{$field_schema['relationship_module']} Relationship field cannot be empty";
+                    } else {
+                        $field_value = $post_data[$field_name];
+                        $data[$field_name] = $field_value;
+                    }
                 }
             }
         }
@@ -413,20 +415,20 @@ class Module {
                 $fieldset[] = $value;
             } else {
                 //In case there are multiple fields of same relationship table is there, do not send  all fields. Only send the one field.
-                    if (!isset($dependencies[$value['relationship_module']])) {
+                if (!isset($dependencies[$value['relationship_module']])) {
 
-                        $value['relationship_foregin_key'] = 'set';
-                        $dependencies[$value['relationship_module']] = 'set';
-                        $value['relationship_field_name'] = $this->module_settings->prepareforeignKeyName($value['relationship_module']);
-                        $value['relationship_module_display_name'] = $this->module_settings->getModule($value['relationship_module']);
-                    } 
-                    $result2 = $this->module_settings->fetch(
-                            array('module' => $value['relationship_module'],
-                                'module_field_name' => $value['module_field_name']
-                            )
-                    );
-                    $value['relationship_field_settings'] = $result2[0];
-                    $fieldset[] = $value;
+                    $value['relationship_foregin_key'] = 'set';
+                    $dependencies[$value['relationship_module']] = 'set';
+                    $value['relationship_field_name'] = $this->module_settings->prepareforeignKeyName($value['relationship_module']);
+                    $value['relationship_module_display_name'] = $this->module_settings->getModule($value['relationship_module']);
+                }
+                $result2 = $this->module_settings->fetch(
+                        array('module' => $value['relationship_module'],
+                            'module_field_name' => $value['module_field_name']
+                        )
+                );
+                $value['relationship_field_settings'] = $result2[0];
+                $fieldset[] = $value;
             }
             //$fieldset[]
         }

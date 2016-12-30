@@ -3,7 +3,7 @@
     {% set field_permission = permissions.custom_field[field_settings.module_field_name] %}
     {% if  (permissions.custom == false or field_permission == 2 )%}
         {# First display the relationship field foreign key #}
-        <li><label>{{field_settings.relationship_module_display_name }} (relationship):</label> 
+        <li><label>{{field_settings.relationship_module_display_name }}(relationship){{field_settings.required_field=='Y'?'*':''}}:</label> 
             <div class="field-wrap">
                 <div class="ui-widget">
                     <input name="{{field_settings.relationship_field_name}}" id="{{field_settings.relationship_field_name}}"  value="{{data[field_settings.relationship_field_name] is defined ? data[field_settings.relationship_field_name] : ''}}" type="text" data-url="{{ path('intelligent_'~field_settings.relationship_module | replace({'_':''}) ~'_autocomplete') }}" data-field="{{field_settings.relationship_module_unique_field}}">
