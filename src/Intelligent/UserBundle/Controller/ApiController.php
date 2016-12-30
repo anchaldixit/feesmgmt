@@ -1247,7 +1247,14 @@ class ApiController extends Controller {
         }
     }
     
-    
+    /**
+     * This API will attach or detach a customer to a role
+     * 
+     * @param Request $request
+     * @param type $json
+     * @return Response
+     * @throws \Exception
+     */
     private function attachCustomerToRole(Request $request, $json){
         $user_permissions = $this->get('user_permissions');
         if ($user_permissions->getManageUserAndShareAppPermission()) {
@@ -1304,6 +1311,47 @@ class ApiController extends Controller {
         }
     }
     
+    /**
+     * This API will attach a customer to the current
+     * loggedin user according to its role
+     * 
+     * @param Request $request
+     * @param type $json
+     * @return Response
+     * @throws \Exception
+     */
+    private function attachCustomerToUser(Request $request, $json){
+        $user = $this->getUser();
+        $body = $json->body;
+        if(isset($body->customer_id)){
+            $em = $this->getDoctrine()->getManager();
+            
+            $customer = $em->getRepository("IntelligentUserBundle:Customer")->find($body->customer_id);
+            if($customer){
+                $allowed_customers = $user->getRole()->getAllowedCustomers(true);
+                # Check if the current customer is in the allowed list or not
+                $required_allowed_customer = null;
+                foreach($allowed_customers as $allowed_customer){
+                    if($allowed_customer->getCustomer()->getId() == $body->customer_id){
+                        $required_allowed_customer = $allowed_customer;
+                        break;
+                    }
+                }
+                
+                if(is_null($required_allowed_customer)){
+                    throw new \Exception("This customer is not in user's role list", 412);
+                }else{
+                    $user->setCurrentCustomer($required_allowed_customer);
+                    $em->flush();
+                    return $this->_handleSuccessfulRequest();
+                }
+            }else{
+                throw new \Exception("Customer with customer_id($body->customer_id) not found",404);
+            }
+        }else{
+            throw new \Exception("customer_id is not set in request json", 412);
+        }
+    }
     
     /**
      * This function will convert the exception into a json response object 
