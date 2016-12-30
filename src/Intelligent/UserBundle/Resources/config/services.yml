@@ -3,10 +3,10 @@ services:
 #        class: Intelligent\UserBundle\Example
 #        arguments: ["@service_id", "plain_value", "%parameter%"]
     
-    controller_listener:
-        class: Intelligent\UserBundle\Services\ControllerListener
-        tags:
-            - { name: kernel.event_listener, event: kernel.controller}
+#    controller_listener:
+#        class: Intelligent\UserBundle\Services\ControllerListener
+#        tags:
+#            - { name: kernel.event_listener, event: kernel.controller}
     module_settings:
         class: Intelligent\SettingBundle\Lib\Settings
         arguments: ["@database_connection"]
