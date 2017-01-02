@@ -173,7 +173,27 @@ class DefaultController extends Controller {
      * @return Response
      */
     public function choosecustomerAction(Request $request){
-        return $this->render('IntelligentUserBundle:Default:choosecustomer.html.twig', array());
+        $data = array('customers' => $this->_getAllCustomersForUser($this->getUser()));
+        return $this->render('IntelligentUserBundle:Default:choosecustomer.html.twig', $data);
     }
 
+    /**
+     * This function will return the array of customers 
+     * for a role
+     * 
+     * @param User $user
+     * @return array of customers
+     */
+    private function _getAllCustomersForUser(User $user) {
+        $customer_pointers = $user->getAllowedCustomers(true);
+        $result = array();
+        foreach ($customer_pointers as $customer_pointer) {
+            $customer = $customer_pointer->getCustomer();
+            $result[] = array(
+                'id' => $customer->getId(),
+                'name' => $customer->getName()
+            );
+        }
+        return $result;
+    }
 }

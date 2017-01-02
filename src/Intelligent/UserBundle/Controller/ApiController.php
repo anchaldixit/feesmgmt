@@ -573,6 +573,14 @@ class ApiController extends Controller {
         }
     }
 
+    /**
+     * This function is to attach multiple customers to a user
+     * 
+     * @param Request $request
+     * @param type $json
+     * @return type
+     * @throws \Exception
+     */
     private function attachMultipleCustomersToUser(Request $request, $json) {
         $user_permissions = $this->get('user_permissions');
         if ($user_permissions->getManageUserAndShareAppPermission()) {
