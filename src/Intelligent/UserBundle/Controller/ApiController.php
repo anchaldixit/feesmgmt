@@ -346,7 +346,7 @@ class ApiController extends Controller {
             if (is_array($body)) {
                 $new_user_arr = array();
                 foreach ($body as $index => $new_user) {
-                    if (isset($new_user->email) && isset($new_user->new_role)) {
+                    if (isset($new_user->email) && isset($new_user->new_role) && isset($new_user->customer_ids)) {
                         $em = $this->getDoctrine()->getManager();
                         # check for already existing email/username
                         $already_existing_user = $em->getRepository("IntelligentUserBundle:User")
@@ -359,6 +359,8 @@ class ApiController extends Controller {
                         if (!$attached_role) {
                             throw new \Exception("new_role ($new_user->new_role) is not valid", 412);
                         }
+                        
+                        
                         $newUser = new User();
                         $newUser->setEmail($new_user->email);
                         $newUser->setRole($attached_role);
@@ -366,21 +368,36 @@ class ApiController extends Controller {
                         $newUser->setVerificationId(uniqid());
                         $newUser->setCreateDatetime(new \DateTime());
                         $newUser->setUpdateDatetime(new \DateTime());
+                        // Persist user
+                        $em->persist($newUser);
+                        // Attach customers
+                        foreach($new_user->customer_ids as $customer_id){
+                            $customer = $em->getRepository("IntelligentUserBundle:Customer")->find($customer_id);
+                            if(!$customer){
+                                throw new \Exception("Customer with customer_id($customer_id) do not exists for $new_user->email", 412);
+                            }
+                            
+                            $user_allowed_customer = new UserAllowedCustomer();
+                            $user_allowed_customer->setIsActive(TRUE);
+                            $user_allowed_customer->setCustomer($customer);
+                            $user_allowed_customer->setUser($newUser);
+                            // Pesist user_allowed_customer
+                            $em->persist($user_allowed_customer);
+                        }
                         $new_user_arr[] = $newUser;
                     } else {
                         throw new \Exception("Email or new role_id is not set in json at index #$index", 400);
-                    }
-                    foreach ($new_user_arr as $new_user_final) {
-                        // Send email
-                        $email_body = $this->_getEmailBody("inviteUser.html.twig", array('emailVerifyId' => $new_user_final->getVerificationId()));
-                        $this->_sendEmail($new_user_final->getEmail(), "Verify your email", $email_body);
-                        // Persist user
-                        $em->persist($new_user_final);
-                    }
-                    # Now finish by sending email and saving new users 
-                    $em->flush();
-                    return $this->_handleSuccessfulRequest();
+                    } 
                 }
+                // Send email to all users;
+                foreach ($new_user_arr as $new_user_final) {
+                    // Send email
+                    $email_body = $this->_getEmailBody("inviteUser.html.twig", array('emailVerifyId' => $new_user_final->getVerificationId()));
+                    $this->_sendEmail($new_user_final->getEmail(), "Verify your email", $email_body);                 
+                }
+                # Now finish by saving new users 
+                $em->flush();
+                return $this->_handleSuccessfulRequest();
             } else {
                 throw new \Exception("Body should be array in the request json", 400);
             }
