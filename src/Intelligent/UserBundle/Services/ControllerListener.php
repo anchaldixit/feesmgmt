@@ -23,7 +23,7 @@ class ControllerListener {
         if(!preg_match("/chooseCustomer/", $request_url)){
             if(($controller[0] instanceof Controller) && !($controller[0] instanceof ApiController)){
                 $user = $controller[0]->getUser();
-                if(is_null($user->getCurrentCustomer()) || !$user->getCurrentCustomer()->getIsActive()){
+                if((is_null($user->getCurrentCustomer()) || !$user->getCurrentCustomer()->getIsActive()) && $user){
                     if(count($user->getAllowedCustomers(true)) > 0){
                         $request->attributes->set('_controller', 'IntelligentUserBundle:Default:choosecustomer');
                     }else{
