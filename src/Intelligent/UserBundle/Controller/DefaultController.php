@@ -121,7 +121,8 @@ class DefaultController extends Controller {
      * @return Response
      */
     public function usersAction(Request $request){
-        return $this->render('IntelligentUserBundle:Default:users.html.twig', array());
+        $data = array('customers' => $this->_getAllCustomers());
+        return $this->render('IntelligentUserBundle:Default:users.html.twig', $data);
     }
     
     /**
@@ -189,6 +190,24 @@ class DefaultController extends Controller {
         $result = array();
         foreach ($customer_pointers as $customer_pointer) {
             $customer = $customer_pointer->getCustomer();
+            $result[] = array(
+                'id' => $customer->getId(),
+                'name' => $customer->getName()
+            );
+        }
+        return $result;
+    }
+    
+    /**
+     * This method will return all the customers
+     * 
+     * @return array
+     */
+    private function _getAllCustomers() {
+        $repo = $this->getDoctrine()->getManager()->getRepository("IntelligentUserBundle:Customer");
+        $customers = $repo->findAll();
+        $result = array();
+        foreach ($customers as $customer) {
             $result[] = array(
                 'id' => $customer->getId(),
                 'name' => $customer->getName()
