@@ -16,6 +16,10 @@ function Role() {
 function Permission() {
 }
 
+function Customer(){
+    
+}
+
 $.extend(Login, {
     ajaxLink: window.location.origin + '/api/v1/general',
     ajaxLink2: window.location.origin + '/api/v1',
@@ -323,7 +327,8 @@ $.extend(User, {
     roles: ['Registered', 'Unregistered', 'Unverified', 'Deactivated', 'Denied', 'Password Reset'],
     role: new Role(),
     login: new Login(),
-    permission: new Permission()
+    permission: new Permission(),
+    customer: new Customer() 
 });
 
 $.extend(User.prototype, {
@@ -334,6 +339,7 @@ $.extend(User.prototype, {
         User.login.init();
 
         User.permission.init();
+        User.customer.init();
         that.featureSlider();
         if ($('#userList').length) {
             that.createUserPage();
@@ -409,7 +415,13 @@ $.extend(User.prototype, {
         User.role.openPopup('.add-popup');
         User.role.closePopup();
         that.inviteUsers();
+        User.customer.addCustomerInList();
+        User.customer.removeCustomerFromList();
+        User.customer.updateAssignedCustomers();
+        User.customer.bindCustomerPopup();
+
     },
+    
     disableUser: function () {
         var that = this;
 
@@ -694,7 +706,7 @@ $.extend(User.prototype, {
         var that = this;
 
         that.getAjaxData(User.ajaxLink2, _obj, function (responseData) {
-            //console.log(responseData);
+
             var html = '';
             var status = '';
             var status_ul = '';
@@ -703,7 +715,7 @@ $.extend(User.prototype, {
             var _data = responseData.body.data;
             var allstatus = responseData.body.filters.status;
             var allroles = responseData.body.filters.roles;
-
+            var cust = '';
             if (that.flag == true) {
                 that.flag = false;
 
@@ -725,15 +737,27 @@ $.extend(User.prototype, {
 
             if (_data.length > 0) {
                 $.each(_data, function (index) {
+                    var customers = '';
+                    customers = _data[index].attached_customers;
+                    cust = '';
+                    if (customers.length) {
+                        $.each(customers, function (index) {
 
+                            cust += customers[index].name + ', ';
+                        });
+                        cust = cust.substring(0, cust.length - 2);
+                    }
+                    else {
+                        cust = 'No customer added';
+                    }
                     var userrole = _data[index].role.id;
                     var selectbox = '';
                     if (_data[index].status == 4) {
-                    selectbox += '<select class="change_role" data-user-id="' + _data[index].id + '" disabled>';
-                }
-                else{
-                    selectbox += '<select class="change_role" data-user-id="' + _data[index].id + '" '+ (_data[index].id == logged_user_id?'disabled':'') +'>';
-                }
+                        selectbox += '<select class="change_role" data-user-id="' + _data[index].id + '" disabled>';
+                    }
+                    else {
+                        selectbox += '<select class="change_role" data-user-id="' + _data[index].id + '" ' + (_data[index].id == logged_user_id ? 'disabled' : '') + '>';
+                    }
                     $.each(allroles, function (index) {
                         selectbox += '<option ' + (userrole == allroles[index].id ? 'selected' : '') + ' value = "' + allroles[index].id + '" ' + (allroles[index].status == 1 ? "" : 'disabled') + '>' + allroles[index].name + '</option>';
                     });
@@ -747,17 +771,18 @@ $.extend(User.prototype, {
                     else {
                         html += '<tr>';
                     }
-                    html += '<td><a href="mailto:'+_data[index].email+'">' + (_data[index].name == null ? _data[index].email : _data[index].name) + '</a>';
-                    html += (_data[index].id == logged_user_id?'<i class="fa fa-check"></i>':''); 
+                    html += '<td><a href="mailto:' + _data[index].email + '">' + (_data[index].name == null ? _data[index].email : _data[index].name) + '</a>';
+                    html += (_data[index].id == logged_user_id ? '<i class="fa fa-check"></i>' : '');
                     html += '</td>';
                     html += '<td>' + selectbox + '</td>';
+                    html += '<td><span class="assigned_c">' + cust + '</span>&nbsp;&nbsp;<a class="open_popup_customers" data-modal-id="#editCustomers" href="#" data-user-id="' + _data[index].id + '"><i class="fa fa-pencil"></i></a></td>';
                     html += '<td class="status">' + status + '</td>';
                     html += '<td>' + _data[index].last_login + '</td>';
                     if (_data[index].status == 4)
                         html += '<td><a class="activate_user" href="#"  data-id="' + _data[index].id + '"><i class="fa fa-check green"></i></a></td>';
                     else {
                         html += '<td>';
-                        if(_data[index].id != logged_user_id){
+                        if (_data[index].id != logged_user_id) {
                             html += '<a class="disable_user" href="#"  data-id="' + _data[index].id + '"><i class="fa fa-times red"></i></a>';
                         }
                         html += '</td>';
@@ -1094,7 +1119,7 @@ $.extend(Role.prototype, {
     },
     openPopup: function (_Id) {
         $(_Id).click(function () {
-            
+
             var modalId = $(this).attr('data-modal-id');
             $(modalId).show();
             return false;
@@ -1165,7 +1190,7 @@ $.extend(Permission.prototype, {
         var that = this;
 
         that.createPermissionPage();
-        
+
 
     },
     createTabs: function () {
@@ -1196,8 +1221,7 @@ $.extend(Permission.prototype, {
             that.getPermissionsByRole();
             that.changeFieldPermission();
             that.editRole();
-            that.addCustomerInList();
-            that.removeCustomerFromList();
+            
         }
 
     },
@@ -1225,67 +1249,67 @@ $.extend(Permission.prototype, {
             var editPermission = '';
             var deletePermission = '';
             var icon = '';
-            if(_data.length > 0){
-            $.each(_data, function (index) {
-                //console.log(_data[index]);
-                if (Permission.moduleIcon[index] !== undefined) {
-                    icon = Permission.moduleIcon[index];
-                }
-                else {
-                    icon = '<i class="fa"></i>';
-                }
+            if (_data.length > 0) {
+                $.each(_data, function (index) {
+                    //console.log(_data[index]);
+                    if (Permission.moduleIcon[index] !== undefined) {
+                        icon = Permission.moduleIcon[index];
+                    }
+                    else {
+                        icon = '<i class="fa"></i>';
+                    }
 
 
-                if (_data[index].viewPermission) {
-                    viewPermission = '<a data-value="' + _data[index].viewPermission + '" data-module-id="' + _data[index].module.id + '" data-role-id="' + roleId + '" class="view_permission" href="#"><i class="fa fa-check green"></i></a>';
-                }
-                else {
-                    viewPermission = '<a data-value="' + _data[index].viewPermission + '" data-module-id="' + _data[index].module.id + '" data-role-id="' + roleId + '" class="view_permission" href="#"><i class="fa fa-times red"></i></a>';
-                }
+                    if (_data[index].viewPermission) {
+                        viewPermission = '<a data-value="' + _data[index].viewPermission + '" data-module-id="' + _data[index].module.id + '" data-role-id="' + roleId + '" class="view_permission" href="#"><i class="fa fa-check green"></i></a>';
+                    }
+                    else {
+                        viewPermission = '<a data-value="' + _data[index].viewPermission + '" data-module-id="' + _data[index].module.id + '" data-role-id="' + roleId + '" class="view_permission" href="#"><i class="fa fa-times red"></i></a>';
+                    }
 
-                if (_data[index].addPermission) {
-                    addPermission = '<a data-value="' + _data[index].addPermission + '" data-module-id="' + _data[index].module.id + '" data-role-id="' + roleId + '" class="add_permission" href="#"><i class="fa fa-check green"></i></a>';
-                }
-                else {
-                    addPermission = '<a data-value="' + _data[index].addPermission + '" data-module-id="' + _data[index].module.id + '" data-role-id="' + roleId + '" class="add_permission" href="#"><i class="fa fa-times red"></i></a>';
-                }
+                    if (_data[index].addPermission) {
+                        addPermission = '<a data-value="' + _data[index].addPermission + '" data-module-id="' + _data[index].module.id + '" data-role-id="' + roleId + '" class="add_permission" href="#"><i class="fa fa-check green"></i></a>';
+                    }
+                    else {
+                        addPermission = '<a data-value="' + _data[index].addPermission + '" data-module-id="' + _data[index].module.id + '" data-role-id="' + roleId + '" class="add_permission" href="#"><i class="fa fa-times red"></i></a>';
+                    }
 
-                if (_data[index].editPermission) {
-                    editPermission = '<a data-value="' + _data[index].editPermission + '" data-module-id="' + _data[index].module.id + '" data-role-id="' + roleId + '" class="edit_permission" href="#"><i class="fa fa-check green"></i></a>';
-                }
-                else {
-                    editPermission = '<a data-value="' + _data[index].editPermission + '" data-module-id="' + _data[index].module.id + '" data-role-id="' + roleId + '" class="edit_permission" href="#"><i class="fa fa-times red"></i></a>';
-                }
+                    if (_data[index].editPermission) {
+                        editPermission = '<a data-value="' + _data[index].editPermission + '" data-module-id="' + _data[index].module.id + '" data-role-id="' + roleId + '" class="edit_permission" href="#"><i class="fa fa-check green"></i></a>';
+                    }
+                    else {
+                        editPermission = '<a data-value="' + _data[index].editPermission + '" data-module-id="' + _data[index].module.id + '" data-role-id="' + roleId + '" class="edit_permission" href="#"><i class="fa fa-times red"></i></a>';
+                    }
 
-                if (_data[index].deletePermission) {
-                    deletePermission = '<a data-value="' + _data[index].deletePermission + '" data-module-id="' + _data[index].module.id + '" data-role-id="' + roleId + '" class="delete_permission" href="#"><i class="fa fa-check green"></i></a>';
-                }
-                else {
-                    deletePermission = '<a data-value="' + _data[index].deletePermission + '" data-module-id="' + _data[index].module.id + '" data-role-id="' + roleId + '" class="delete_permission" href="#"><i class="fa fa-times red"></i></a>';
-                }
+                    if (_data[index].deletePermission) {
+                        deletePermission = '<a data-value="' + _data[index].deletePermission + '" data-module-id="' + _data[index].module.id + '" data-role-id="' + roleId + '" class="delete_permission" href="#"><i class="fa fa-check green"></i></a>';
+                    }
+                    else {
+                        deletePermission = '<a data-value="' + _data[index].deletePermission + '" data-module-id="' + _data[index].module.id + '" data-role-id="' + roleId + '" class="delete_permission" href="#"><i class="fa fa-times red"></i></a>';
+                    }
 
-                html += '<tr>';
-                html += '<td>' + icon + _data[index].module.name + '</td>';
-                html += '<td>' + viewPermission + '</td>';
-                html += '<td>' + editPermission + '</td>';
-                html += '<td>' + addPermission + '</td>';
-                html += '<td>' + deletePermission + '</td>';
-                html += '<td style="width:15%">';
-                html += '<select class="changeModuleFieldPermission" data-module-id="' + _data[index].module.id + '" data-role-id="' + roleId +'">';
-                html += '<option value="false"' + (_data[index].fieldPermission == false ? 'selected' : '') + '>Full Access</option>';
-                html += '<option value="true"' + (_data[index].fieldPermission == true ? 'selected' : '') + '>Custom Access</option>';
-                html += '</select>';
-                if (_data[index].fieldPermission == true) {
-                    html += '&nbsp;&nbsp;<span class="pencil" style="width:20px; display:inline-block;"><a href="#" data-module-id="' + _data[index].module.id + '" data-role-id="' + roleId + '" data-modal-pop-id="#customPermissionPop" class="open-popup"><i class="fa fa-pencil"></i></a></span>';
-                }
-                else {
-                    html += '&nbsp;&nbsp;<span class="pencil" style="width:20px; display:inline-block;"></span>';
-                }
-                html += '</td>';
-                html += '</tr>';
-            });
+                    html += '<tr>';
+                    html += '<td>' + icon + _data[index].module.name + '</td>';
+                    html += '<td>' + viewPermission + '</td>';
+                    html += '<td>' + editPermission + '</td>';
+                    html += '<td>' + addPermission + '</td>';
+                    html += '<td>' + deletePermission + '</td>';
+                    html += '<td style="width:15%">';
+                    html += '<select class="changeModuleFieldPermission" data-module-id="' + _data[index].module.id + '" data-role-id="' + roleId + '">';
+                    html += '<option value="false"' + (_data[index].fieldPermission == false ? 'selected' : '') + '>Full Access</option>';
+                    html += '<option value="true"' + (_data[index].fieldPermission == true ? 'selected' : '') + '>Custom Access</option>';
+                    html += '</select>';
+                    if (_data[index].fieldPermission == true) {
+                        html += '&nbsp;&nbsp;<span class="pencil" style="width:20px; display:inline-block;"><a href="#" data-module-id="' + _data[index].module.id + '" data-role-id="' + roleId + '" data-modal-pop-id="#customPermissionPop" class="open-popup"><i class="fa fa-pencil"></i></a></span>';
+                    }
+                    else {
+                        html += '&nbsp;&nbsp;<span class="pencil" style="width:20px; display:inline-block;"></span>';
+                    }
+                    html += '</td>';
+                    html += '</tr>';
+                });
             }
-            else{
+            else {
                 html += '<tr>';
                 html += '<td colospan="6">No data found</td>';
                 html += '</tr>';
@@ -1352,7 +1376,7 @@ $.extend(Permission.prototype, {
                     td.html('');
                     td.html('<i class="fa fa-check green"></i>');
                     td.attr('data-value', 'true');
-                    
+
                 }
                 var ajax_msg = 'View Permission changed';
                 $('.info-notice').html(ajax_msg);
@@ -1616,7 +1640,7 @@ $.extend(Permission.prototype, {
         $('#permissionsTable').on('click', '.open-popup', function () {
             var modalPopId = $(this).attr('data-modal-pop-id');
             var moduleId = $(this).attr('data-module-id');
-            var role_id  = $(this).attr('data-role-id');
+            var role_id = $(this).attr('data-role-id');
             var obj = {
                 head: {
                     action: "getModuleFieldPermissions"
@@ -1691,66 +1715,188 @@ $.extend(Permission.prototype, {
             });
         });
     },
-    editRole: function(){
-        $('#editRole').click(function(){ 
+    editRole: function () {
+        $('#editRole').click(function () {
             var error = '';
             var _roleName = $('#roleName').val();
             var _roleDesc = $('textarea#roleDescription').val();
-            if($.trim(_roleName) == ''){
+            if ($.trim(_roleName) == '') {
                 error = 'Role Name can not empty';
                 var ele = $('#roleName').next('.validation_msg');
                 ele.html(error);
             }
-            else if($.trim(_roleDesc) == ''){
+            else if ($.trim(_roleDesc) == '') {
                 error = 'Role Description can not empty';
                 var ele = $('#roleDescription').next('.validation_msg');
                 ele.html(error);
             }
-            else{
+            else {
                 $('.validation_msg').html('');
                 var obj = {
-                        head:{
-                            action:"editRole"
-                        },
-                        body:{
-                            role_id:parseInt(roleId),
-                            name: _roleName,
-                            description: _roleDesc
-                        }
-                    };
+                    head: {
+                        action: "editRole"
+                    },
+                    body: {
+                        role_id: parseInt(roleId),
+                        name: _roleName,
+                        description: _roleDesc
+                    }
+                };
                 var _obj = JSON.stringify(obj);
                 Permission.user.getAjaxData(User.ajaxLink2, _obj, function (data) {
                     $('#resp-msg').html('Role has been updated successfully');
                     $('#loader').hide();
-                    
+
                 });
             }
         });
+    }
+
+});
+
+$.extend(Customer,{
+    user: new User()
+});
+
+$.extend(Customer.prototype,{
+    init: function(){
+        var that = this;
+        console.log();
+        if($('.choose-customer').length){
+            that.fillCustomerPageDropdown();
+        }
     },
-    addCustomerInList: function(){
-        $('#customerList').change(function(){
-            var _val = $(this).val();
-            var _text = $(this).find("option:selected").text();
-            
-            if(_val != ''){
-                var html = '';
-                $(this).find("option:selected").attr('disabled',true);
-                html = '<em class="cust_add"><span class="cc" data-value="'+_val+'">'+_text+'</span><i class="fa fa-times remove_customer"></i></em>';
-                $('.added-customer').append(html);
-            }
-            
+    fillCustomerPageDropdown : function (){
+        var that = this;
+        var allcust = that.gatAllCustomersDropDown();
+        
+        $('#chooseCustomer').html(allcust);
+       
+    },
+    bindCustomerPopup: function(){
+        var that = this;
+        $('#userList').on('click', '.open_popup_customers', function () {
+            that._cell = $(this);
+            _anchor_obj = $(this);
+            var userId = $(this).attr('data-user-id');
+            that.getCustomersByUser(userId);
+            return false;
         });
     },
-    removeCustomerFromList: function (){
-        $('.added-customer').on('click','.remove_customer',function(){
+    getCustomersByUser: function (_userId) {
+        var that = this;
+        var obj = {
+            head: {
+                action: "getUserAssignedCustomers"
+            },
+            body: {
+                user_id: _userId
+            }
+        };
+
+        var _obj = JSON.stringify(obj);
+        
+        Customer.user.getAjaxData(User.ajaxLink2, _obj, function (_data) {
+            $('#loader').hide();
+            //console.log(_data.body);
+            var all_customers = that.gatAllCustomersDropDown(_data.body);
+            var assigned_customer = that.gatAssignedCustomerList(_data.body.assigned_customers);
+            $('#all_customers').html(all_customers);
+            $('.added-customer').html(assigned_customer);
+            that.showPopup(_anchor_obj);
+        });
+
+    },
+    showPopup : function(_obj){
+        var modalId = _obj.attr('data-modal-id');
+        
+        $(modalId).show();
+    },
+    gatAllCustomersDropDown: function (_data) {
+        var that = this;
+        var _allCustomer = _data.all_customers;
+        var _assignedCustomer = _data.assigned_customers;
+        var html = '<option value="">Select Customer</option>';
+        if (_allCustomer.length) {
+            $.each(_allCustomer, function (index) {
+                var _val = that.isAlreadyAssignedCustomer(_allCustomer[index].id, _assignedCustomer);
+                html += '<option value="' + _allCustomer[index].id + '" ' + (_val == true ? 'disabled' : '') + '>' + _allCustomer[index].name + '</option>';
+            });
+        }
+        return html;
+    },
+    gatAssignedCustomerList: function (_data) {
+        var html = '';
+        if (_data.length) {
+            $.each(_data, function (index) {
+                html += '<em class="cust_add">';
+                html += '<span class="cc" data-value="' + _data[index].id + '">' + _data[index].name + '</span>';
+                html += '<i class="fa fa-times remove_customer"></i>'
+                html += '</em>';
+
+            });
+        }
+        else {
+            html = '<small>No Customer added for this user</small>';
+        }
+        return html;
+    },
+    isAlreadyAssignedCustomer: function (id, assignedCustomerList) {
+        var flag = false;
+        $.each(assignedCustomerList, function (index) {
+            if (id == assignedCustomerList[index].id) {
+                flag = true;
+            }
+        });
+        return flag;
+    },
+    addCustomerInList: function () {
+        $('#all_customers').change(function () {
+            var _val = $(this).val();
+            var _text = $(this).find("option:selected").text();
+
+            if (_val != '') {
+                var html = '';
+                $(this).find("option:selected").attr('disabled', true);
+                html = '<em class="cust_add"><span class="cc" data-value="' + _val + '">' + _text + '</span><i class="fa fa-times remove_customer"></i></em>';
+                if ($('.added-customer .cust_add').length == 0) {
+                    $('.added-customer').html('');
+                }
+                $('.added-customer').append(html);
+            }
+
+        });
+    },
+    removeCustomerFromList: function () {
+        $('.added-customer').on('click', '.remove_customer', function () {
             var _custObj = $(this).parent();
             var _custVal = _custObj.find('.cc').attr('data-value');
-            $('#customerList option[value="'+_custVal+'"]').attr('disabled',false);
+            $('#all_customers option[value="' + _custVal + '"]').attr('disabled', false);
             _custObj.remove();
+            if ($('.added-customer .cust_add').length == 0) {
+                $('.added-customer').html('<small>No Customer added for this user</small>');
+            }
+
+        });
+    },
+    updateAssignedCustomers: function () {
+        var that = this;
+        $('#update_customers').click(function () {
+            var _addCust = $('.added-customer .cust_add');
+            var _cust = '';
+            if (_addCust.length) {
+                $.each(_addCust, function () {
+                    _cust += $(this).find('.cc').text() + ', ';
+                });
+            }
+            _cust = _cust.substring(0, _cust.length - 2);
+            var _cc = that._cell;
+            var td = '';
+            td = _cc.parent('td');
+            td.find('.assigned_c').html(_cust);
         });
     }
 });
-
 
 $(document).ready(function () {
 
