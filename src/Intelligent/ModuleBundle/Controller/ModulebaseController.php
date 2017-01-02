@@ -162,10 +162,12 @@ abstract class ModulebaseController extends Controller {
         $module_display_name = $module->module_settings->getModule($this->module_name);
 
         $filters = $request->query->all();
+
         array_walk_recursive($filters, function(&$val) {
             $val = trim($val);
             $val = stripslashes($val);
         });
+        $filters = $this->removeEmptyConditions($filters);
 
         $params = $this->prepareFilterCondtion($filters);
 
@@ -242,6 +244,11 @@ abstract class ModulebaseController extends Controller {
             }
             if (!empty($filters['filter']['match'])) {
                 foreach ($filters['filter']['match'] as $field => $value) {
+                    $params[$field] = $value;
+                }
+            }
+            if (!empty($filters['filter']['range']) and ! empty($filters['filter']['range'])) {
+                foreach ($filters['filter']['range'] as $field => $value) {
                     $params[$field] = $value;
                 }
             }
@@ -356,6 +363,35 @@ abstract class ModulebaseController extends Controller {
 
         $classnamelike = ucfirst($this->module_route_identifier);
         return $this->forward("IntelligentModuleBundle:$classnamelike:view", array('page_no' => 1));
+    }
+
+    /*
+     * Remove all empty value keys of array. Check it recursively
+     */
+    private function removeEmptyConditions($source) {
+        $final = $source;
+        if (is_array($source) and count($source))
+            foreach ($source as $key => $value) {
+                if ($value === '') {//clear empty string condition
+                    //do not use empty, we want zero to be based
+                    unset($final[$key]);
+                } elseif (is_array($value) and ! count($value)) {//clear empty array
+                    unset($final[$key]);
+                } elseif (is_array($value) and count($value)) {
+
+                    $filtered_array = array_filter($value, function($v) {//clear non empty array
+                        return $v === '' ? false : true;
+                    });
+                    //recursive call
+                    $filtered_array = $this->removeEmptyConditions($filtered_array);
+                    if (count($filtered_array)) {
+                        $final[$key] = $filtered_array;
+                    } else {
+                        unset($final[$key]);
+                    }
+                }
+            }
+        return $final;
     }
 
 }

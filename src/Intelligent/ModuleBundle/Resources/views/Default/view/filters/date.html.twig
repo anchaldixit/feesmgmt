@@ -1,4 +1,48 @@
 {% if permissions.custom == false or  (permissions.custom == true and permissions.custom_field[field_settings.module_field_name]>0) %}
 {# if custom access setting id done then allowed only for view & editview is true that is 1 or 2  #}
-date
+
+<div class="filter-box">
+    <h6><a href="#"><i class="fa fa-caret-down"></i>{{field_settings.module_field_display_name}}</a></h6>
+    <ul>
+        <li>
+            From:
+            <input name="filter[range][{{field_settings.module_field_name}}][min]" id="{{field_settings.module_field_name}}_min"  value="{{selected.range[field_settings.module_field_name] is defined and selected.range[field_settings.module_field_name] is not empty ? selected.range[field_settings.module_field_name]['min'] | trim | date("m/d/Y"):'' }}" class="datepicker filter-{{field_settings.module_field_name}} " type="text" >
+            To:
+            <input name="filter[range][{{field_settings.module_field_name}}][max]" id="{{field_settings.module_field_name}}_max"  value="{{selected.range[field_settings.module_field_name] is defined and selected.range[field_settings.module_field_name] is not empty ? selected.range[field_settings.module_field_name]['max'] | trim | date("m/d/Y"):'' }}" class="datepicker filter-{{field_settings.module_field_name}} " type="text" >
+            <br> <input type='submit' value=">>">
+        </li>
+    </ul>
+</div>
+<script>
+    jQuery(document).ready(function ($) {
+        var min = $("#{{field_settings.module_field_name}}_min");
+        var max = $("#{{field_settings.module_field_name}}_max");
+        min.datepicker({
+            changeMonth: true,
+            changeYear: true
+            
+        }).on( "change", function() {
+          max.datepicker( "option", "minDate", getDate( this ) );
+        });
+
+        max.datepicker({
+            changeMonth: true,
+            changeYear: true
+        }).on( "change", function() {
+        min.datepicker( "option", "maxDate", getDate( this ) );
+      });
+
+        function getDate(element) {
+            var date;
+            try {
+                date = $.datepicker.parseDate("mm/dd/yy", element.value);
+            } catch (error) {
+                date = null;
+            }
+            return date;
+        }
+
+    });
+
+</script>
 {% endif %}

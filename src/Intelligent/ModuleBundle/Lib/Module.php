@@ -60,6 +60,16 @@ class Module {
                     //$arr_where[]= " $column like '{$value['like']}'";
                     $arr_where[] = " $column like ?";
                     $params[] = "%{$value['like']}%";
+                } elseif (is_array($value) and ( isset($value['min']) or isset($value['min']) )) {
+                    //range bound condtion
+                    if (isset($value['min']) and ! empty($value['min'])) {
+                        $arr_where[] = " $column >= ?";
+                         $params[] = strstr($value['min'],'/')===false ? $value['min']: date('Y-m-d',  strtotime($value['min']));
+                    }
+                    if (isset($value['max']) and ! empty($value['max'])) {
+                        $arr_where[] = " $column <= ?";
+                        $params[] = strstr($value['max'],'/')===false ? $value['max']: date('Y-m-d',  strtotime($value['max']));
+                    }
                 } else {
                     $arr_where[] = " {$this->table}.$column=?";
                     $params[] = $value;
@@ -90,7 +100,6 @@ class Module {
 
             $select_fields = implode(' , ', $fields);
         }
-
 
         $sql = "SELECT $select_fields FROM {$this->table} $join_condition $extended_where $order_by limit $limit";
         $this->last_sql_withoutlimit = "SELECT count(*) FROM {$this->table} $join_condition $extended_where ";
@@ -173,9 +182,6 @@ class Module {
         });
         $fields_config = $this->getFormFields();
 
-//        var_dump($fields_config);
-//        exit;
-        #var_dump($post_data);
         //validate each field based on its configurations & data type
         foreach ($fields_config as $key => $field_schema) {
 
@@ -200,9 +206,10 @@ class Module {
                                 $error[] = "$field_display_name crossed the character limit of {$field_schema['varchar_limit']}.";
                             }
                             break;
+                        case 'percentage':    
                         case 'currency':
 
-                            if (!is_numeric($field_value)) {
+                            if (!empty($field_value) and !is_numeric($field_value)) {
                                 $error[] = "$field_display_name should be a number.";
                             } else {
                                 $field_value = round($field_value, 2);
@@ -215,7 +222,7 @@ class Module {
                         case 'decimal':
                         case 'number':
 
-                            if (!is_numeric($field_value)) {
+                            if (!empty($field_value) and !is_numeric($field_value)) {
                                 $error[] = "$field_display_name should be a number.";
                             }
                             break;

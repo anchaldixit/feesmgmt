@@ -30,6 +30,7 @@ class Settings {
         'currency' => 'Currency',
         'decimal' => 'Decimal',
         'number' => 'Number',
+        'percentage' => 'Percentage',
         'enum' => 'Value Set',
         'link' => 'Link',
         'user' => 'User',
@@ -169,7 +170,15 @@ class Settings {
      */
 
     function delete($delete_id) {
+
+        //first fetch the details to know which column need to be deleted
+        $data = $this->fetch(array('id' => $delete_id));
+        
         $respid = $this->db->delete("{$this->table}", array('id' => $delete_id));
+        
+        $this->afterDelete($data[0]);
+
+
         return $respid;
     }
 
@@ -214,16 +223,15 @@ class Settings {
                 } elseif ($post_data['relationship_module'] == $post_data['module']) {
 
                     $error[] = "Relationship Module cannot be same as module name.";
-                } elseif(empty($post_data['relationship_module_unique_field'])){
+                } elseif (empty($post_data['relationship_module_unique_field'])) {
                     $error[] = "Relationship Module unique field cannot be empty.";
-                    
-                }else {
+                } else {
                     //check the field name exist in relationship module
                     $result1 = $this->fetch(
                             array(
                                 'module' => $post_data['relationship_module'],
                                 'module_field_name' => $data['module_field_name']));
-                    
+
                     //check the field
                     $result2 = $this->fetch(
                             array(
@@ -233,13 +241,11 @@ class Settings {
                     if (!count($result1)) {
                         //Field not found
                         $error[] = "{$data['module_field_name']} field not found for relationship module";
-                    }elseif(!count($result2)){
-                        
+                    } elseif (!count($result2)) {
+
                         $error[] = "{$post_data['relationship_module_unique_field']} field not found for relationship module";
-                    
-                        
-                    }else {
-                    
+                    } else {
+
                         $data['relationship_module'] = $post_data['relationship_module'];
                         $data['relationship_module_unique_field'] = $post_data['relationship_module_unique_field'];
                     }
@@ -338,20 +344,27 @@ class Settings {
         } elseif ($data['enable_filter'] == 'Y') {
             $index_type = 'INDEX';
         } else {
-            $index_type = '';
+            $index_type = 'INDEX';
         }
 
         $this->createModuleField($data['module'], $data['module_field_name'], $data['module_field_datatype'], $index_type, $other_details);
     }
 
-    public function afterDelete() {
-        
+    public function afterDelete($data) {
+
+        $alt_sql = "ALTER TABLE `{$data['module']}` 
+            DROP COLUMN `{$data['module_field_name']}`";
+        $this->db->executeQuery($alt_sql);
+
+        if ($this->db->errorCode() != 0) {
+
+            throw new \Exception($this->db->errorInfo(), '004');
+        }
     }
-    
-    public function prepareforeignKeyName($module){
-        
+
+    public function prepareforeignKeyName($module) {
+
         return "relationship_{$module}_id";
-        
     }
 
     public function createModuleField($table, $field_name, $datatype, $index_type, $other_details) {
@@ -369,11 +382,11 @@ class Settings {
             $type = 'text';
         } elseif ($datatype == 'link') {
             $type = 'varchar(400)';
-        } else if (in_array($datatype, array('integer', 'user','number'))) {
+        } else if (in_array($datatype, array('integer', 'user', 'number'))) {
             $type = 'int(11)';
         } else if (in_array($datatype, array('decimal'))) {
             $type = 'float(12,4)';
-        } else if (in_array($datatype, array('currency'))) {
+        } else if (in_array($datatype, array('currency', 'percentage'))) {
             $type = 'float(10,2)';
         } else if (in_array($datatype, array('date'))) {
             $type = 'date';

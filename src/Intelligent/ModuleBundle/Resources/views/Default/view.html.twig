@@ -2,6 +2,8 @@
 {% extends "base.html.twig"  %}
 {% block stylesheets %}
     {{ parent() }}
+    <link href="/assets/js/jquery-ui/jquery-ui.min.css" rel="stylesheet" type="text/css"/>
+    <link href="/assets/js/jquery-ui/jquery-ui.theme.min.css" rel="stylesheet" type="text/css"/>
     <style>
         .full-container{
             width: 100%;
@@ -26,8 +28,8 @@
             padding: 5px 15px;
             margin: 5px 15px;
         }
-        
-        
+
+
 
 
 
@@ -36,6 +38,7 @@
 {% endblock %}
 {% block javascripts %}
     {{ parent() }}
+    <script src="/assets/js/jquery-ui/jquery-ui.min.js" type="text/javascript"></script>
     <script>
 
         jQuery(document).ready(function ($) {
@@ -50,10 +53,13 @@
                 if (filter == 'sort') {
                     $("#filter_form select[name='sort']").val('')
                 } else {
-                    field = $('.filter-' + filter)
+                    field = $('.filter-' + filter);
+                    console.log(field)
                     if (field.length) {
+                        field.val('')
                         if (field.attr('type') == 'text') {
-                            $("#filter_form input[name='filter[text][" + filter + "]'").val('')
+                            field.val('')
+                            //$("#filter_form input[name='filter[text][" + filter + "]'").val('')
                         } else {
                             $("#filter_form input[name='filter[match][" + filter + "]'").prop('checked', false);
                         }
@@ -62,19 +68,21 @@
                 $(this).parent().remove();
                 $("#filter_form").submit();
             });
-            $('.delete-link').on('click',function(event){
-                
-                if(confirm('Are you sure to delete the row?')){
-                    
+            $('.delete-link').on('click', function (event) {
+
+                if (confirm('Are you sure to delete the row?')) {
+
                     event.stopPropagation();
                     return true;
                 }
                 return false;
-            
+
             });
         });
 
+
     </script>
+
 {% endblock %}
 {% block body %}
 
