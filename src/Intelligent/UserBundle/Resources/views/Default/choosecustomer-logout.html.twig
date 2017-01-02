@@ -1,0 +1,32 @@
+{% extends 'truebase.html.twig' %}
+
+{% block title %}
+    <title>Expertise.com: Choose Customer</title>
+{% endblock %}
+
+{% block breadcrumb %}
+    <div class="bread-crumb">
+        <span>Expertise.com Marketing Mgmt</span>
+        <i class="fa fa-long-arrow-right"></i>
+        <span>Choose Customer</span>
+
+    </div>
+{% endblock %}
+{% block custom_feature %}
+{% endblock %}
+{% block body %}
+
+    <div class="my-preferences-outer">
+        <div class="choose-customer-outer">
+            <h4>Choose a customer to proceed</h4>
+            <div class="choose-customer">
+                <select>
+                    <option value="">Select Customer</option>
+                    <option value="expertise.com">Expertise.com</option>
+                    <option value="intelligent.com">Intelligent.com</option>
+                    <option value="thesimpledollar.com">Thesimpledollar.com</option>
+                </select>
+            </div>
+        </div>    
+    </div>
+{% endblock %}
