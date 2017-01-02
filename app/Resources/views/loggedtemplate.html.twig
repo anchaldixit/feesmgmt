@@ -96,12 +96,14 @@ and open the template in the editor.
                             <span>Module Settings</span>
                         </a>
                     </li>
-                    <li>
-                        <a href="/users">
-                            <i class="fa fa-user"></i>
-                            <span>Users</span>
-                        </a>
-                    </li>
+                    {% if app.getUser().getRole().getGlobalPermission().getManageUserAppPermission() %}
+                        <li>
+                            <a href="/users">
+                                <i class="fa fa-user"></i>
+                                <span>Users</span>
+                            </a>
+                        </li>
+                    {% endif %}
                     <li>
                         <a href="/customer/view">
                             <i class="fa fa-users"></i>
@@ -189,10 +191,12 @@ and open the template in the editor.
                     </div>
                 {% endblock %}
                 {% block custom_feature %}
-                    <div class="custom-feature">
-                        <a href="#"><i class="fa fa-user-plus"></i>Share app with new user</a>
-                        <a href="/roles"><i class="fa fa-user-secret"></i>Manage Roles</a>
-                    </div>
+                    {% if app.getUser().getRole().getGlobalPermission().getManageUserAppPermission() %}
+                        <div class="custom-feature">
+                            <a href="#"><i class="fa fa-user-plus"></i>Share app with new user</a>
+                            <a href="/roles"><i class="fa fa-user-secret"></i>Manage Roles</a>
+                        </div>
+                    {% endif %}
                 {% endblock %}
             </div>
 
