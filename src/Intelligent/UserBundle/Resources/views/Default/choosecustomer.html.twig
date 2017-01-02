@@ -22,9 +22,9 @@
             <div class="choose-customer">
                 <select>
                     <option value="">Select Customer</option>
-                    <option value="expertise.com">Expertise.com</option>
-                    <option value="intelligent.com">Intelligent.com</option>
-                    <option value="thesimpledollar.com">Thesimpledollar.com</option>
+                    {% for customer in customers %}
+                        <option value="{{customer.id}}">{{customer.name}}</option>
+                    {% endfor %}
                 </select>
             </div>
         </div>    
