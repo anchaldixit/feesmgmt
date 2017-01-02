@@ -341,6 +341,7 @@ $.extend(User.prototype, {
         User.permission.init();
         User.customer.init();
         that.featureSlider();
+        that.bindCustomerChangeAction();
         if ($('#userList').length) {
             that.createUserPage();
         }
@@ -421,7 +422,15 @@ $.extend(User.prototype, {
         User.customer.bindCustomerPopup();
 
     },
-    
+    bindCustomerChangeAction: function(){
+        if($('#cusomerMenu').length){
+            $('#cusomerMenu').on('click','a',function(){
+                var _linkId = $(this).attr('data-customer-link-id');
+                User.customer.setDefaultCustomer(_linkId);
+                return false;
+            });
+        }
+    },
     disableUser: function () {
         var that = this;
 
@@ -1763,15 +1772,30 @@ $.extend(Customer.prototype,{
         var that = this;
         console.log();
         if($('.choose-customer').length){
-            that.fillCustomerPageDropdown();
+            that.refreshChooseCustomerPage();
         }
     },
-    fillCustomerPageDropdown : function (){
+    refreshChooseCustomerPage: function (){
         var that = this;
-        var allcust = that.gatAllCustomersDropDown();
-        
-        $('#chooseCustomer').html(allcust);
-       
+        $('#chooseCustomer').change(function(){
+            var _val = $(this).find('option:selected').val();
+            that.setDefaultCustomer(_val);
+        });
+    },
+    setDefaultCustomer: function(_val){
+        var that = this;
+        var obj = {
+                head:{
+                    action:"changeUserAssignedCustomer"
+                },
+                body:{
+                    customer_id:_val
+                }
+            }
+        var _obj = JSON.stringify(obj);
+        Customer.user.getAjaxData(User.ajaxLink2,_obj, function(_data){
+            window.location.href = 'http://'+window.location.hostname+window.location.pathname;
+        });
     },
     bindCustomerPopup: function(){
         var that = this;
