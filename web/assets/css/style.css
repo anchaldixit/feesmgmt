@@ -1151,3 +1151,35 @@ input[type="submit"]:focus, input[type="button"]:focus {
         border-color: #c2bfbf; }
         .added-customer-outer .added-customer .cust_add:hover i {
           color: #999797; }
+
+.added-customer2 {
+  width: 100%;
+  border: 1px solid #cacaca;
+  padding: 15px 15px 7px 15px;
+  background-color: #fff;
+  line-height: 22px; }
+  .added-customer2 .cust_add {
+    font-style: normal;
+    font-weight: 400;
+    background-color: #f5f5f5;
+    border: 1px solid #d9d9d9;
+    border-radius: 3px;
+    -webkit-border-radius: 3px;
+    -ms-border-radius: 3px;
+    -o-border-radius: 3px;
+    padding: 2px 10px 3px 10px;
+    margin-right: 5px;
+    margin-bottom: 8px;
+    display: inline-block; }
+    .added-customer2 .cust_add span {
+      font-size: 12px;
+      color: #222222; }
+    .added-customer2 .cust_add i {
+      font-size: 11px;
+      color: #b5b5b5;
+      margin-left: 10px;
+      cursor: pointer; }
+    .added-customer2 .cust_add:hover {
+      border-color: #c2bfbf; }
+      .added-customer2 .cust_add:hover i {
+        color: #999797; }
