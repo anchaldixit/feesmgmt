@@ -13,7 +13,7 @@
         {% for type,selected_filter in selected_filters.filter %}
 
             {% for selected_filter_name,selected_filter_value in selected_filter %}
-                {% if type == 'text'%}
+                {% if type == 'text' and selected_filter_value is not empty%}
 
                     <div class="selected_filter">
                         {{schema[selected_filter_name]['module_field_display_name']}} like {{selected_filter_value}} <span data-resetfilter="{{selected_filter_name}}">X</span> 

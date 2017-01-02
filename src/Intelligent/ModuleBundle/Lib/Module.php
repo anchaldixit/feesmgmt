@@ -93,7 +93,7 @@ class Module {
 
 
         $sql = "SELECT $select_fields FROM {$this->table} $join_condition $extended_where $order_by limit $limit";
-        $this->last_sql_withoutlimit = "SELECT count(*) FROM {$this->table} $extended_where ";
+        $this->last_sql_withoutlimit = "SELECT count(*) FROM {$this->table} $join_condition $extended_where ";
         $this->last_sql_withoutlimit_params = $params;
         $result = $this->db->fetchAll($sql, $params);
         return $result;
@@ -258,13 +258,15 @@ class Module {
             } elseif ($field_schema['module_field_datatype'] == 'relationship') {
                 //relationship field need to handled separately
 
-                $field_name = $field_schema['relationship_field_name'];
+                if (isset($field_schema['relationship_field_name'])) {
+                    $field_name = $field_schema['relationship_field_name'];
 
-                if ($field_schema['required_field'] == 'Y' and empty($post_data[$field_name])) {
-                    $error[] = "{$field_schema['relationship_module']} Relationship field cannot be empty";
-                } else {
-                    $field_value = $post_data[$field_name];
-                    $data[$field_name] = $field_value;
+                    if ($field_schema['required_field'] == 'Y' and empty($post_data[$field_name])) {
+                        $error[] = "{$field_schema['relationship_module']} Relationship field cannot be empty";
+                    } else {
+                        $field_value = $post_data[$field_name];
+                        $data[$field_name] = $field_value;
+                    }
                 }
             }
         }
@@ -375,7 +377,7 @@ class Module {
                             'module_field_name' => $value['module_field_name']
                         )
                 );
-                
+
                 # Add field setting to $fieldset only for if relationship settings found for it
                 if (count($result2)) {
                     $value['relationship_field_settings'] = $result2[0];
@@ -385,7 +387,7 @@ class Module {
                 $fieldset[$value['module_field_name']] = $value;
             }
         }
-        
+
         return $fieldset;
     }
 
@@ -412,14 +414,21 @@ class Module {
             if ($value['module_field_datatype'] !== 'relationship') {
                 $fieldset[] = $value;
             } else {
-                //In case there are multiple fields of same relationship table is there, do not send the all fields. Only send the one field.
+                //In case there are multiple fields of same relationship table is there, do not send  all fields. Only send the one field.
                 if (!isset($dependencies[$value['relationship_module']])) {
 
+                    $value['relationship_foregin_key'] = 'set';
                     $dependencies[$value['relationship_module']] = 'set';
                     $value['relationship_field_name'] = $this->module_settings->prepareforeignKeyName($value['relationship_module']);
                     $value['relationship_module_display_name'] = $this->module_settings->getModule($value['relationship_module']);
-                    $fieldset[] = $value;
                 }
+                $result2 = $this->module_settings->fetch(
+                        array('module' => $value['relationship_module'],
+                            'module_field_name' => $value['module_field_name']
+                        )
+                );
+                $value['relationship_field_settings'] = $result2[0];
+                $fieldset[] = $value;
             }
             //$fieldset[]
         }

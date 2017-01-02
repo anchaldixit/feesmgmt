@@ -2,8 +2,6 @@
 
 namespace Intelligent\UserBundle\Services;
 use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Intelligent\UserBundle\Controller\ApiController;
 
@@ -25,7 +23,7 @@ class ControllerListener {
         if(!preg_match("/chooseCustomer/", $request_url)){
             if(($controller[0] instanceof Controller) && !($controller[0] instanceof ApiController)){
                 $user = $controller[0]->getUser();
-                if(is_null($user->getCurrentCustomer()) || !$user->getCurrentCustomer()->getIsActive()){
+                if($user && (is_null($user->getCurrentCustomer()) || !$user->getCurrentCustomer()->getIsActive())){
                     if(count($user->getAllowedCustomers(true)) > 0){
                         $request->attributes->set('_controller', 'IntelligentUserBundle:Default:choosecustomer');
                     }else{

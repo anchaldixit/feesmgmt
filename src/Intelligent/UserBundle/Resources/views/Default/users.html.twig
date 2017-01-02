@@ -13,11 +13,12 @@
     </div>
 {% endblock %}
 {% block custom_feature %}
-    <div class="custom-feature">
-        <a href="#" class="add-popup" data-modal-id="#inviteUsers"><i class="fa fa-user-plus"></i>Share app with new user</a>
-        <a href="/roles"><i class="fa fa-user-secret"></i>Manage Roles</a>
-    </div>
-
+    {% if app.getUser().getRole().getGlobalPermission().getManageUserAppPermission() %}
+        <div class="custom-feature">
+            <a href="#" class="add-popup" data-modal-id="#inviteUsers"><i class="fa fa-user-plus"></i>Share app with new user</a>
+            <a href="/roles"><i class="fa fa-user-secret"></i>Manage Roles</a>
+        </div>
+    {% endif %}
 {% endblock %}
 {% block body %}
 
