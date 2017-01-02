@@ -2,8 +2,6 @@
 
 namespace Intelligent\UserBundle\Services;
 use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Intelligent\UserBundle\Controller\ApiController;
 
