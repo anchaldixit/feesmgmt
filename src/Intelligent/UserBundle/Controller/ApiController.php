@@ -576,7 +576,7 @@ class ApiController extends Controller {
                         $customer = $em->getRepository("IntelligentUserBundle:Customer")->find($customer_id);
                         # Check customer
                         if (!$customer) {
-                            throw new \Exception("Customer with customer_id($body->customer_id) do not exists", 404);
+                            throw new \Exception("Customer with customer_id($customer_id) do not exists", 404);
                         }
                     }
                     // First detach all the customers first
