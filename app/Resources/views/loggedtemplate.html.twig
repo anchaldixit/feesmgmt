@@ -31,7 +31,16 @@ and open the template in the editor.
                             <img src="{{ asset('assets/images/aizan_logo2.png') }}" width="120" alt=""/></a>
                     </div>
                     <ul>
-                        <li><a class="b-btn open-menu" href="#cusomerMenu"><span class="fa fa-user-circle-o"></span>Choose Customer</a>
+                        <li>
+                            {% if app.getUser().getCurrentCustomer() and app.getUser().getCurrentCustomer().getIsActive() %}
+                                <a class="b-btn open-menu" href="#cusomerMenu">
+                                    <span class="fa fa-user-circle-o"></span>{{app.getUser().getCurrentCustomer().getCustomer().getName()}}
+                                </a>
+                            {% else %}
+                                <a class="b-btn open-menu" href="#cusomerMenu">
+                                    <span class="fa fa-user-circle-o"></span>Choose Customer
+                                </a>
+                            {% endif %}
                             <div class="MenuDd" id="cusomerMenu">
                                 <ol>
                                     {% for customer in app.getUser().getAllowedCustomers(true) %}
