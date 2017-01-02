@@ -416,8 +416,10 @@ $.extend(User.prototype, {
         User.role.openPopup('.add-popup');
         User.role.closePopup();
         that.inviteUsers();
-        User.customer.addCustomerInList();
-        User.customer.removeCustomerFromList();
+        User.customer.addCustomerInList('#all_customers2','.added-customer2');
+        User.customer.removeCustomerFromList('#all_customers2','.added-customer2');
+        User.customer.addCustomerInList('#all_customers','.added-customer');
+        User.customer.removeCustomerFromList('#all_customers','.added-customer');
         User.customer.updateAssignedCustomers();
         User.customer.bindCustomerPopup();
 
@@ -784,7 +786,11 @@ $.extend(User.prototype, {
                     html += (_data[index].id == logged_user_id ? '<i class="fa fa-check"></i>' : '');
                     html += '</td>';
                     html += '<td>' + selectbox + '</td>';
-                    html += '<td><span class="assigned_c">' + cust + '</span>&nbsp;&nbsp;<a class="open_popup_customers" data-modal-id="#editCustomers" href="#" data-user-id="' + _data[index].id + '"><i class="fa fa-pencil"></i></a></td>';
+                    html += '<td><span class="assigned_c">' + cust + '</span>&nbsp;&nbsp;';
+                    if (_data[index].id != logged_user_id) {
+                        html += '<a class="open_popup_customers" data-modal-id="#editCustomers" href="#" data-user-id="' + _data[index].id + '"><i class="fa fa-pencil"></i></a>';
+                    }
+                    html += '</td>';
                     html += '<td class="status">' + status + '</td>';
                     html += '<td>' + _data[index].last_login + '</td>';
                     if (_data[index].status == 4)
@@ -821,10 +827,12 @@ $.extend(User.prototype, {
         var email_obj = '';
         var error = '';
         var errDiv = '';
+        var cust_obj = '';
+        var custArr = [];
         $('#invite_users').click(function () {
-
+            
             var useremail = $('#useremail').val();
-
+            
             var selectedrole = $('#selected_role :selected').val();
             if (useremail == '') {
                 error = 'Email field can not empty';
@@ -839,13 +847,26 @@ $.extend(User.prototype, {
                 errDiv = email_obj.next('.validation_msg');
                 errDiv.html(error);
             }
+            else if($('.added-customer2 .cc').length == 0){
+                alert(222);
+                error = 'Please select at least one Customer';
+                var cust_obj = $('.added-customer-outer2');
+                errDiv = cust_obj.next('.validation_msg');
+                errDiv.html(error);
+            }
             else if (selectedrole == 0) {
                 error = 'Please select a Role';
-                role_obj = $('#selected_role');
+                var role_obj = $('#selected_role');
                 errDiv = role_obj.next('.validation_msg');
                 errDiv.html(error);
             }
+            
             else {
+                cust_obj = $('.added-customer2 .cc');
+                cust_obj.each(function(index){
+                    custArr.push(parseInt($(this).attr('data-value')));
+                });
+                //console.log(custArr);
                 var obj = {
                     head: {
                         action: "inviteUsers"
@@ -853,7 +874,8 @@ $.extend(User.prototype, {
                     body: [
                         {
                             email: useremail,
-                            new_role: selectedrole
+                            new_role: selectedrole,
+                            customer_ids: custArr
                         }
                     ]
                 }
@@ -1770,7 +1792,7 @@ $.extend(Customer,{
 $.extend(Customer.prototype,{
     init: function(){
         var that = this;
-        console.log();
+        //console.log();
         if($('.choose-customer').length){
             that.refreshChooseCustomerPage();
         }
@@ -1874,8 +1896,8 @@ $.extend(Customer.prototype,{
         });
         return flag;
     },
-    addCustomerInList: function () {
-        $('#all_customers').change(function () {
+    addCustomerInList: function (_id, _added_customer) {
+        $(_id).change(function () {
             var _val = $(this).val();
             var _text = $(this).find("option:selected").text();
 
@@ -1883,22 +1905,22 @@ $.extend(Customer.prototype,{
                 var html = '';
                 $(this).find("option:selected").attr('disabled', true);
                 html = '<em class="cust_add"><span class="cc" data-value="' + _val + '">' + _text + '</span><i class="fa fa-times remove_customer"></i></em>';
-                if ($('.added-customer .cust_add').length == 0) {
-                    $('.added-customer').html('');
+                if ($(_added_customer+' .cust_add').length == 0) {
+                    $(_added_customer).html('');
                 }
-                $('.added-customer').append(html);
+                $(_added_customer).append(html);
             }
 
         });
     },
-    removeCustomerFromList: function () {
-        $('.added-customer').on('click', '.remove_customer', function () {
+    removeCustomerFromList: function (_id,_added_customer) {
+        $(_added_customer).on('click', '.remove_customer', function () {
             var _custObj = $(this).parent();
             var _custVal = _custObj.find('.cc').attr('data-value');
-            $('#all_customers option[value="' + _custVal + '"]').attr('disabled', false);
+            $(_id+' option[value="' + _custVal + '"]').attr('disabled', false);
             _custObj.remove();
-            if ($('.added-customer .cust_add').length == 0) {
-                $('.added-customer').html('<small>No Customer added for this user</small>');
+            if ($(_added_customer+' .cust_add').length == 0) {
+                $(_added_customer).html('<small>No Customer added for this user</small>');
             }
 
         });
@@ -1908,16 +1930,49 @@ $.extend(Customer.prototype,{
         $('#update_customers').click(function () {
             var _addCust = $('.added-customer .cust_add');
             var _cust = '';
+            var _custArr = [];
             if (_addCust.length) {
                 $.each(_addCust, function () {
                     _cust += $(this).find('.cc').text() + ', ';
+                    _custArr.push(parseInt($(this).find('.cc').attr('data-value')));
                 });
+                
             }
-            _cust = _cust.substring(0, _cust.length - 2);
             var _cc = that._cell;
-            var td = '';
-            td = _cc.parent('td');
-            td.find('.assigned_c').html(_cust);
+            //console.log(_cc);
+            var userId = _cc.attr('data-user-id');
+            _cust = _cust.substring(0, _cust.length - 2);
+            if($.trim(_cust) == ''){
+                _cust = 'No customer added';
+            }
+            var obj = {
+                    head:{
+                        action:"attachMultipleCustomersToUser"
+                    },
+                    body:{
+                        customer_ids:_custArr,
+                        user_id:parseInt(userId)
+                    }
+                }
+            var _obj = JSON.stringify(obj);
+            Customer.user.getAjaxData(User.ajaxLink2,_obj,function(_data){
+                $('#loader').hide();
+                var td = '';
+                td = _cc.parent('td');
+                td.find('.assigned_c').html(_cust);
+                $('.popup-wrapper').hide();
+                var ajax_msg = 'Customers are Assigned with user';
+                $('.info-notice').html(ajax_msg);
+                $('.notify').addClass('n-animation');
+                setTimeout(function () {
+                    $('.notify').removeClass('n-animation');
+                }, 2500);
+            });
+            
+            
+            
+            
+            
         });
     }
 });
