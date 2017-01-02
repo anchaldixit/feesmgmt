@@ -21,8 +21,14 @@
         <div class="choose-customer-outer">
             <h4>Choose a customer to proceed</h4>
             <div class="choose-customer">
+
                 <select id="chooseCustomer">
                     
+                    <option value="">Select Customer</option>
+                    {% for customer in customers %}
+                        <option value="{{customer.id}}">{{customer.name}}</option>
+                    {% endfor %}
+
                 </select>
             </div>
         </div>    
