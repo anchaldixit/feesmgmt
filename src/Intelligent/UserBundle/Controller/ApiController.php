@@ -596,6 +596,7 @@ class ApiController extends Controller {
                         }
                         # If there is no joining object
                         if (is_null($corresponding_allowed_customer)) {
+                            $customer = $em->getRepository("IntelligentUserBundle:Customer")->find($customer_id);
                             $joining_object = new UserAllowedCustomer();
                             $joining_object->setCustomer($customer);
                             $joining_object->setUser($user);
