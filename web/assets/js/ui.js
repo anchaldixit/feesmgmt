@@ -848,7 +848,7 @@ $.extend(User.prototype, {
                 errDiv.html(error);
             }
             else if($('.added-customer2 .cc').length == 0){
-                alert(222);
+                //alert(222);
                 error = 'Please select at least one Customer';
                 var cust_obj = $('.added-customer-outer2');
                 errDiv = cust_obj.next('.validation_msg');
