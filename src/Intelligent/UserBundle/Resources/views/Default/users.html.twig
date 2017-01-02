@@ -87,6 +87,29 @@
                                 </div>
                             </li>
                             <li>
+                                <label>All Customers</label>
+                                <div class="field-wrap">
+                                    <select id="all_customers2">
+                                        <option value="">Select Customer</option>
+                                        {% for customer in app.getUser().getAllowedCustomers(true) %}
+                                            <option value="{{ customer.getCustomer().getId() }}">{{ customer.getCustomer().getName() }}</option>
+                                        {% endfor %}
+                                    </select>
+                                    <span class="validation_msg"></span>
+                                </div>
+                            </li>
+                            <li>
+                                <label>Customers Added</label>
+                                <div class="field-wrap">
+                                <div class="added-customer-outer" style="width:91%; margin-bottom: 10px;">
+
+                                    <div class="added-customer2">
+                                    </div>
+                                </div>
+                                <span class="validation_msg"></span>
+                                </div>
+                            </li>
+                            <li>
                                 <label>Roles</label>
                                 <div class="field-wrap">
                                     <select id="selected_role">
@@ -135,14 +158,14 @@
                                 <div class="added-customer-outer" style="width:91%">
 
                                     <div class="added-customer">
-                                        <em class="cust_add">
+                                        <!--<em class="cust_add">
                                             <span class="cc" data-value="expertise.com">Expertise.com</span>
                                             <i class="fa fa-times remove_customer"></i>
                                         </em>
                                         <em class="cust_add">
                                             <span class="cc" data-value="intelligent.com">Intelligent.com</span>
                                             <i class="fa fa-times remove_customer"></i>
-                                        </em>
+                                        </em>-->
                                     </div>
                                 </div>
                             </li>
