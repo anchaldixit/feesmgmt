@@ -1,35 +1,45 @@
-<li><label>{{field_settings.relationship_module_display_name }} (relationship):</label> 
-    <div class="field-wrap">
-        <div class="ui-widget">
-        <input name="{{field_settings.relationship_field_name}}" id="{{field_settings.relationship_field_name}}"  value="{{data is defined ? data : ''}}" type="text" data-url="{{ path('intelligent_'~field_settings.relationship_module | replace({'_':''}) ~'_autocomplete') }}" data-field="{{field_settings.relationship_module_unique_field}}">
-        </div><br>
-    </div>
-    <script>
+{% if field_settings.relationship_foregin_key is defined %}
+    {# this readonly parameter will only come thru edit relationship.html.twig. Already decided to show field in readonly way#}
+    {% set field_permission = permissions.custom_field[field_settings.module_field_name] %}
+    {% if  (permissions.custom == false or field_permission == 2 )%}
+        {# First display the relationship field foreign key #}
+        <li><label>{{field_settings.relationship_module_display_name }}(relationship){{field_settings.required_field=='Y'?'*':''}}:</label> 
+            <div class="field-wrap">
+                <div class="ui-widget">
+                    <input name="{{field_settings.relationship_field_name}}" id="{{field_settings.relationship_field_name}}"  value="{{data[field_settings.relationship_field_name] is defined ? data[field_settings.relationship_field_name] : ''}}" type="text" data-url="{{ path('intelligent_'~field_settings.relationship_module | replace({'_':''}) ~'_autocomplete') }}" data-field="{{field_settings.relationship_module_unique_field}}">
+                </div><br>
+            </div>
 
-        jQuery(document).ready(function ($) {
-            
-            $( "#{{field_settings.relationship_field_name}}" ).autocomplete({
-      source: function( request, response ) {
-        $.ajax( {
-          url: $( "#{{field_settings.relationship_field_name}}" ).attr('data-url'),
-          dataType: "jsonp",
-          data: {
-            term: request.term,
-            field: $( "#{{field_settings.relationship_field_name}}" ).attr('data-field'),
-            
-    
-          },
-          success: function( data ) {
-            response( data );
-          }
-        } );
-      },
-      minLength: 2,
-      select: function( event, ui ) {
-        //log( "Selected: " + ui.item.value + " aka " + ui.item.id );
-      }
-    } );
+            <script>
 
-        });
-    </script>
-</li>
+                jQuery(document).ready(function ($) {
+
+                    $("#{{field_settings.relationship_field_name}}").autocomplete({
+                        source: function (request, response) {
+                            $.ajax({
+                                url: $("#{{field_settings.relationship_field_name}}").attr('data-url'),
+                                dataType: "jsonp",
+                                data: {
+                                    term: request.term,
+                                    field: $("#{{field_settings.relationship_field_name}}").attr('data-field'),
+                                },
+                                success: function (data) {
+                                    response(data);
+                                }
+                            });
+                        },
+                        minLength: 2,
+                        select: function (event, ui) {
+                            //log( "Selected: " + ui.item.value + " aka " + ui.item.id );
+                        }
+                    });
+
+                });
+            </script>
+        </li>
+    {% endif%}
+{% endif%}
+{% if data[field_settings.module_field_name] is defined and data[field_settings.module_field_name] is not empty%}
+    {# most propably this is edit field required. Relationship had to set yet  #}
+    {{ include('IntelligentModuleBundle:Default:edit/'~field_settings.relationship_field_settings.module_field_datatype~'.html.twig', { 'field_settings': field_settings.relationship_field_settings,'data': data[field_settings.module_field_name] is defined ? data[field_settings.module_field_name] : '' ,'permissions':permissions,'readonly':true}) }}
+{% endif %}

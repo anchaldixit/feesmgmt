@@ -55,6 +55,16 @@
                 $("#filter_form").submit();
 
             });
+            $('.delete-link').on('click', function (event) {
+
+                if (confirm('Are you sure to delete the row?')) {
+
+                    event.stopPropagation();
+                    return true;
+                }
+                return false;
+
+            });
         });
 
     </script>
@@ -167,7 +177,7 @@
                         <td>{{row.display_position}}</td>
                         <td>{{row.enable_filter}}</td>
                         <td>{{row.modified_datetime}}</td>
-                        <td><a href="{{ path('intelligent_setting_edit', {'edit_id': row.id}) }}">view</a> | <a href="{{ path('intelligent_setting_edit', {'edit_id': row.id}) }}">edit</a> | <a href="{{ path('intelligent_setting_delete', {'delete_id': row.id}) }}">delete</a></td>
+                        <td><a href="{{ path('intelligent_setting_edit', {'edit_id': row.id}) }}">view</a> | <a href="{{ path('intelligent_setting_edit', {'edit_id': row.id}) }}">edit</a> | <a href="{{ path('intelligent_setting_delete', {'delete_id': row.id}) }}" class="delete-link">delete</a></td>
                     </tr>
                 {% endfor %}
 

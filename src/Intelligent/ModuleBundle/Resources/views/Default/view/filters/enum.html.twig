@@ -8,7 +8,7 @@
         {% for v in select_values %}
             <li>
                 <input type="radio" name="filter[match][{{field_settings.module_field_name}}]"  value="{{v}}"
-                       {{selected_filters.filter.match[field_settings.module_field_name] is defined and selected_filters.filter.match[field_settings.module_field_name] == v? 'CHECKED':'' }}>
+                       {{selected_filters.filter.match[field_settings.module_field_name] is defined and selected_filters.filter.match[field_settings.module_field_name] == v? 'CHECKED':'' }} class="filter-{{field_settings.module_field_name}}">
                 <label>{{v}}</label> 
             </li>
                 
