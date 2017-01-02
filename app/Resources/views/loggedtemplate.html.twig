@@ -44,7 +44,7 @@ and open the template in the editor.
                             <div class="MenuDd" id="cusomerMenu">
                                 <ol>
                                     {% for customer in app.getUser().getAllowedCustomers(true) %}
-                                        <li><a href="#" data-customer-id="{{ customer.getCustomer().getId() }}">{{ customer.getCustomer().getName() }}</a></li>
+                                        <li><a href="#" data-customer-link-id="{{ customer.getCustomer().getId() }}">{{ customer.getCustomer().getName() }}</a></li>
                                     {% endfor %}
                                 </ol>
                             </div>
