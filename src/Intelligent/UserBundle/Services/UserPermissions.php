@@ -25,18 +25,13 @@ class UserPermissions {
     private $settings;
 
     /**
-     * Role of the current loggedin user
+     * TokenStorage of the current loggedin user
      * 
-     * @var Role
+     * @var TokenStorage
      */
-    private $role;
+    private $tokenStorage;
     
-    /**
-     * Current loggedin user
-     * 
-     * @var User
-     */
-    private $user;
+    
 
     /**
      * Constructor function
@@ -46,9 +41,8 @@ class UserPermissions {
      */
     public function __construct(TokenStorage $tokenStorage, Settings $settings) {
         // Recieve other services
+        $this->tokenStorage = $tokenStorage;
         $this->settings = $settings;
-        $this->user = $tokenStorage->getToken()->getUser();
-        $this->role = $this->user->getRole();
     }
 
     /**
@@ -59,6 +53,14 @@ class UserPermissions {
     public function getSetting() {
         return $this->settings;
     }
+    
+    public function getUser(){
+        return $this->tokenStorage->getToken()->getUser();
+    }
+    
+    public function getRole(){
+        return $this->getUser()->getRole();
+    }
 
     /**
      * This function will tell if the user have permission for
@@ -67,8 +69,8 @@ class UserPermissions {
      * @return bool true if it has permission false if not.
      */
     public function getManageUserAndShareAppPermission() {
-        if ($this->role->getGlobalPermission() instanceof RoleGlobalPermission) {
-            return $this->role->getGlobalPermission()->getManageUserAppPermission();
+        if ($this->getRole()->getGlobalPermission() instanceof RoleGlobalPermission) {
+            return $this->getRole()->getGlobalPermission()->getManageUserAppPermission();
         } else {
             return false;
         }
@@ -81,8 +83,8 @@ class UserPermissions {
      * @return bool true if it has permission false if not.
      */
     public function getEditAppStructurePermission() {
-        if ($this->role->getGlobalPermission() instanceof RoleGlobalPermission) {
-            return $this->role->getGlobalPermission()->getEditAppStructurePermission();
+        if ($this->getRole()->getGlobalPermission() instanceof RoleGlobalPermission) {
+            return $this->getRole()->getGlobalPermission()->getEditAppStructurePermission();
         } else {
             return false;
         }
@@ -96,7 +98,7 @@ class UserPermissions {
      * @return bool true if it has permission false if not
      */
     public function getViewPermission($module) {
-        $modulePermission = $this->role->getSingleModulePermission($module);
+        $modulePermission = $this->getRole()->getSingleModulePermission($module);
         if ($modulePermission instanceof RoleModulePermission) {
             return $modulePermission->getViewPermission();
         } else {
@@ -112,7 +114,7 @@ class UserPermissions {
      * @return bool true if it has permission false if not
      */
     public function getEditPermission($module) {
-        $modulePermission = $this->role->getSingleModulePermission($module);
+        $modulePermission = $this->getRole()->getSingleModulePermission($module);
         if ($modulePermission instanceof RoleModulePermission) {
             return $modulePermission->getModifyPermission();
         } else {
@@ -128,7 +130,7 @@ class UserPermissions {
      * @return bool true if it has permission false if not
      */
     public function getAddPermission($module) {
-        $modulePermission = $this->role->getSingleModulePermission($module);
+        $modulePermission = $this->getRole()->getSingleModulePermission($module);
         if ($modulePermission instanceof RoleModulePermission) {
             return $modulePermission->getAddPermission();
         } else {
@@ -144,7 +146,7 @@ class UserPermissions {
      * @return bool true if it has permission false if not
      */
     public function getDeletePermission($module) {
-        $modulePermission = $this->role->getSingleModulePermission($module);
+        $modulePermission = $this->getRole()->getSingleModulePermission($module);
         if ($modulePermission instanceof RoleModulePermission) {
             return $modulePermission->getDeletePermission();
         } else {
@@ -160,7 +162,7 @@ class UserPermissions {
      * @return bool true if custom access is enabled. false if not
      */
     public function getCustomFieldPermission($module) {
-        $modulePermission = $this->role->getSingleModulePermission($module);
+        $modulePermission = $this->getRole()->getSingleModulePermission($module);
         if ($modulePermission instanceof RoleModulePermission) {
             return $modulePermission->getFieldPermission();
         } else {
@@ -175,7 +177,7 @@ class UserPermissions {
      * @return Intelligent\UserBundle\Entity\Customer
      */
     public function getCurrentViewCustomer(){
-        $current_customer = $this->user->getCurrentCustomer();
+        $current_customer = $this->getUser()->getCurrentCustomer();
         if($current_customer instanceof UserAllowedCustomer){
             if($current_customer->getIsActive()){
                 return $current_customer->getCustomer();;
@@ -198,7 +200,7 @@ class UserPermissions {
     public function getAllFieldPermissions($module,Role $role = null, $userFieldIdAsKey=true) {
         // If no role is given use internal role
         if(is_null($role)){
-            $role = $this->role;
+            $role = $this->getRole();
         }
         $fields_permission = array();
         if ($this->isModuleExists($module)) {
@@ -254,6 +256,29 @@ class UserPermissions {
         }
     }
 
+    /**
+     * This function will tell you if the module is visible
+     * 
+     * @param type $moduleName
+     * @return boolean True if module is visible and false if module is not visible
+     */
+    public function isModuleVisible($moduleName){
+        $field_permissions = $this->getAllFieldPermissions($moduleName);
+        if($field_permissions === false){
+            return false;
+        }
+        // 
+        foreach($field_permissions as $field => $permission){
+            # If any of the field has view/edit permission (1 or 2)
+            if($permission){
+                // Then the module is visible
+                return true;
+            }
+        }
+        // If no field is visible then the module is not visible
+        return false;
+    }
+    
     /**
      * Check is the module with the module name exists
      * 

@@ -13,7 +13,7 @@
     </div>
 {% endblock %}
 {% block custom_feature %}
-    {% if app.getUser().getRole().getGlobalPermission().getManageUserAppPermission() %}
+    {% if is_user_admin() %}
         <div class="custom-feature">
             <a href="#" class="add-popup" data-modal-id="#inviteUsers"><i class="fa fa-user-plus"></i>Share app with new user</a>
             <a href="/roles"><i class="fa fa-user-secret"></i>Manage Roles</a>

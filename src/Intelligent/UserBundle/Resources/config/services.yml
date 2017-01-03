@@ -20,3 +20,9 @@ services:
     success.user_login:
         class: Intelligent\UserBundle\Services\LoginSuccessHandler
         arguments: ["@security.http_utils","@doctrine.orm.entity_manager"]
+    twig.module_permission:
+        class: Intelligent\UserBundle\Extension\UserPermissionExtension
+        arguments: ["@user_permissions"]
+        public: false
+        tags:
+            - { name: twig.extension }

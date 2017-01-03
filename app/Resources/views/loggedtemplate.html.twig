@@ -90,13 +90,15 @@ and open the template in the editor.
                             <span>Home</span>
                         </a>
                     </li>
+                    {% if is_app_admin() %}
                     <li>
                         <a href="/settings/view">
                             <i class="fa fa-gears"></i>
                             <span>Module Settings</span>
                         </a>
                     </li>
-                    {% if app.getUser().getRole().getGlobalPermission().getManageUserAppPermission() %}
+                    {% endif %}
+                    {% if is_user_admin() %}
                         <li>
                             <a href="/users">
                                 <i class="fa fa-user"></i>
@@ -104,48 +106,60 @@ and open the template in the editor.
                             </a>
                         </li>
                     {% endif %}
-                    <li>
+                    {% if is_module_visible('customer') %}
+                    <li> 
                         <a href="/customer/view">
                             <i class="fa fa-users"></i>
                             <span>Customer</span>
                         </a>
                     </li>
+                    {% endif %}
+                    {% if is_module_visible('marketing_projects') %}
                     <li>
                         <a href="/marketingprojects/view">
                             <i class="fa fa-list-alt"></i>
                             <span>Marketing Projects</span>
                         </a>
                     </li>
+                    {% endif %}
                     <li>
                         <a href="#">
                             <i class="fa fa-gears"></i>
                             <span>Initiatives</span>
                         </a>
                     </li>
+                    {% if is_module_visible('campaign') %}
                     <li>
                         <a href="#">
                             <i class="fa fa-bullhorn"></i>
                             <span>Campaign</span>
                         </a>
                     </li>
+                    {% endif %}
+                    {% if is_module_visible('campaign_contacts') %}
                     <li>
                         <a href="#">
                             <i class="fa fa-address-book"></i>
                             <span>Campaign Contacts</span>
                         </a>
                     </li>
+                    {% endif %}
+                    {% if is_module_visible('psuedo_email_accounts') %}
                     <li>
                         <a href="#">
                             <i class="fa fa-envelope"></i>
                             <span>Psuedo Email Accounts</span>
                         </a>
                     </li>
+                    {% endif %}
+                    {% if is_module_visible('assign_psuedo') %}
                     <li>
                         <a href="#">
                             <i class="fa fa-desktop"></i>
                             <span>Assign Psudeo</span>
                         </a>
                     </li>
+                    {% endif %}
                     <li>
                         <a href="#">
                             <i class="fa fa-user-circle "></i>
