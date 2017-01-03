@@ -163,21 +163,25 @@
                 </li>
             </ul>
         </div>
-        {% for type, messages in app.session.flashbag.all() %}
-            {% for message in messages %}
-                {% if type == 'success' %}
-                    <div style="color: green"> {{ message }} </div>
-                {% else %}
-                    <div style="color: red"> {{ message }} </div>
+        <div class="flash">
+            <div class="flash-msg">
+            {% for type, messages in app.session.flashbag.all() %}
+                {% for message in messages %}
+                    {% if type == 'success' %}
+                        <div class="msg green"> {{ message }} </div>
+                    {% else %}
+                        <div class="msg red"> {{ message }} </div>
 
-                {% endif %}
-                {# Or even with css class rendering:
-                  <div class="flash-{{type}}">{{message}}</div>
-                 #}
+                    {% endif %}
+                    {# Or even with css class rendering:
+                      <div class="flash-{{type}}">{{message}}</div>
+                     #}
+                {% endfor %}
             {% endfor %}
-        {% endfor %}
+            </div>
+        </div>
     {% block body %}{% endblock %}
-
+    
 </div>
 {% block footer %}
     <footer class="footer">
