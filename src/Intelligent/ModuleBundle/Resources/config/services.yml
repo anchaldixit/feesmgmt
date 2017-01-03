@@ -2,3 +2,15 @@ services:
 #    intelligent_module.example:
 #        class: Intelligent\ModuleBundle\Example
 #        arguments: ["@service_id", "plain_value", "%parameter%"]
+
+
+    intelligent.customer.module:
+        class: Intelligent\ModuleBundle\Lib\Customer
+        calls: 
+            - [setContainer, [@service_container]]
+            - [init]
+    intelligent.marketing_projects.module:
+        class: Intelligent\ModuleBundle\Lib\Marketingprojects
+        calls: 
+            - [setContainer, [@service_container]]
+            - [init]

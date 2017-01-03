@@ -30,6 +30,24 @@
                 </div>
                 <ul>
                     <li>
+                        {% if app.getUser().getCurrentCustomer() and app.getUser().getCurrentCustomer().getIsActive() %}
+                            <a class="b-btn open-menu" href="#cusomerMenu">
+                                <span class="fa fa-user-circle-o"></span>{{app.getUser().getCurrentCustomer().getCustomer().getName()}}
+                            </a>
+                        {% else %}
+                            <a class="b-btn open-menu" href="#cusomerMenu">
+                                <span class="fa fa-user-circle-o"></span>Choose Customer
+                            </a>
+                        {% endif %}
+                        <div class="MenuDd" id="cusomerMenu">
+                            <ol>
+                                {% for customer in app.getUser().getAllowedCustomers(true) %}
+                                    <li><a href="#" data-customer-link-id="{{ customer.getCustomer().getId() }}">{{ customer.getCustomer().getName() }}</a></li>
+                                    {% endfor %}
+                            </ol>
+                        </div>
+                    </li>
+                    <li>
                         <a class="b-btn profile open-menu" href="#user_popup"><span class="fa fa-user"></span>{{ app.user.getName() }}<span class="fa-rt fa fa-caret-down"></span></a>
                         <div class="PopMenu" id="user_popup">
                             <ul>

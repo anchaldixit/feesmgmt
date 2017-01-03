@@ -9,7 +9,6 @@
 namespace Intelligent\ModuleBundle\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
-//use Intelligent\ModuleBundle\Lib\Marketingprojects;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Session\Session;
@@ -48,17 +47,14 @@ abstract class ModulebaseController extends Controller {
 
         $this->initPermissionsDetails();
         
-        $this->initRowAccessPermission();
+        //$this->initRowAccessPermission();
         
         if ($this->noAccess('view')) {
             return $this->render('IntelligentUserBundle:Default:noaccess.html.twig', array());
         }
 
-        $conn = $this->get('database_connection');
-        #echo get_class($conn);
-        #$module = new Marketingprojects($conn);
-        $class = "Intelligent\\ModuleBundle\\Lib\\{$this->module_classname}";
-        $module = new $class($conn);
+        $module = $this->get("intelligent.{$this->module_name}.module");
+
 
         $module_display_name = $module->module_settings->getModule($this->module_name);
 
@@ -147,7 +143,6 @@ abstract class ModulebaseController extends Controller {
             'permissions' => $this->permissions
         );
 
-
         return $this->render('IntelligentModuleBundle:Default:edit.html.twig', $parameters);
     }
 
@@ -155,17 +150,18 @@ abstract class ModulebaseController extends Controller {
 
 
         $this->initPermissionsDetails();
-        $this->initRowAccessPermission();
+        //$this->initRowAccessPermission();
         
         if ($this->noAccess('view')) {
             return $this->noAccessPage();
         }
 
-        $conn = $this->get('database_connection');
+                
+        $module = $this->get("intelligent.{$this->module_name}.module");
 
         $request = Request::createFromGlobals();
-        $class = "Intelligent\\ModuleBundle\\Lib\\{$this->module_classname}";
-        $module = new $class($conn);
+        //$class = "Intelligent\\ModuleBundle\\Lib\\{$this->module_classname}";
+        //$module = new $class($conn);
 
         $module_display_name = $module->module_settings->getModule($this->module_name);
 
@@ -401,7 +397,11 @@ abstract class ModulebaseController extends Controller {
             }
         return $final;
     }
-        function initRowAccessPermission() {
+        
+    /*
+     * NOt in use
+     */
+    function initRowAccessPermission() {
         
         $user_permission = $this->get("user_permissions");
         $active_customer_filter = $user_permission->getCurrentViewCustomer()->getId();
