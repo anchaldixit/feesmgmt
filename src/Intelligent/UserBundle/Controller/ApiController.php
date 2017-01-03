@@ -588,50 +588,9 @@ class ApiController extends Controller {
 
             if (isset($body->user_id) && isset($body->customer_ids)) {
                 if (is_array($body->customer_ids)) {
-                    $em = $this->getDoctrine()->getManager();
-                    # Get role
-                    $user = $em->getRepository("IntelligentUserBundle:User")->find($body->user_id);
-                    # Check role
-                    if (!$user) {
-                        throw new \Exception("User with user_id($body->user_id) do not exists", 404);
-                    }
-                    // Check all the customer ids
-                    foreach($body->customer_ids as $customer_id){
-                        # Get customer
-                        $customer = $em->getRepository("IntelligentUserBundle:Customer")->find($customer_id);
-                        # Check customer
-                        if (!$customer) {
-                            throw new \Exception("Customer with customer_id($customer_id) do not exists", 404);
-                        }
-                    }
-                    // First detach all the customers first
-                    $allowed_customers = $user->getAllowedCustomers();
-                    foreach ($allowed_customers as $allowed_customer) {
-                        $allowed_customer->setIsActive(FALSE);
-                    }
-                    // Now allow only the one which is needed
-                    foreach($body->customer_ids as $customer_id){
-                        # Check if the customer is already attached to the role
-                        $corresponding_allowed_customer = null;
-                        foreach ($allowed_customers as $allowed_customer) {
-                            if ($customer_id == $allowed_customer->getCustomer()->getId()) {
-                                $corresponding_allowed_customer = $allowed_customer;
-                                break;
-                            }
-                        }
-                        # If there is no joining object
-                        if (is_null($corresponding_allowed_customer)) {
-                            $customer = $em->getRepository("IntelligentUserBundle:Customer")->find($customer_id);
-                            $joining_object = new UserAllowedCustomer();
-                            $joining_object->setCustomer($customer);
-                            $joining_object->setUser($user);
-                            $joining_object->setIsActive(TRUE);
-                            $em->persist($joining_object);
-                        } else {
-                            $corresponding_allowed_customer->setIsActive(TRUE);
-                        }
-                    }
-                    $em->flush();
+                    // Now finally attach these customers to this user.
+                    $this->get('user_customers')->attachCustomersToUser($body->customer_ids, $body->user_id)->flush();
+                    // Send success
                     return $this->_handleSuccessfulRequest();
                 }else{
                     throw new \Exception("customer_ids is not an array", 412);
@@ -654,33 +613,12 @@ class ApiController extends Controller {
      * @throws \Exception
      */
     private function changeUserAssignedCustomer(Request $request, $json) {
-        $user = $this->getUser();
         $body = $json->body;
         if (isset($body->customer_id)) {
-            $em = $this->getDoctrine()->getManager();
-
-            $customer = $em->getRepository("IntelligentUserBundle:Customer")->find($body->customer_id);
-            if ($customer) {
-                $allowed_customers = $user->getAllowedCustomers(true);
-                # Check if the current customer is in the allowed list or not
-                $required_allowed_customer = null;
-                foreach ($allowed_customers as $allowed_customer) {
-                    if ($allowed_customer->getCustomer()->getId() == $body->customer_id) {
-                        $required_allowed_customer = $allowed_customer;
-                        break;
-                    }
-                }
-
-                if (is_null($required_allowed_customer)) {
-                    throw new \Exception("This customer is not in user's role list", 412);
-                } else {
-                    $user->setCurrentCustomer($required_allowed_customer);
-                    $em->flush();
-                    return $this->_handleSuccessfulRequest();
-                }
-            } else {
-                throw new \Exception("Customer with customer_id($body->customer_id) not found", 404);
-            }
+            # Attach customer
+            $this->get('user_customers')->changeUserAssignedCustomer($body->customer_id)->flush();
+            # Send success response
+            return $this->_handleSuccessfulRequest();
         } else {
             throw new \Exception("customer_id is not set in request json", 412);
         }

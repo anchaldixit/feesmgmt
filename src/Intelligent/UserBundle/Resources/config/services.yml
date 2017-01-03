@@ -14,6 +14,9 @@ services:
     user_permissions:
         class: Intelligent\UserBundle\Services\UserPermissions
         arguments: ["@security.token_storage","@module_settings"]
+    user_customers:
+        class: Intelligent\UserBundle\Services\UserCustomers
+        arguments: ["@user_permissions","@doctrine.orm.entity_manager"]
     entry_point.user_login:
         class: Intelligent\UserBundle\Services\LoginEntryPoint
         arguments: ["@router"]
