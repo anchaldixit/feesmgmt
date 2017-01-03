@@ -18,6 +18,8 @@ class Customer extends Module {
 
         $this->table = 'customer';
         $this->module = 'customer';
+        $this->row_filter_enabled = false;
+
     }
 
 

@@ -47,6 +47,9 @@ abstract class ModulebaseController extends Controller {
 
 
         $this->initPermissionsDetails();
+        
+        $this->initRowAccessPermission();
+        
         if ($this->noAccess('view')) {
             return $this->render('IntelligentUserBundle:Default:noaccess.html.twig', array());
         }
@@ -107,10 +110,13 @@ abstract class ModulebaseController extends Controller {
 
                     $result = $module->getRow($edit_id);
                     $id = $edit_id;
+                    
+                    
 
-                    if (empty($result)) {
+                    if (!count($result['row'])) {
                         //@todo: just for testing, redirect to listing page
-                        throw new \Exception('Invalid Edit Request', '011');
+                        $this->get('session')->getFlashBag()->add('error', "Invalid URL/Access");
+                        return $this->redirectToRoute("intelligent_{$this->module_route_identifier}_view");
                     }
                 } else {
                     //new item, display empty form
@@ -131,7 +137,7 @@ abstract class ModulebaseController extends Controller {
         $all_users = $this->getUsers();
 
         //var_dump($result);exit;
-        $parameters = array('data' => isset($result['row']) ? $result['row'][0] : array(),
+        $parameters = array('data' => isset($result['row'][0]) ? $result['row'][0] : array(),
             'schema' => $result['schema'],
             'id' => $id,
             'users' => $all_users,
@@ -149,6 +155,8 @@ abstract class ModulebaseController extends Controller {
 
 
         $this->initPermissionsDetails();
+        $this->initRowAccessPermission();
+        
         if ($this->noAccess('view')) {
             return $this->noAccessPage();
         }
@@ -393,5 +401,16 @@ abstract class ModulebaseController extends Controller {
             }
         return $final;
     }
+        function initRowAccessPermission() {
+        
+        $user_permission = $this->get("user_permissions");
+        $active_customer_filter = $user_permission->getCurrentViewCustomer()->getId();
+        
+        $session = new Session();
+        
+        $session->set('active_customer_filter', $active_customer_filter);
+        
+    }
+
 
 }

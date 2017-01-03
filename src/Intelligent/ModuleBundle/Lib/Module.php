@@ -9,6 +9,7 @@
 namespace Intelligent\ModuleBundle\Lib;
 
 use Intelligent\SettingBundle\Lib\Settings;
+use Symfony\Component\HttpFoundation\Session\Session;
 
 class Module {
 
@@ -20,8 +21,8 @@ class Module {
     private $last_sql_withoutlimit; //sql will be store in case total number of count need to be fetched
     private $last_sql_withoutlimit_params; //store the parameters for $last_sql_withoutlimit variable sql
     private $db_manager;
-
-    function __construct($conn) {
+    protected $row_filter_enabled = true;
+                function __construct($conn) {
 
         $this->db = $conn;
 
@@ -113,6 +114,10 @@ class Module {
         $data = $this->validateAndSet($post_data, 'save');
 
         $data['modified_datetime'] = date("Y-m-d H:i:s");
+        
+        if($this->row_filter_enabled){
+            $data = $this->addViewAccessCondition($data);
+        }
 
         $this->db->insert(
                 $this->table, $data
@@ -167,6 +172,8 @@ class Module {
      */
 
     function delete($delete_id) {
+        
+        
         $respid = $this->db->delete("{$this->table}", array('id' => $delete_id));
         return $respid;
     }
@@ -325,8 +332,10 @@ class Module {
                 $fieldset[] = "{$row['module']}.{$row['module_field_name']}";
             }
         }
+        
+        $filters = $this->addViewAccessCondition(array('id' => $id));
 
-        $result = $this->fetch($fieldset, array('id' => $id), $join);
+        $result = $this->fetch($fieldset, $filters, $join);
 
         return array('schema' => $module_field_set, 'row' => $result);
 
@@ -360,6 +369,8 @@ class Module {
             }
         }
         $fieldset[] = "{$this->table}.modified_datetime";
+        
+        $where = $this->addViewAccessCondition($where);
 
         $result = $this->fetch($fieldset, $where, $join, $order_by, $limit);
 
@@ -465,6 +476,21 @@ class Module {
     }
 
     function afterSave($data) {
+        
+    }
+    function addViewAccessCondition($params){
+        
+        $session = new Session();
+        
+        $val = $session->get('active_customer_filter');
+
+        if($this->module !='customer' and !empty($val) ){
+            $params = array_merge($params, array('linked_customer_id'=>$val));
+        }elseif($this->module =='customer'){
+            $params = array_merge($params, array('id'=>$val));
+        }
+        
+        return $params;
         
     }
 
