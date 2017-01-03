@@ -586,9 +586,36 @@ input[type="submit"],input[type="button"]{
             li{
                 list-style: none;
                 margin-left:8px;
+                margin-bottom: 5px;
+                overflow:hidden;
                 label{
                     font-size: 13px;
                     margin-left: 8px;
+                    float: left;
+                    line-height: 16px;
+                    width: 77%;
+                }
+                select{
+                    width: 94%;
+                }
+                input[type="radio"],input[type="checkbox"]{
+                    float: left;
+                    margin-top: 0;
+                }
+                input[type="text"]{
+                    width:88%;
+                    padding:4px 5px;
+                    &:focus{
+                        outline: none;
+                    }
+                }
+                input[type="submit"]{
+                    width: 35px;
+                    background-color: #5aa3ff;
+                    border: 0px solid;
+                    padding: 3px 0 5px 0;
+                    margin-top: 10px;
+                    border-radius: 4px;
                 }
             }
         }
@@ -931,7 +958,7 @@ input[type="submit"],input[type="button"]{
         border-bottom:1px solid #c1c1c1;
     }
     .form-control{
-        width: 650px;
+        width: 750px;
         margin: 50px auto;
         background:#f4f4f4;
 
@@ -950,6 +977,7 @@ input[type="submit"],input[type="button"]{
                     font-weight: 400;
                     line-height: 20px;
                     padding-top: 8px;
+                    padding-right: 15px;
                 }
                 .field-wrap{
                     width: 65%;
@@ -962,6 +990,17 @@ input[type="submit"],input[type="button"]{
                         font-size: 16px;
                         line-height: 20px;
 
+                        &:focus{
+                            outline: none;
+                            border:1px solid #5aa3ff;
+                        }
+                    }
+                    textarea{
+                        width: 100%;
+                        padding: 8px 2%;
+                        border:1px solid #dadbdd;
+                        font-size: 16px;
+                        line-height: 20px;
                         &:focus{
                             outline: none;
                             border:1px solid #5aa3ff;
@@ -986,7 +1025,7 @@ input[type="submit"],input[type="button"]{
                         vertical-align: middle;
                         font-size: 16px;
                         line-height: 20px;
-                        width: 407px;
+                        width: 465px;
                         border:1px solid #dadbdd;
                         overflow: hidden;
                         color: #000;
@@ -1045,7 +1084,12 @@ input[type="submit"],input[type="button"]{
                         font-size: 16px;
                         line-height: 20px;
                     }
-
+                    
+                    small,#fieldname_edit{
+                        display: block;
+                        margin-top: 5px;
+                        font-size: 12px;
+                    }
                 }
                 .check-wrap{
                     padding-top: 10px;
@@ -1505,5 +1549,60 @@ input[type="submit"],input[type="button"]{
                 color: #999797;
             }
         }
+    }
+}
+.selected_fitlers_container{
+    .selected_filter{
+        font-style: normal;
+        font-weight: 400;
+        background-color: #f5f5f5;
+        border: 1px solid #d9d9d9;
+        border-radius: 3px;
+        -webkit-border-radius: 3px;
+        -ms-border-radius: 3px;
+        -o-border-radius: 3px;
+        padding: 4px 10px;
+        margin-right: 10px;
+        margin-bottom: 8px;
+        display: inline-block;
+        font-size: 13px;
+        margin-left:0px;
+        span{
+            font-size: 10px;
+            background: #e6e8e6;
+            padding: 3px 5px;
+            border-radius: 50%;
+            text-align: center;
+            display: inline-block;
+            margin-left: 5px;
+            cursor: pointer;
+        }
+    }
+}
+.paging{
+    padding:15px 0;
+    a,span{
+        background-color: #393939;
+        color:#fff;
+        display: inline-block;
+        padding: 3px 6px;
+        margin-right: 5px;
+        text-decoration: none;
+    }
+    span{
+        background: #cacaca;
+        color: #393939;
+    }
+    
+}
+.flash{
+    position:relative;
+    height:0;
+    width: 750px;
+    margin: 0 auto;
+    .flash-msg{
+        position: absolute;
+        top:50px;
+        left:0px;
     }
 }

@@ -633,20 +633,21 @@ $.extend(User.prototype, {
             var order_type = $(this).attr('data-order-type');
             $('#userList .sort_table').each(function () {
                 var _orderType = $(this).attr('data-order-type');
+                
                 if (_orderType != 'desc') {
-                    $(this).find('.fa').removeClass('fa-caret-up').addClass('fa-caret-down');
+                    $(this).find('.fa').removeClass('fa-caret-down').removeClass('fa-caret-up').addClass('fa-sort');
                     $(this).removeClass('active_sort');
                     $(this).attr('data-order-type', 'asc');
                 }
             });
 
             if (order_type == 'asc') {
-                $(this).find('.fa').addClass('fa-caret-down').removeClass('fa-caret-up');
+                $(this).find('.fa').addClass('fa-caret-down').removeClass('fa-sort');
                 $(this).attr('data-order-type', 'desc');
                 $(this).addClass('active_sort');
             }
             else {
-                $(this).find('.fa').removeClass('fa-caret-down').addClass('fa-caret-up');
+                $(this).find('.fa').removeClass('fa-sort').addClass('fa-caret-up');
                 $(this).attr('data-order-type', 'asc');
                 $(this).addClass('active_sort');
             }
