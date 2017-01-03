@@ -12,14 +12,11 @@ use Intelligent\ModuleBundle\Lib\Module;
 
 class Marketingprojects extends Module {
 
-    function __construct($conn) {
 
-        parent::__construct($conn);
-
+    public function _init() {
+        
         $this->table = 'marketing_projects';
         $this->module = 'marketing_projects';
     }
-
-
 
 }

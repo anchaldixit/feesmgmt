@@ -10,18 +10,16 @@ namespace Intelligent\ModuleBundle\Lib;
 
 use Intelligent\ModuleBundle\Lib\Module;
 
+//use Symfony\Component\DependencyInjection\;
+
+
 class Customer extends Module {
 
-    function __construct($conn) {
-
-        parent::__construct($conn);
-
+    function _init() {
+        
         $this->table = 'customer';
         $this->module = 'customer';
         $this->row_filter_enabled = false;
-
     }
-
-
 
 }

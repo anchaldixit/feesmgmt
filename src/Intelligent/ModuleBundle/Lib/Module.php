@@ -10,8 +10,9 @@ namespace Intelligent\ModuleBundle\Lib;
 
 use Intelligent\SettingBundle\Lib\Settings;
 use Symfony\Component\HttpFoundation\Session\Session;
+use Symfony\Component\DependencyInjection\ContainerAware;
 
-class Module {
+abstract class Module extends ContainerAware {
 
     var $db;
     protected $table;
@@ -22,18 +23,31 @@ class Module {
     private $last_sql_withoutlimit_params; //store the parameters for $last_sql_withoutlimit variable sql
     private $db_manager;
     protected $row_filter_enabled = true;
-                function __construct($conn) {
 
-        $this->db = $conn;
 
-        $this->module_settings = new Settings($conn);
-
-        $this->initModuleSettings();
-    }
-
-    function initModuleSettings() {
+    /*
+     * Leave the construct blank, dont remove
+     */
+    function __construct() {
         
     }
+
+    /*
+     * Function will be called thru service
+     */
+    function init() {
+        
+        $this->db = $this->container->get('database_connection');
+        $this->module_settings = new Settings($this->db);
+        
+        $this->_init();
+    }
+    
+    abstract function _init();
+
+
+
+
 
     /*
      * 
@@ -65,11 +79,11 @@ class Module {
                     //range bound condtion
                     if (isset($value['min']) and ! empty($value['min'])) {
                         $arr_where[] = " $column >= ?";
-                         $params[] = strstr($value['min'],'/')===false ? $value['min']: date('Y-m-d',  strtotime($value['min']));
+                        $params[] = strstr($value['min'], '/') === false ? $value['min'] : date('Y-m-d', strtotime($value['min']));
                     }
                     if (isset($value['max']) and ! empty($value['max'])) {
                         $arr_where[] = " $column <= ?";
-                        $params[] = strstr($value['max'],'/')===false ? $value['max']: date('Y-m-d',  strtotime($value['max']));
+                        $params[] = strstr($value['max'], '/') === false ? $value['max'] : date('Y-m-d', strtotime($value['max']));
                     }
                 } else {
                     $arr_where[] = " {$this->table}.$column=?";
@@ -114,8 +128,8 @@ class Module {
         $data = $this->validateAndSet($post_data, 'save');
 
         $data['modified_datetime'] = date("Y-m-d H:i:s");
-        
-        if($this->row_filter_enabled){
+
+        if ($this->row_filter_enabled) {
             $data = $this->addViewAccessCondition($data);
         }
 
@@ -172,8 +186,8 @@ class Module {
      */
 
     function delete($delete_id) {
-        
-        
+
+
         $respid = $this->db->delete("{$this->table}", array('id' => $delete_id));
         return $respid;
     }
@@ -213,10 +227,10 @@ class Module {
                                 $error[] = "$field_display_name crossed the character limit of {$field_schema['varchar_limit']}.";
                             }
                             break;
-                        case 'percentage':    
+                        case 'percentage':
                         case 'currency':
 
-                            if (!empty($field_value) and !is_numeric($field_value)) {
+                            if (!empty($field_value) and ! is_numeric($field_value)) {
                                 $error[] = "$field_display_name should be a number.";
                             } else {
                                 $field_value = round($field_value, 2);
@@ -229,7 +243,7 @@ class Module {
                         case 'decimal':
                         case 'number':
 
-                            if (!empty($field_value) and !is_numeric($field_value)) {
+                            if (!empty($field_value) and ! is_numeric($field_value)) {
                                 $error[] = "$field_display_name should be a number.";
                             }
                             break;
@@ -332,7 +346,7 @@ class Module {
                 $fieldset[] = "{$row['module']}.{$row['module_field_name']}";
             }
         }
-        
+
         $filters = $this->addViewAccessCondition(array('id' => $id));
 
         $result = $this->fetch($fieldset, $filters, $join);
@@ -369,7 +383,7 @@ class Module {
             }
         }
         $fieldset[] = "{$this->table}.modified_datetime";
-        
+
         $where = $this->addViewAccessCondition($where);
 
         $result = $this->fetch($fieldset, $where, $join, $order_by, $limit);
@@ -478,20 +492,26 @@ class Module {
     function afterSave($data) {
         
     }
-    function addViewAccessCondition($params){
-        
-        $session = new Session();
-        
-        $val = $session->get('active_customer_filter');
 
-        if($this->module !='customer' and !empty($val) ){
-            $params = array_merge($params, array('linked_customer_id'=>$val));
-        }elseif($this->module =='customer'){
-            $params = array_merge($params, array('id'=>$val));
+    /*
+     * Function will add the row level condition to $parameters. Currently scope is restricted to customer level view.
+     * @param: Array
+     */
+    function addViewAccessCondition($params) {
+
+        //$session = new Session();
+
+        //$val = $session->get('active_customer_filter');
+        $user_permission = $this->container->get("user_permissions");
+        $val = $user_permission->getCurrentViewCustomer()->getId();
+
+        if ($this->module != 'customer' and ! empty($val)) {
+            $params = array_merge($params, array('linked_customer_id' => $val));
+        } elseif ($this->module == 'customer') {
+            $params = array_merge($params, array('id' => $val));
         }
-        
+
         return $params;
-        
     }
 
 }
