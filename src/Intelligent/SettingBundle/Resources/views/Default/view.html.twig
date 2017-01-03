@@ -137,17 +137,17 @@
 
                 {% if selected_filters.filter.text.module_field_display_name is defined and  selected_filters.filter.text.module_field_display_name is not empty%}
                     <div class="selected_filter">
-                        Field name like {{selected_filters.filter.text.module_field_display_name}} <span data-resetfilter="module_field_display_name">X</span> 
+                        <small>Field name like {{selected_filters.filter.text.module_field_display_name}}</small> <span data-resetfilter="module_field_display_name">X</span> 
                     </div>
                 {% endif %}
                 {% if selected_filters.filter.match.module is defined%}
                     <div class="selected_filter" >
-                        Module: {{modules[selected_filters.filter.match.module]}}  <span data-resetfilter="module">X</span> 
+                        <small><b>Module:</b> {{modules[selected_filters.filter.match.module]}} </small> <span data-resetfilter="module">X</span> 
                     </div>
                 {% endif %}
                 {% if selected_filters.filter.match.module_field_datatype is defined%}
                     <div class="selected_filter" >
-                        DataType: {{datatypes[selected_filters.filter.match.module_field_datatype]}}  <span data-resetfilter="module_field_datatype">X</span> 
+                        <small><b> DataType:</b> {{datatypes[selected_filters.filter.match.module_field_datatype]}} </small> <span data-resetfilter="module_field_datatype">X</span> 
                     </div>
                 {% endif %}
                 {% if selected_filters.sort is defined and  selected_filters.sort is not empty%}
