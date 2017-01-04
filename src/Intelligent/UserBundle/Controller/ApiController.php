@@ -523,47 +523,10 @@ class ApiController extends Controller {
             $body = $json->body;
 
             if (isset($body->user_id) && isset($body->customer_id) && isset($body->value)) {
-                $em = $this->getDoctrine()->getManager();
-                # Get role
-                $user = $em->getRepository("IntelligentUserBundle:User")->find($body->user_id);
-                # Check role
-                if (!$user) {
-                    throw new \Exception("User with user_id($body->user_id) do not exists", 404);
-                }
-                # Get customer
-                $customer = $em->getRepository("IntelligentUserBundle:Customer")->find($body->customer_id);
-                # Check customer
-                if (!$customer) {
-                    throw new \Exception("Customer with customer_id($body->customer_id) do not exists", 404);
-                }
-
-                $allowed_customers = $user->getAllowedCustomers();
-                # Check if the customer is already attached to the role
-                $corresponding_allowed_customer = null;
-                foreach ($allowed_customers as $allowed_customer) {
-                    if ($body->customer_id == $allowed_customer->getCustomer()->getId()) {
-                        $corresponding_allowed_customer = $allowed_customer;
-                        break;
-                    }
-                }
-                # If there is no joining object
-                if (is_null($corresponding_allowed_customer)) {
-                    $joining_object = new UserAllowedCustomer();
-                    $joining_object->setCustomer($customer);
-                    $joining_object->setUser($user);
-                    $joining_object->setIsActive($body->value);
-                    $em->persist($joining_object);
-                } else {
-                    $is_active = $corresponding_allowed_customer->getIsActive();
-                    if (!$is_active && !$body->value) {
-                        throw new \Exception("Customer is already detached", 412);
-                    } else if ($body->value && $is_active) {
-                        throw new \Exception("Customer is already attached", 412);
-                    } else {
-                        $corresponding_allowed_customer->setIsActive($body->value);
-                    }
-                }
-                $em->flush();
+                # Attach customers
+                $this->get('user_customers')
+                        ->attachCustomerToUser($body->customer_id,$body->value,$body->user_id)->flush();
+                # Send successful response
                 return $this->_handleSuccessfulRequest();
             } else {
                 throw new \Exception("user_id, customer_id or value not set in request json", 412);
@@ -615,7 +578,7 @@ class ApiController extends Controller {
     private function changeUserAssignedCustomer(Request $request, $json) {
         $body = $json->body;
         if (isset($body->customer_id)) {
-            # Attach customer
+            # Attach customers
             $this->get('user_customers')->changeUserAssignedCustomer($body->customer_id)->flush();
             # Send success response
             return $this->_handleSuccessfulRequest();

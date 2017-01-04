@@ -23,7 +23,8 @@ class UserCustomers {
     }
 
     /**
-     * This function will attach all the customer to a user 
+     * This function will attach all the customer to a user and detach the
+     * previous ones
      * 
      * @param array $customerIds ids of all customers to be attched
      * @param mixed $user id or the user, User entity object or just null
@@ -85,6 +86,64 @@ class UserCustomers {
         }
         return $this;
     }
+    
+    /**
+     * This function will attach or detach a customer 
+     * from a user
+     * 
+     * @param int $customerId
+     * @param Boolean $attach
+     * @param User $user
+     * @return \Intelligent\UserBundle\Services\UserCustomers
+     * @throws \Exception
+     */
+    public function attachCustomerToUser($customerId, $attach = true, $user = null) {
+        $em = $this->em;
+        if (is_null($user)) {
+            $user = $this->permission->getUser();
+        } else if (is_numeric($user)) {
+            # Get user
+            $user = $em->getRepository("IntelligentUserBundle:User")->find($user);
+            # Check user
+            if (!$user) {
+                throw new \Exception("User with user_id($user) do not exists", 404);
+            }
+        } else if ($user instanceof User) {
+            // User supplied is good
+        } else {
+            throw new \Exception("User is illegal", 412);
+        }
+
+        # Get customer
+        $customer = $em->getRepository("IntelligentUserBundle:Customer")->find($customerId);
+        # Check customer
+        if (!$customer) {
+            throw new \Exception("Customer with customer_id($customerId) do not exists", 404);
+        }
+        
+        // Get all attached customers now and back 
+        $allowed_customers = $user->getAllowedCustomers();
+        
+        # Check if the customer is already attached sometime back
+        $corresponding_allowed_customer = null;
+        foreach ($allowed_customers as $allowed_customer) {
+            if ($customerId == $allowed_customer->getCustomer()->getId()) {
+                $corresponding_allowed_customer = $allowed_customer;
+                break;
+            }
+        }
+        # If there is no joining object and $attach is true
+        if (is_null($corresponding_allowed_customer) && $attach) {
+            $joining_object = new UserAllowedCustomer();
+            $joining_object->setCustomer($customer);
+            $joining_object->setUser($user);
+            $joining_object->setIsActive($attach);
+            $em->persist($joining_object);
+        } else if(!is_null($corresponding_allowed_customer) && $corresponding_allowed_customer->getIsActive() != $attach){
+            $corresponding_allowed_customer->setIsActive($attach);
+        }
+        return $this;
+    }
 
     /**
      * This function will make a default customer for current user
@@ -128,7 +187,7 @@ class UserCustomers {
      * @throws \Exception if underlying functions throw exceptions
      */
     public function assignCustomerAndMakeDefault($customerId){
-        $this->attachCustomersToUser(array($customerId))
+        $this->attachCustomerToUser($customerId)
                 ->flush()
                 ->changeUserAssignedCustomer($customerId)
                 ->flush();
