@@ -296,6 +296,11 @@ class Settings {
         } else {
             $data['enable_filter'] = $post_data['enable_filter'];
         }
+        if (empty($post_data['enable_filter_with_option'])) {
+            $error[] = "Enable filter with option cannot be empty";
+        } else {
+            $data['enable_filter_with_option'] = $post_data['enable_filter_with_option'];
+        }
 
         if (empty($post_data['show_in_grid'])) {
             $error[] = "Show in Grid field cannot be empty";

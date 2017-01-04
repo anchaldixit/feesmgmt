@@ -31,7 +31,8 @@ class DefaultController extends Controller {
 
         $request = Request::createFromGlobals();
         $id = null;
-
+        
+        
 
         try {
             if ($request->isMethod('POST')) {//Result submited
@@ -43,7 +44,7 @@ class DefaultController extends Controller {
 
                     $id = $settings->save($post);
                     $this->get('session')->getFlashBag()->add('success', "Row added successfully.");
-                    return $this->redirectToRoute('intelligent_setting_edit', array('edit_id' => $id));
+                    return $this->redirectToRoute('intelligent_setting_edit', array_merge($request->query->all(), array('edit_id' => $id)));
                 } else {
 
                     if (!empty($request->request->get('delete_submit'))) {
@@ -51,12 +52,12 @@ class DefaultController extends Controller {
                         $settings->delete($request->request->get('id'));
                         //@todo: redirect should be done 
                         $this->get('session')->getFlashBag()->add('success', "Row Deleted Successfully.");
-                        return $this->redirectToRoute('intelligent_setting_view');
+                        return $this->redirectToRoute('intelligent_setting_view',$request->query->all());
                     } else {//update
                         $id = $edit_id;
                         $settings->update($post);
                         $this->get('session')->getFlashBag()->add('success', "Row Updated successfully.");
-                        return $this->redirectToRoute('intelligent_setting_edit', array('edit_id' => $edit_id));
+                        return $this->redirectToRoute('intelligent_setting_edit', array_merge($request->query->all(), array('edit_id' => $id)));
                     }
                 }
                 $id = is_numeric($edit_id) ? $edit_id : null;
