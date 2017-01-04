@@ -14,3 +14,13 @@ services:
         calls: 
             - [setContainer, [@service_container]]
             - [init]
+    intelligent.initiative.module:
+        class: Intelligent\ModuleBundle\Lib\Initiative
+        calls: 
+            - [setContainer, [@service_container]]
+            - [init]
+    intelligent.campaign.module:
+        class: Intelligent\ModuleBundle\Lib\Campaign
+        calls: 
+            - [setContainer, [@service_container]]
+            - [init]

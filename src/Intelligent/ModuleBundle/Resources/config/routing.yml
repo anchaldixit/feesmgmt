@@ -22,3 +22,27 @@ intelligent_marketingprojects_view:
 intelligent_marketingprojects_autocomplete:
     path:     /marketingprojects/autocomplete
     defaults: { _controller: IntelligentModuleBundle:Marketingprojects:autocomplete }
+intelligent_initiative:
+    path:     /initiative
+    defaults: { _controller: IntelligentModuleBundle:Initiative:index }
+intelligent_initiative_edit:
+    path:     /initiative/edit/{edit_id}
+    defaults: { _controller: IntelligentModuleBundle:Initiative:edit }
+intelligent_initiative_view:
+    path:     /initiative/view/{page_no}
+    defaults: { _controller: IntelligentModuleBundle:Initiative:view , page_no: 1 }
+intelligent_initiative_autocomplete:
+    path:     /initiative/autocomplete
+    defaults: { _controller: IntelligentModuleBundle:Initiative:autocomplete }
+intelligent_campaign:
+    path:     /campaign
+    defaults: { _controller: IntelligentModuleBundle:Campaign:index }
+intelligent_campaign_edit:
+    path:     /campaign/edit/{edit_id}
+    defaults: { _controller: IntelligentModuleBundle:Campaign:edit }
+intelligent_campaign_view:
+    path:     /campaign/view/{page_no}
+    defaults: { _controller: IntelligentModuleBundle:Campaign:view , page_no: 1 }
+intelligent_campaign_autocomplete:
+    path:     /campaign/autocomplete
+    defaults: { _controller: IntelligentModuleBundle:Campaign:autocomplete }
