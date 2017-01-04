@@ -74,6 +74,7 @@ abstract class ModulebaseController extends Controller {
                     $id = $module->save($post);
 
                     $this->get('session')->getFlashBag()->add('success', "Row added successfully.");
+                    $this->_afterSaveEvent($id);
                     return $this->redirectToRoute("intelligent_{$this->module_route_identifier}_edit", array('edit_id' => $id));
                 } else {
 
@@ -410,6 +411,14 @@ abstract class ModulebaseController extends Controller {
         
         $session->set('active_customer_filter', $active_customer_filter);
         
+    }
+    
+    /*
+     * Method to override 
+     * param1: @mixed
+     */
+    protected function _afterSaveEvent($param) {
+        //empty
     }
 
 

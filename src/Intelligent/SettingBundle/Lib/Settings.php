@@ -19,10 +19,14 @@ class Settings {
     var $module = array(
         'customer' => 'Customer',
         'marketing_projects' => 'Marketing Projects',
-        'campaign' => 'Campanigns',
-        'campaign_contacts' => 'Campanigns Contact',
+        'initiative' => 'Initiatives',
+        'campaign' => 'Campaigns',
+        'campaign_contacts' => 'Campaigns Contact',
         'psuedo_email_accounts' => 'Psuedo Email Accounts',
-        'assign_psuedo' => 'Assign Psuedo'
+        'assign_psuedo' => 'Assign Psuedo',
+        'links' => 'Links',
+        'link_rates' => 'Link Rates',
+        'dnc_lists' =>'DNC Lists'
     );
     var $module_datatypes = array(
         'varchar' => 'Limited Character',
