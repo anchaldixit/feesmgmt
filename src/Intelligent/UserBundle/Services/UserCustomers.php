@@ -138,6 +138,7 @@ class UserCustomers {
             $joining_object->setCustomer($customer);
             $joining_object->setUser($user);
             $joining_object->setIsActive($attach);
+            $user->addAllowedCustomer($joining_object);
             $em->persist($joining_object);
         } else if(!is_null($corresponding_allowed_customer) && $corresponding_allowed_customer->getIsActive() != $attach){
             $corresponding_allowed_customer->setIsActive($attach);
