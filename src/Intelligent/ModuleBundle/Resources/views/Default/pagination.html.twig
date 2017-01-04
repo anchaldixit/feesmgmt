@@ -1,9 +1,11 @@
 {% if pagination.total_count > 0 %}
+    <div class="paging">
     {% for i in 1..pagination.total_count %}
         {% if i== pagination.active %}
-            {{i}} 
+            <span>{{i}}</span> 
         {% else %}
             <a href="{{ path('intelligent_setting_view', app.request.query.all| merge( {'page_no': i})) }}">{{i}}</a>
         {% endif %}
     {% endfor %}
+    </div>
 {% endif %}

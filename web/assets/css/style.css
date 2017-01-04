@@ -489,10 +489,32 @@ input[type="submit"]:focus, input[type="button"]:focus {
       margin: 15px 0; }
       .content-table .left-sidebar ul li {
         list-style: none;
-        margin-left: 8px; }
+        margin-left: 8px;
+        margin-bottom: 5px;
+        overflow: hidden; }
         .content-table .left-sidebar ul li label {
           font-size: 13px;
-          margin-left: 8px; }
+          margin-left: 8px;
+          float: left;
+          line-height: 16px;
+          width: 77%; }
+        .content-table .left-sidebar ul li select {
+          width: 94%; }
+        .content-table .left-sidebar ul li input[type="radio"], .content-table .left-sidebar ul li input[type="checkbox"] {
+          float: left;
+          margin-top: 0; }
+        .content-table .left-sidebar ul li input[type="text"] {
+          width: 88%;
+          padding: 4px 5px; }
+          .content-table .left-sidebar ul li input[type="text"]:focus {
+            outline: none; }
+        .content-table .left-sidebar ul li input[type="submit"] {
+          width: 35px;
+          background-color: #5aa3ff;
+          border: 0px solid;
+          padding: 3px 0 5px 0;
+          margin-top: 10px;
+          border-radius: 4px; }
   .content-table .table-content {
     float: right;
     width: calc(100% - 210px); }
@@ -747,7 +769,7 @@ input[type="submit"]:focus, input[type="button"]:focus {
   padding: 15px 30px;
   border-bottom: 1px solid #c1c1c1; }
 .form-control-outer .form-control {
-  width: 650px;
+  width: 750px;
   margin: 50px auto;
   background: #f4f4f4;
   border: 1px solid #c1c1c1;
@@ -764,7 +786,8 @@ input[type="submit"]:focus, input[type="button"]:focus {
         font-size: 16px;
         font-weight: 400;
         line-height: 20px;
-        padding-top: 8px; }
+        padding-top: 8px;
+        padding-right: 15px; }
       .form-control-outer .form-control ul li .field-wrap {
         width: 65%;
         float: left; }
@@ -775,6 +798,15 @@ input[type="submit"]:focus, input[type="button"]:focus {
           font-size: 16px;
           line-height: 20px; }
           .form-control-outer .form-control ul li .field-wrap input[type="text"]:focus, .form-control-outer .form-control ul li .field-wrap input[type="email"]:focus {
+            outline: none;
+            border: 1px solid #5aa3ff; }
+        .form-control-outer .form-control ul li .field-wrap textarea {
+          width: 100%;
+          padding: 8px 2%;
+          border: 1px solid #dadbdd;
+          font-size: 16px;
+          line-height: 20px; }
+          .form-control-outer .form-control ul li .field-wrap textarea:focus {
             outline: none;
             border: 1px solid #5aa3ff; }
         .form-control-outer .form-control ul li .field-wrap select {
@@ -790,7 +822,7 @@ input[type="submit"]:focus, input[type="button"]:focus {
           vertical-align: middle;
           font-size: 16px;
           line-height: 20px;
-          width: 407px;
+          width: 465px;
           border: 1px solid #dadbdd;
           overflow: hidden;
           color: #000;
@@ -836,6 +868,10 @@ input[type="submit"]:focus, input[type="button"]:focus {
           border: 1px solid transparent;
           font-size: 16px;
           line-height: 20px; }
+        .form-control-outer .form-control ul li .field-wrap small, .form-control-outer .form-control ul li .field-wrap #fieldname_edit {
+          display: block;
+          margin-top: 5px;
+          font-size: 12px; }
       .form-control-outer .form-control ul li .check-wrap {
         padding-top: 10px;
         width: 65%;
@@ -1183,3 +1219,51 @@ input[type="submit"]:focus, input[type="button"]:focus {
       border-color: #c2bfbf; }
       .added-customer2 .cust_add:hover i {
         color: #999797; }
+
+.selected_fitlers_container .selected_filter {
+  font-style: normal;
+  font-weight: 400;
+  background-color: #f5f5f5;
+  border: 1px solid #d9d9d9;
+  border-radius: 3px;
+  -webkit-border-radius: 3px;
+  -ms-border-radius: 3px;
+  -o-border-radius: 3px;
+  padding: 4px 10px;
+  margin-right: 10px;
+  margin-bottom: 8px;
+  display: inline-block;
+  font-size: 13px;
+  margin-left: 0px; }
+  .selected_fitlers_container .selected_filter span {
+    font-size: 10px;
+    background: #e6e8e6;
+    padding: 3px 5px;
+    border-radius: 50%;
+    text-align: center;
+    display: inline-block;
+    margin-left: 5px;
+    cursor: pointer; }
+
+.paging {
+  padding: 15px 0; }
+  .paging a, .paging span {
+    background-color: #393939;
+    color: #fff;
+    display: inline-block;
+    padding: 3px 6px;
+    margin-right: 5px;
+    text-decoration: none; }
+  .paging span {
+    background: #cacaca;
+    color: #393939; }
+
+.flash {
+  position: relative;
+  height: 0;
+  width: 750px;
+  margin: 0 auto; }
+  .flash .flash-msg {
+    position: absolute;
+    top: 50px;
+    left: 0px; }
