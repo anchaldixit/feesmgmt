@@ -24,10 +24,10 @@ abstract class Module extends ContainerAware {
     private $db_manager;
     protected $row_filter_enabled = true;
 
-
     /*
      * Leave the construct blank, dont remove
      */
+
     function __construct() {
         
     }
@@ -35,14 +35,15 @@ abstract class Module extends ContainerAware {
     /*
      * Function will be called thru service
      */
+
     function init() {
-        
+
         $this->db = $this->container->get('database_connection');
         $this->module_settings = new Settings($this->db);
-        
+
         $this->_init();
     }
-    
+
     abstract function _init();
 
 
@@ -86,7 +87,7 @@ abstract class Module extends ContainerAware {
                         $params[] = strstr($value['max'], '/') === false ? $value['max'] : date('Y-m-d', strtotime($value['max']));
                     }
                 } else {
-                    $arr_where[] = " {$this->table}.$column=?";
+                    $arr_where[] = "$column=?";
                     $params[] = $value;
                 }
             }
@@ -105,10 +106,12 @@ abstract class Module extends ContainerAware {
             $arr_join_part = array();
             foreach ($join as $tablename => $value) {
 
-                $arr_join_part[] = "LEFT JOIN $tablename ON ({$this->table}.{$value['id']} = $tablename.id)";
+                foreach ($value as $left_conditon => $right_condition) {
+                    $arr_join_part[] = "LEFT JOIN $tablename ON ($left_conditon = $right_condition)";
+                    $fields[] = $right_condition;
+                }
             }
             $join_condition = implode(' ', $arr_join_part);
-            $fields[] = "{$this->table}.{$value['id']}";
         }
         if (is_array($fields) and count($fields)) {
             //Parameter is not default, create the where clause
@@ -328,6 +331,7 @@ abstract class Module extends ContainerAware {
         $this->table;
         $join = array();
         $fieldset = array();
+        $where = array("{$this->module}.id" => $id);
 
         $module_field_set = $this->getFormFields();
 
@@ -338,16 +342,26 @@ abstract class Module extends ContainerAware {
             if ($row['module_field_datatype'] == 'relationship') {
                 //relationship datatype need to handle is separately.
                 //append module name before field name
-                $name = "{$row['relationship_module']}.{$row['module_field_name']}";
-                $fieldset[] = $name;
-
-                $join[$row['relationship_module']] = array('id' => $this->module_settings->prepareforeignKeyName($row['relationship_module']));
+                $this->prepareSQLParams($row, $join, $fieldset, $where);
+//                if ($row['relationship_field_settings']['module_field_datatype'] == 'relationship') {
+//                    $join_table = $row['relationship_field_settings']['relationship_module'];
+//                    //one extra join required(nested)
+//                    $join[$row['relationship_module']] = array("$join_table.id" => "{$row['relationship_module']}." . $this->module_settings->prepareforeignKeyName($join_table));
+//
+//                    $join[$join_table] = array("{$row['relationship_module']}.id" => "{$this->module}." . $this->module_settings->prepareforeignKeyName($row['relationship_module']));
+//                } else {
+//                    $join_table = $row['relationship_module'];
+//
+//                    $join[$join_table] = array("$join_table.id" => "{$this->module}." . $this->module_settings->prepareforeignKeyName($join_table));
+//                }
+//                $name = "{$join_table}.{$row['module_field_name']}";
+//                $fieldset[] = $name;
             } else {
                 $fieldset[] = "{$row['module']}.{$row['module_field_name']}";
             }
         }
 
-        $filters = $this->addViewAccessCondition(array('id' => $id));
+        $filters = $this->addViewAccessCondition($where);
 
         $result = $this->fetch($fieldset, $filters, $join);
 
@@ -374,12 +388,14 @@ abstract class Module extends ContainerAware {
             if ($row['module_field_datatype'] == 'relationship') {
                 //relationship datatype need to handle is separately.
                 //append module name before field name
-                $name = "{$row['relationship_module']}.{$row['module_field_name']}";
-                $fieldset[] = $name;
-
-                $join[$row['relationship_module']] = array('id' => $this->module_settings->prepareforeignKeyName($row['relationship_module']));
+                $this->prepareSQLParams($row, $join, $fieldset, $where);
             } else {
                 $fieldset[] = "{$row['module']}.{$row['module_field_name']}";
+                if (isset($where[$row['module_field_name']])) {
+                    $temp = $where[$row['module_field_name']];
+                    $where["{$row['module']}.{$row['module_field_name']}"] = $temp;
+                    unset($where[$row['module_field_name']]);
+                }
             }
         }
         $fieldset[] = "{$this->table}.modified_datetime";
@@ -391,36 +407,102 @@ abstract class Module extends ContainerAware {
         return array('schema' => $module_field_set, 'row' => $result);
     }
 
+    /*
+     * Function is expected to be used for view page, it will fetch all the settings required to show fields & filters
+     */
+
     function getDisplayGridFields() {
 
 
         $results = $this->module_settings->fetch(
                 array('module' => $this->module, 'show_in_grid' => 'Y'), array('display_position' => 'ASC'));
 
-        #return $results;
         $fieldset = array();
 
         foreach ($results as $value) {
 
             # If datatype is relationship then extract the field setting of relationship field and include into relationship table
             if ($value['module_field_datatype'] == 'relationship') {
-                $result2 = $this->module_settings->fetch(
-                        array('module' => $value['relationship_module'],
-                            'module_field_name' => $value['module_field_name']
-                        )
-                );
+                //relationship field also required setting for relationship module
+
+                $result2 = $this->getFieldSettings($value['relationship_module'], $value['module_field_name']);
 
                 # Add field setting to $fieldset only for if relationship settings found for it
                 if (count($result2)) {
-                    $value['relationship_field_settings'] = $result2[0];
+                    $value['relationship_field_settings'] = $result2;
+                    $this->filterSettings($value);
                     $fieldset[$value['module_field_name']] = $value;
                 }
             } else {//non relationship type field
+                //May be some information/twigs need to be done for filters
+                $this->filterSettings($value);
                 $fieldset[$value['module_field_name']] = $value;
             }
         }
 
         return $fieldset;
+    }
+
+    /*
+     * Get Field settings/configurition. function will fetch the setting recursively if field datatype is relationship
+     * @param1: module name (string)
+     * @param2: Field name (string)
+     * Return: Array
+     */
+
+    function getFieldSettings($module, $field_name) {
+
+        $result = $this->module_settings->fetch(
+                array('module' => $module,
+                    'module_field_name' => $field_name
+                )
+        );
+        if (count($result)) {
+            if ($result[0]['module_field_datatype'] == 'relationship') {
+                //Recursive call
+                $result2 = $this->getFieldSettings($result[0]['relationship_module'], $result[0]['module_field_name']);
+                if (count($result2)) {
+                    $result[0]['relationship_field_settings'] = $result2;
+                }
+            }
+            return $result[0];
+        }
+    }
+
+    /*
+     * Prepare join condition. If field is relational then prepare join recursively till end
+     * Parameter 1: field setting(array)
+     * Parameter 2: join conitions(array call by reference)
+     * Parameter : $select fields(array call by reference)
+     */
+
+    function prepareSQLParams($field_settings, &$join, &$select, &$where) {
+
+        if ($field_settings['relationship_field_settings']['module_field_datatype'] == 'relationship') {
+            $join_table = $field_settings['relationship_field_settings']['relationship_module'];
+            //one extra join required(nested)
+
+            $join[$field_settings['relationship_module']] = array("{$field_settings['relationship_module']}.id" => "{$field_settings['module']}." . $this->module_settings->prepareforeignKeyName($field_settings['relationship_module']));
+
+            $join[$join_table] = array("$join_table.id" => "{$field_settings['relationship_module']}." . $this->module_settings->prepareforeignKeyName($join_table));
+            if (isset($where[$field_settings['module_field_name']])) {
+                $temp = $where[$field_settings['module_field_name']];
+                $where["$join_table.{$field_settings['module_field_name']}"] = $temp;
+                unset($where[$field_settings['module_field_name']]);
+            }
+        } else {
+            $join_table = $field_settings['relationship_module'];
+
+            $join[$join_table] = array("$join_table.id" => "{$field_settings['module']}." . $this->module_settings->prepareforeignKeyName($join_table));
+
+            if (isset($where[$field_settings['module_field_name']])) {
+                $temp = $where[$field_settings['module_field_name']];
+                $where["$join_table.{$field_settings['module_field_name']}"] = $temp;
+                unset($where[$field_settings['module_field_name']]);
+            }
+        }
+        $field_name = "$join_table.{$field_settings['module_field_name']}";
+        $select[] = $field_name;
     }
 
     function getEnableFilters() {
@@ -497,21 +579,87 @@ abstract class Module extends ContainerAware {
      * Function will add the row level condition to $parameters. Currently scope is restricted to customer level view.
      * @param: Array
      */
+
     function addViewAccessCondition($params) {
 
         //$session = new Session();
-
         //$val = $session->get('active_customer_filter');
         $user_permission = $this->container->get("user_permissions");
         $val = $user_permission->getCurrentViewCustomer()->getId();
 
         if ($this->module != 'customer' and ! empty($val)) {
-            $params = array_merge($params, array('linked_customer_id' => $val));
+            $params = array_merge($params, array("{$this->module}.linked_customer_id" => $val));
         } elseif ($this->module == 'customer') {
-            $params = array_merge($params, array('id' => $val));
+            $params = array_merge($params, array("{$this->module}.id" => $val));
         }
 
         return $params;
+    }
+
+    /*
+     * Fetch more information required for filters
+     * Param 1: Array(call by reference)
+     */
+
+    function filterSettings(&$field_settings) {
+
+        if ($field_settings['enable_filter'] == 'Y') {
+
+            if ($field_settings['enable_filter_with_option'] == 'Y') {
+                //change the datatype of field to enum
+                //$field_settings['value']='';
+                $this->convert2EnumDatatype4Filter($field_settings);
+            }
+        }
+    }
+
+    /*
+     * This will fetch the column values and put that as enum value for filters
+     * Param 1: Array(call by reference)
+     */
+
+    private function convert2EnumDatatype4Filter(&$field_settings) {
+
+        if ($field_settings['module_field_datatype'] == 'relationship') {
+
+            $this->convert2EnumDatatype4Filter($field_settings['relationship_field_settings']);
+        } else {
+
+            $module = $this->container->get("intelligent.{$field_settings['module']}.module");
+            $filters = $module->addViewAccessCondition(array());
+
+            $params = $condition = array();
+
+            foreach ($filters as $key => $value) {
+                $condition[] = "$key = ?";
+                $params[] = $value;
+            }
+            $where = ' where ' . implode(' and ', $condition);
+
+
+            $sql = "select GROUP_CONCAT(distinct {$field_settings['module_field_name']} SEPARATOR '|') as 'values' from  {$field_settings['module']} $where";
+
+            $result = $this->db->fetchAll($sql, $params);
+            if (count($result)) {
+                //do setting only if results found
+                $field_settings['module_field_datatype'] = 'enum';
+                //enum parameter understands pipe as dilimiter
+                $field_settings['value'] = $result[0]['values'];
+            }
+        }
+    }
+
+    /*
+     * Fetch the core settings of relationsihp field. It may go to array nested level of 3 -4
+     */
+
+    function getCoreSettingsOfRelationshipField($field_settings) {
+
+        if (isset($field_settings['relationship_field_settings']) and $field_settings['relationship_field_datatype'] == 'relationship' and count($field_settings['relationship_field_settings'])) {
+            $this->getCoreSettingsOfRelationshipField($field_settings['relationship_field_settings']);
+        } else {
+            return $field_settings;
+        }
     }
 
 }

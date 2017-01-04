@@ -21,7 +21,7 @@ class Settings {
         'marketing_projects' => 'Marketing Projects',
         'initiative' => 'Initiatives',
         'campaign' => 'Campaigns',
-        'campaign_contacts' => 'Campaigns Contact',
+        'campaign_contacts' => 'Campaign Contacts',
         'psuedo_email_accounts' => 'Psuedo Email Accounts',
         'assign_psuedo' => 'Assign Psuedo',
         'links' => 'Links',
