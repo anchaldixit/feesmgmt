@@ -1273,10 +1273,10 @@ input[type="submit"]:focus, input[type="button"]:focus {
   height: 0;
   width: 750px;
   margin: 0 auto; }
-  .flash .flash-msg {
-    position: absolute;
-    top: 40px;
-    left: 0px; }
+
+.flash-msg {
+  width: 750px;
+  margin: 10px auto; }
 
 .table-outer {
   overflow: auto;
