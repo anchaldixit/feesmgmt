@@ -29,7 +29,7 @@
             margin: 5px 15px;
         }
 
-
+        .marketingProjects thead tr th:first-child, .marketingProjects tbody tr td:first-child{text-align: center;}
 
 
 
@@ -78,6 +78,49 @@
                 return false;
 
             });
+            
+            if($('._id').length){
+               $('._id').css('width','50px');
+            }
+            if($('._varchar').length){
+               $('._varchar').css('width','200px');
+            }
+            if($('._relationship').length){
+               $('._relationship').css('width','150px');
+            }
+            if($('._enum').length){
+               $('._enum').css('width','100px');
+            }
+            if($('._link').length){
+               $('._link').css('width','110px');
+            }
+            if($('._user').length){
+               $('._user').css('width','200px');
+            }
+            if($('._number').length){
+               $('._number').css('width','100px');
+            }
+            if($('._decimal').length){
+               $('._decimal').css('width','100px');
+            }
+            if($('._date').length){
+               $('._date').css('width','150px');
+            }
+            if($('._modified').length){
+                $('._modified').css('width','130px');
+            }
+            if($('._action').length){
+                $('._action').css('width','130px');
+            }
+            var _width = 0;
+            var th = $('.marketingProjects thead tr th');
+            th.each(function(){
+                w = $(this)[0].style.width;
+                console.log(w);
+                _width = _width + parseInt(w);
+            });
+            
+            $('.marketingProjects').css('width',_width+'px')
         });
 
 
@@ -147,19 +190,21 @@
 
                                             {{ include('IntelligentModuleBundle:Default:view/selected-labels.html.twig', { 'schema': schema,'selected_filters': selected_filters ,'users':users }) }}   
                                             {% if rows|length > 0 %}
-                                                <table>
+                                                <div class="table-outer">
+                                                <table class="marketingProjects">
                                                     <thead>
                                                         <tr>
 
-                                                            <th>Id</th>
+                                                            <th class="_id">Id</th>
+                                                            
                                                                 {% for field_settings in schema %}
                                                                     {% if permissions.custom == false or  (permissions.custom == true and permissions.custom_field[field_settings.module_field_name]>0) %}
                                                                     {# if custom access setting id done then allowed only for view & editview is true that is 1 or 2  #}
-                                                                <th>{{field_settings.module_field_display_name}}</th>
+                                                                <th class="_{{field_settings.module_field_datatype}}">{{field_settings.module_field_display_name}}</th>
                                                                     {% endif %}
                                                                         {% endfor %}
-                                                                        <th>Last Modified</th>
-                                                                        <th>Action</th>
+                                                                        <th class="_modified">Last Modified</th>
+                                                                        <th class="_action">Action</th>
                                                                     </tr>
                                                                 </thead>
 
@@ -189,7 +234,7 @@
                                                                                 {% endfor %}
 
                                                                                 </table>
-
+                                                                                </div>
                                                                                 {{ include('IntelligentModuleBundle:Default:pagination.html.twig', { 'pagination': pagination,'module':module }) }}
                                                                                 {% else %}
                                                                                     <br><br><br> 
