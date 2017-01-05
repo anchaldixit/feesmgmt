@@ -5,10 +5,11 @@
     <h6><a href="#"><i class="fa fa-caret-down"></i>{{field_settings.module_field_display_name}}</a></h6>
     <ul>
         <li>
-            From:
-            <input name="filter[range][{{field_settings.module_field_name}}][min]" id="{{field_settings.module_field_name}}_min"  value="{{selected.range[field_settings.module_field_name] is defined and selected.range[field_settings.module_field_name] is not empty ? selected.range[field_settings.module_field_name]['min'] | trim | date("m/d/Y"):'' }}" class="datepicker filter-{{field_settings.module_field_name}} " type="text" >
-            To:
-            <input name="filter[range][{{field_settings.module_field_name}}][max]" id="{{field_settings.module_field_name}}_max"  value="{{selected.range[field_settings.module_field_name] is defined and selected.range[field_settings.module_field_name] is not empty ? selected.range[field_settings.module_field_name]['max'] | trim | date("m/d/Y"):'' }}" class="datepicker filter-{{field_settings.module_field_name}} " type="text" >
+            <small>From:</small>
+            <input name="filter[range][{{field_settings.module_field_name}}][min]" id="{{field_settings.module_field_name}}_min"  value="{{selected.range[field_settings.module_field_name] is defined and selected.range[field_settings.module_field_name] is not empty ? selected.range[field_settings.module_field_name]['min'] | trim | date("m/d/Y"):'' }}" class="datepicker filter-{{field_settings.module_field_name}} " type="text" /></li>
+        <li>
+            <small>To:</small>
+            <input name="filter[range][{{field_settings.module_field_name}}][max]" id="{{field_settings.module_field_name}}_max"  value="{{selected.range[field_settings.module_field_name] is defined and selected.range[field_settings.module_field_name] is not empty ? selected.range[field_settings.module_field_name]['max'] | trim | date("m/d/Y"):'' }}" class="datepicker filter-{{field_settings.module_field_name}} " type="text" />
             <br> <input type='submit' value=">>">
         </li>
     </ul>

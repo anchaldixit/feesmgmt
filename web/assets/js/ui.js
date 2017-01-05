@@ -810,7 +810,7 @@ $.extend(User.prototype, {
             }
             else {
                 html += '<tr>';
-                html += '<td colspan="5" >No Data is Found</td>';
+                html += '<td colspan="6" >No Data is Found</td>';
                 html += '</tr>';
                 $('.curr-result, .total-result').text('0');
             }

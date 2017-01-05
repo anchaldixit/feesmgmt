@@ -492,6 +492,11 @@ input[type="submit"]:focus, input[type="button"]:focus {
         margin-left: 8px;
         margin-bottom: 5px;
         overflow: hidden; }
+        .content-table .left-sidebar ul li small {
+          float: left;
+          font-size: 12px;
+          padding: 8px 0;
+          min-width: 35px; }
         .content-table .left-sidebar ul li label {
           font-size: 13px;
           margin-left: 8px;
@@ -500,6 +505,9 @@ input[type="submit"]:focus, input[type="button"]:focus {
           width: 77%; }
         .content-table .left-sidebar ul li select {
           width: 94%; }
+        .content-table .left-sidebar ul li input[type="text"].datepicker {
+          width: 57%;
+          text-align: center; }
         .content-table .left-sidebar ul li input[type="radio"], .content-table .left-sidebar ul li input[type="checkbox"] {
           float: left;
           margin-top: 0; }
@@ -1220,30 +1228,32 @@ input[type="submit"]:focus, input[type="button"]:focus {
       .added-customer2 .cust_add:hover i {
         color: #999797; }
 
-.selected_fitlers_container .selected_filter {
-  font-style: normal;
-  font-weight: 400;
-  background-color: #f5f5f5;
-  border: 1px solid #d9d9d9;
-  border-radius: 3px;
-  -webkit-border-radius: 3px;
-  -ms-border-radius: 3px;
-  -o-border-radius: 3px;
-  padding: 4px 10px;
-  margin-right: 10px;
-  margin-bottom: 8px;
-  display: inline-block;
-  font-size: 13px;
-  margin-left: 0px; }
-  .selected_fitlers_container .selected_filter span {
-    font-size: 10px;
-    background: #e6e8e6;
-    padding: 3px 5px;
-    border-radius: 50%;
-    text-align: center;
+.selected_fitlers_container {
+  overflow: hidden; }
+  .selected_fitlers_container .selected_filter {
+    font-style: normal;
+    font-weight: 400;
+    background-color: #f5f5f5;
+    border: 1px solid #d9d9d9;
+    border-radius: 3px;
+    -webkit-border-radius: 3px;
+    -ms-border-radius: 3px;
+    -o-border-radius: 3px;
+    padding: 4px 10px;
+    margin-right: 10px;
+    margin-bottom: 8px;
     display: inline-block;
-    margin-left: 5px;
-    cursor: pointer; }
+    font-size: 13px;
+    margin-left: 0px; }
+    .selected_fitlers_container .selected_filter span {
+      font-size: 10px;
+      background: #e6e8e6;
+      padding: 3px 5px;
+      border-radius: 50%;
+      text-align: center;
+      display: inline-block;
+      margin-left: 5px;
+      cursor: pointer; }
 
 .paging {
   padding: 15px 0; }
@@ -1265,5 +1275,9 @@ input[type="submit"]:focus, input[type="button"]:focus {
   margin: 0 auto; }
   .flash .flash-msg {
     position: absolute;
-    top: 50px;
+    top: 40px;
     left: 0px; }
+
+.table-outer {
+  overflow: auto;
+  padding-bottom: 15px; }

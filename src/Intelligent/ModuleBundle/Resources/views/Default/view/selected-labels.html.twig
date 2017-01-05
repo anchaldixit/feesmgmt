@@ -22,12 +22,12 @@
                 {% elseif type == 'match' %}
 
                     <div class="selected_filter" >
-                        {{schema[selected_filter_name]['module_field_display_name']}}: {{schema[selected_filter_name]['module_field_datatype'] == 'user'? users[selected_filter_value]:selected_filter_value}} <span data-resetfilter="{{selected_filter_name}}">X</span> 
+                        <b>{{schema[selected_filter_name]['module_field_display_name']}}:</b> {{schema[selected_filter_name]['module_field_datatype'] == 'user'? users[selected_filter_value]:selected_filter_value}} <span data-resetfilter="{{selected_filter_name}}">X</span> 
                     </div>
                 {% elseif type == 'range' %}
 
                     <div class="selected_filter" >
-                        {{schema[selected_filter_name]['module_field_display_name']}}: {{selected_filter_value.min}} - {{selected_filter_value.max}} <span data-resetfilter="{{selected_filter_name}}">X</span> 
+                        <b>{{schema[selected_filter_name]['module_field_display_name']}}:</b> {{selected_filter_value.min}} - {{selected_filter_value.max}} <span data-resetfilter="{{selected_filter_name}}">X</span> 
                     </div>
 
                 {% endif %}

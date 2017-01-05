@@ -21,7 +21,7 @@ class Settings {
         'marketing_projects' => 'Marketing Projects',
         'initiative' => 'Initiatives',
         'campaign' => 'Campaigns',
-        'campaign_contacts' => 'Campaigns Contact',
+        'campaign_contacts' => 'Campaign Contacts',
         'psuedo_email_accounts' => 'Psuedo Email Accounts',
         'assign_psuedo' => 'Assign Psuedo',
         'links' => 'Links',
@@ -296,6 +296,11 @@ class Settings {
         } else {
             $data['enable_filter'] = $post_data['enable_filter'];
         }
+        if (empty($post_data['enable_filter_with_option'])) {
+            $error[] = "Enable filter with option cannot be empty";
+        } else {
+            $data['enable_filter_with_option'] = $post_data['enable_filter_with_option'];
+        }
 
         if (empty($post_data['show_in_grid'])) {
             $error[] = "Show in Grid field cannot be empty";
@@ -347,7 +352,7 @@ class Settings {
             $index_type = 'UNIQUE';
         } elseif ($data['enable_filter'] == 'Y') {
             $index_type = 'INDEX';
-        } else {
+        } elseif($data['module_field_datatype'] != 'text') {
             $index_type = 'INDEX';
         }
 
