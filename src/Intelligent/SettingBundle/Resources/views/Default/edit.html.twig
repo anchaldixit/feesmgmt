@@ -27,7 +27,7 @@
                 } else {
                     $('#varchar_limit_row').slideUp('slow')
                 }
-                if ($(this).val() == 'text') {
+                if ($(this).val() == 'text' || $(this).val() == 'link') {
                     jQuery("#enable_filter").val('N')
                     $('#enable_filter_row').slideUp('slow')
                 } else {
@@ -46,7 +46,19 @@
                     $('#relationship_module_row').slideUp('slow')
                     $('#relationship_module_unique_field_row').slideUp('slow')
                 }
+                if ($(this).val() != 'varchar' ) {
+                    $('#enable_filter_with_option_row').slideUp('slow')
+                }
 
+            }).trigger('change');
+            
+            $('#enable_filter').on('change', function () {
+                 if ($(this).val() == 'Y' && $('#module_field_datatype').val()=='varchar'){
+                      $('#enable_filter_with_option_row').slideDown('slow')
+                 }else{
+                     $('#enable_filter_with_option_row').slideUp('slow');
+                 }
+                
             }).trigger('change');
 
             /*field_has_relationship').on('change', function () {
@@ -98,8 +110,8 @@
             <span>Edit</span>
         </div>
         <div class="custom-feature">
-            <a href="{{ path('intelligent_setting_edit', {'edit_id': 'new'}) }}"><i class="fa"></i>New</a>
-            <a href="{{ path('intelligent_setting_view') }}"><i class="fa"></i>Back</a>
+            <a href="{{ path('intelligent_setting_edit', app.request.query.all| merge( {'edit_id': 'new'})) }}"><i class="fa"></i>New</a>
+            <a href="{{ path('intelligent_setting_view', app.request.query.all) }}"><i class="fa"></i>Back</a>
         </div>
     </div>
 
@@ -197,7 +209,7 @@
                         </li><li id="value_row">
                             <label>Value Set:</label> 
                             <div class="field-wrap">
-                                <input name="value" id="value" value="{{config.value is defined ? config.value : 'value1|value2|value3'}}" type="text"><br>
+                                <textarea name="value" id="value" >{{config.value is defined ? config.value : 'value1|value2|value3'}}</textarea><br>
                             </div>
                         </li>
                         <li id="link_text_row">
@@ -226,6 +238,19 @@
                                         <option value="Y" {{config.enable_filter is defined and config.enable_filter == 'Y' ? 'SELECTED': ''}}>Yes</option>
                                     </select><br>
                                 </div>
+                            </div>
+                        </li>
+                        <li id="enable_filter_with_option_row">
+                            <label>Enable Filter With Option:</label> 
+                            <div class="field-wrap">
+                                <div class="dropdown">
+                                    <select name="enable_filter_with_option" id="enable_filter_with_option"  class="selectbox" >
+                                        <option value="N" {{config.enable_filter_with_option is defined and config.enable_filter_with_option == 'N' ? 'SELECTED': ''}}>No</option>
+                                        <option value="Y" {{config.enable_filter_with_option is defined and config.enable_filter_with_option == 'Y' ? 'SELECTED': ''}}>Yes</option>
+                                    </select><br>
+                                    
+                                </div>
+                                    <small><i>Enable this option only it is really required, it affects the performance in some means. </i></small>
                             </div>
                         </li>
                         <li> <label>Show in Grid:</label> 
