@@ -113,9 +113,9 @@ class Settings {
     }
 
     public function save($post_data) {
-
+        
         $data = $this->validateAndSet($post_data, 'save');
-
+        print_r($data);
         $data['modified_datetime'] = date("Y-m-d H:i:s");
 
         $this->db->insert(
@@ -323,11 +323,16 @@ class Settings {
         } else {
             $data['display_position'] = floor($post_data['display_position']);
         }
-
+        
 //        if ($type == 'save') {//Edit not allowed on this field, set it only for new row
 //            $data['relationship_module'] = $post_data['relationship_module'];
 //        }
-
+        if($post_data['group_name'] == 'select_group'){
+            $error[] = "Required field cannot be empty";
+        }
+        else{
+            $data['field_group_name'] = $post_data['group_name'];
+        }
         if (!empty($error)) {
             throw new \Exception(implode('<br>', $error), '001');
         }

@@ -75,6 +75,16 @@
                     }
                 });
             }
+            
+            if($('#group_dd').length){
+                $('#group_dd').change(function(){
+                    var _val = $(this).find('option:selected').val();
+                    if(_val == ''){
+                        $('#field_group_name').show();}
+                    else{
+                        $('#field_group_name').hide();}
+                });
+            }
 
         });
 
@@ -105,7 +115,18 @@
             <form action="" method="POST">
                 <ul>
                     {% for config in field %}
-
+                        <li><label>Group:</label>
+                        <div class="field-wrap">
+                            <div class="dropdown">
+                                <select name="group_name"  class="selectbox" id="group_dd">
+                                    <option value="select_group">Select Group</option>
+                                    <option value="generic">Generic</option>
+                                    <option value="">Add New Group</option>
+                                </select>
+                            </div>
+                            <input type="text" name="field_group_name" id="field_group_name" placeholder="New Group Name" style="display:none;margin-top: 15px;"/>
+                        </div>
+                    </li>
                         <li><label>Module:</label> 
                             <div class="field-wrap">
                                 <div class="dropdown">
