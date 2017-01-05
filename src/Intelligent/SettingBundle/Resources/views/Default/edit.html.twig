@@ -53,7 +53,6 @@
             }).trigger('change');
             
             $('#enable_filter').on('change', function () {
-                console.log('in');
                  if ($(this).val() == 'Y' && $('#module_field_datatype').val()=='varchar'){
                       $('#enable_filter_with_option_row').slideDown('slow')
                  }else{
@@ -189,7 +188,7 @@
                         </li><li id="value_row">
                             <label>Value Set:</label> 
                             <div class="field-wrap">
-                                <input name="value" id="value" value="{{config.value is defined ? config.value : 'value1|value2|value3'}}" type="text"><br>
+                                <textarea name="value" id="value" >{{config.value is defined ? config.value : 'value1|value2|value3'}}</textarea><br>
                             </div>
                         </li>
                         <li id="link_text_row">
