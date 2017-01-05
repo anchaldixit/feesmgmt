@@ -352,7 +352,7 @@ class Settings {
             $index_type = 'UNIQUE';
         } elseif ($data['enable_filter'] == 'Y') {
             $index_type = 'INDEX';
-        } else {
+        } elseif($data['module_field_datatype'] != 'text') {
             $index_type = 'INDEX';
         }
 
