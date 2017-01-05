@@ -588,6 +588,12 @@ input[type="submit"],input[type="button"]{
                 margin-left:8px;
                 margin-bottom: 5px;
                 overflow:hidden;
+                small{
+                    float: left;    
+                    font-size: 12px;
+                    padding: 8px 0;
+                    min-width: 35px;
+                }
                 label{
                     font-size: 13px;
                     margin-left: 8px;
@@ -597,6 +603,10 @@ input[type="submit"],input[type="button"]{
                 }
                 select{
                     width: 94%;
+                }
+                input[type="text"].datepicker{
+                    width: 57%;
+                    text-align: center;
                 }
                 input[type="radio"],input[type="checkbox"]{
                     float: left;
@@ -1552,6 +1562,7 @@ input[type="submit"],input[type="button"]{
     }
 }
 .selected_fitlers_container{
+    overflow:hidden;
     .selected_filter{
         font-style: normal;
         font-weight: 400;
@@ -1602,7 +1613,11 @@ input[type="submit"],input[type="button"]{
     margin: 0 auto;
     .flash-msg{
         position: absolute;
-        top:50px;
+        top:40px;
         left:0px;
     }
+}
+.table-outer{
+    overflow: auto;
+    padding-bottom: 15px;
 }
