@@ -132,16 +132,35 @@
             <form action="" method="POST">
                 <ul>
                     {% for config in field %}
+                        
                         <li><label>Group:</label>
                         <div class="field-wrap">
                             <div class="dropdown">
-                                <select name="group_name"  class="selectbox" id="group_dd">
+                                <select name="group_dropdown" class="selectbox" id="group_dd">
                                     <option value="select_group">Select Group</option>
-                                    <option value="generic">Generic</option>
+                                    {% for group in allgroups %}
+                                        
+                                    <option value="{{group.id}}" {{group.id == config.field_group_id ? 'selected':''}}>{{group.group_name}}</option>
+                                    {% endfor %}
                                     <option value="">Add New Group</option>
                                 </select>
                             </div>
                             <input type="text" name="field_group_name" id="field_group_name" placeholder="New Group Name" style="display:none;margin-top: 15px;"/>
+                        </div>
+                    </li>
+                    <li>
+                        <label>Group Display Order:</label>
+                        <div class="field-wrap">
+                            <div class="dropdown">
+                                <select name="group_display_order" class="selectbox">
+                                    <option value="">Select Group Display Order</option>
+                                    <option value="2" {{groupOrder == 2 ? 'selected':''}}>2</option>
+                                    <option value="3" {{groupOrder == 3 ? 'selected':''}}>3</option>
+                                    <option value="4" {{groupOrder == 4 ? 'selected':''}}>4</option>
+                                    <option value="5" {{groupOrder == 5 ? 'selected':''}}>5</option>
+                                    <option value="6" {{groupOrder == 6 ? 'selected':''}}>6</option>
+                                </select>
+                            </div>
                         </div>
                     </li>
                         <li><label>Module:</label> 
