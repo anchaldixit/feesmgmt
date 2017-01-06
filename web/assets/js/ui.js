@@ -1211,7 +1211,12 @@ $.extend(Permission, {
         '<i class="fa fa-bullhorn"></i>',
         '<i class="fa fa-address-book"></i>',
         '<i class="fa fa-envelope"></i>',
-        '<i class="fa fa-desktop"></i>'
+        '<i class="fa fa-desktop"></i>',
+        '<i class="fa fa-envelope"></i>',
+        '<i class="fa fa-desktop"></i>',
+        '<i class="fa fa-dollar"></i>',
+        '<i class="fa fa-tachometer"></i>',
+        '<i class="fa fa-list-alt"></i>'
     ],
     user: new User(),
     role: new Role()
