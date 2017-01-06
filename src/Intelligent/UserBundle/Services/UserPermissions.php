@@ -99,6 +99,20 @@ class UserPermissions {
             return false;
         }
     }
+    
+    /**
+     * This function will tell if the user have permission for
+     * seeing reports
+     * 
+     * @return bool true if it has permission false if not.
+     */
+    public function getReportPermission() {
+        if ($this->getRole()->getGlobalPermission() instanceof RoleGlobalPermission) {
+            return $this->getRole()->getGlobalPermission()->getReportPermission();
+        } else {
+            return false;
+        }
+    }
 
     /**
      * This function will return the permissions user have for
@@ -266,24 +280,6 @@ class UserPermissions {
         }
     }
 
-    /**
-     * This will give the name and id of all the 
-     * permitted reports for the use
-     * 
-     * @return array
-     */
-    public function getVisibleReports(){
-        $visible_reports = array();
-        $allowed_report_permissions = $this->getUser()->getRole()->getAllowedReportPermissions();
-        foreach($allowed_report_permissions as $allowed_report){
-            $visible_reports[] = array(
-                'id' => $allowed_report->getReport()->getId(),
-                'name' => $allowed_report->getReport()->getName()
-            );
-        }
-        return $allowed_report_permissions;
-    }
-    
     /**
      * This function will tell you if the module is visible
      * 
