@@ -181,6 +181,31 @@ class UserCustomers {
     }
     
     /**
+     * This function will give all the reports 
+     * visible to the user based on the customers attached to it.
+     * 
+     * @return array of all the reports visible to the user
+     */
+    public function getVisibleReports(){
+        $allowed_reports = array();
+        if($this->permission->getReportPermission()){
+            $allowed_customers = $user->getAllowedCustomers(true);
+            $allowed_reports = array();
+            $temp_report_id_arr = array();
+            foreach($allowed_customers as $allowed_customer){
+                $reports = $allowed_customer->getCustomer()->getReports();
+                foreach($reports as $report){
+                    if(!in_array($report->getId(), $temp_report_id_arr)){
+                        $temp_report_id_arr[] = $report->getId();
+                        $allowed_reports[] = $report;
+                    }
+                }
+            }
+        }
+        return $allowed_reports;
+    }
+    
+    /**
      * This function will add the given customer to the user's assigned list
      * and make this user the default one
      * 

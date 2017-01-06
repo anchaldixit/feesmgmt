@@ -899,7 +899,8 @@ class ApiController extends Controller {
                         'description' => $role->getDescription(),
                         'globalPermissions' => array(
                             "userPermission" => $role->getGlobalPermission()->getManageUserAppPermission(),
-                            "appChangePermission" => $role->getGlobalPermission()->getEditAppStructurePermission()
+                            "appChangePermission" => $role->getGlobalPermission()->getEditAppStructurePermission(),
+                            "reportPermission" => $role->getGlobalPermission()->getReportPermission()
                         ),
                         "modulePermissions" => $module_permissions
                     );
@@ -965,6 +966,40 @@ class ApiController extends Controller {
                         throw new \Exception("value already $body->value", 412);
                     } else {
                         $role->getGlobalPermission()->setEditAppStructurePermission($body->value);
+                        $em->flush();
+                        return $this->_handleSuccessfulRequest();
+                    }
+                } else {
+                    throw new \Exception("Role with role_id($body->role_id) not found", 404);
+                }
+            } else {
+                throw new \Exception("role_id or value not set in request json", 412);
+            }
+        } else {
+            $this->_throwNoPermissionException();
+        }
+    }
+    
+    /**
+     * This api function will change the global report permission
+     * 
+     * @param Request $request
+     * @param type $json
+     * @return type
+     * @throws \Exception
+     */
+    private function changeReportPermission(Request $request, $json) {
+        $user_permissions = $this->get('user_permissions');
+        if ($user_permissions->getManageUserAndShareAppPermission()) {
+            $body = $json->body;
+            if (isset($body->role_id) && isset($body->value)) {
+                $em = $this->getDoctrine()->getManager();
+                $role = $em->getRepository("IntelligentUserBundle:Role")->find($body->role_id);
+                if ($role) {
+                    if ($role->getGlobalPermission()->getReportPermission() == $body->value) {
+                        throw new \Exception("value already $body->value", 412);
+                    } else {
+                        $role->getGlobalPermission()->setReportPermission($body->value);
                         $em->flush();
                         return $this->_handleSuccessfulRequest();
                     }
@@ -1378,42 +1413,42 @@ class ApiController extends Controller {
      * @param Request $request
      * @param type $json
      */
-    private function getReportPermissions(Request $request, $json){
-        $user_permissions = $this->get('user_permissions');
-        if ($user_permissions->getManageUserAndShareAppPermission()) {
-            $body = $json->body;
-            if(isset($body->role_id)){
-                $em = $this->getDoctrine()->getManager();
-                $role = $em->getRepository("IntelligentUserBundle:Role")->find($body->role_id);
-                if($role){
-                    $report_permissions = array();
-                    $allowed_report_ids = array();
-                    # Get all existing permissions
-                    $allowed_reports = $role->getAllowedReportPermissions();
-                    foreach($allowed_reports as $allowed_report){
-                        $allowed_report_ids[] = $allowed_report->getReport()->getId();
-                    }
-                    # Get all reports
-                    $reports = $em->getRepository("IntelligentUserBundle:Report")->findAll();
-                    foreach($reports as $report){
-                        $report_permissions[] = array(
-                            'id' => $report->getId(),
-                            'name' => $report->getName(),
-                            "permission" => in_array($report->getId(), $allowed_report_ids)
-                        );
-                    }
-                    
-                    return $this->_handleSuccessfulRequest(array('data' => $report_permissions)); 
-                }else{
-                    throw new \Exception("Role with role_id($body->role_id) not found", 404);
-                }
-            }else{
-                throw new \Exception("role_id is not set in the request json",412);
-            }
-        }else{
-            $this->_throwNoPermissionException();
-        }
-    }
+//    private function getReportPermissions(Request $request, $json){
+//        $user_permissions = $this->get('user_permissions');
+//        if ($user_permissions->getManageUserAndShareAppPermission()) {
+//            $body = $json->body;
+//            if(isset($body->role_id)){
+//                $em = $this->getDoctrine()->getManager();
+//                $role = $em->getRepository("IntelligentUserBundle:Role")->find($body->role_id);
+//                if($role){
+//                    $report_permissions = array();
+//                    $allowed_report_ids = array();
+//                    # Get all existing permissions
+//                    $allowed_reports = $role->getAllowedReportPermissions();
+//                    foreach($allowed_reports as $allowed_report){
+//                        $allowed_report_ids[] = $allowed_report->getReport()->getId();
+//                    }
+//                    # Get all reports
+//                    $reports = $em->getRepository("IntelligentUserBundle:Report")->findAll();
+//                    foreach($reports as $report){
+//                        $report_permissions[] = array(
+//                            'id' => $report->getId(),
+//                            'name' => $report->getName(),
+//                            "permission" => in_array($report->getId(), $allowed_report_ids)
+//                        );
+//                    }
+//                    
+//                    return $this->_handleSuccessfulRequest(array('data' => $report_permissions)); 
+//                }else{
+//                    throw new \Exception("Role with role_id($body->role_id) not found", 404);
+//                }
+//            }else{
+//                throw new \Exception("role_id is not set in the request json",412);
+//            }
+//        }else{
+//            $this->_throwNoPermissionException();
+//        }
+//    }
     
     /**
      * This api function change the report permission
@@ -1422,48 +1457,48 @@ class ApiController extends Controller {
      * @param Request $request
      * @param type $json
      */
-    private function changeReportPermission(Request $request, $json){
-        $user_permissions = $this->get('user_permissions');
-        if ($user_permissions->getManageUserAndShareAppPermission()) {
-            $body = $json->body;
-            if(isset($body->role_id) && isset($body->report_id) && isset($body->value)){
-                $em = $this->getDoctrine()->getManager();
-                $role = $em->getRepository("IntelligentUserBundle:Role")->find($body->role_id);
-                if(!$role){
-                    throw new \Exception("Role with role_id($body->role_id) not found",404);
-                }
-                
-                $report = $em->getRepository("IntelligentUserBundle:Report")->find($body->report_id);
-                if(!$report){
-                    throw new \Exception("Report with report_id($body->report_id) not found",404);
-                }
-                
-                $report_permissions = $role->getReportPermissions();
-                $existing_report_permission = null;
-                foreach($report_permissions as $report_permission){
-                    if($body->report_id == $report_permission->getReport()->getId()){
-                        $existing_report_permission = $report_permission;
-                        break;
-                    }
-                }
-                if(is_null($existing_report_permission)){
-                    $new_report_permission = new RoleReportPermission();
-                    $new_report_permission->setReport($report);
-                    $new_report_permission->setRole($role);
-                    $new_report_permission->setPermission($body->value);
-                    $em->persist($new_report_permission);
-                }else{
-                    $existing_report_permission->setPermission($body->value);
-                }
-                $em->flush();
-                return $this->_handleSuccessfulRequest();
-            }else{
-                throw new \Exception("role_id, report_id or value is not set in request json", 412);
-            }
-        }else{
-            $this->_throwNoPermissionException();
-        }
-    }
+//    private function changeReportPermission(Request $request, $json){
+//        $user_permissions = $this->get('user_permissions');
+//        if ($user_permissions->getManageUserAndShareAppPermission()) {
+//            $body = $json->body;
+//            if(isset($body->role_id) && isset($body->report_id) && isset($body->value)){
+//                $em = $this->getDoctrine()->getManager();
+//                $role = $em->getRepository("IntelligentUserBundle:Role")->find($body->role_id);
+//                if(!$role){
+//                    throw new \Exception("Role with role_id($body->role_id) not found",404);
+//                }
+//                
+//                $report = $em->getRepository("IntelligentUserBundle:Report")->find($body->report_id);
+//                if(!$report){
+//                    throw new \Exception("Report with report_id($body->report_id) not found",404);
+//                }
+//                
+//                $report_permissions = $role->getReportPermissions();
+//                $existing_report_permission = null;
+//                foreach($report_permissions as $report_permission){
+//                    if($body->report_id == $report_permission->getReport()->getId()){
+//                        $existing_report_permission = $report_permission;
+//                        break;
+//                    }
+//                }
+//                if(is_null($existing_report_permission)){
+//                    $new_report_permission = new RoleReportPermission();
+//                    $new_report_permission->setReport($report);
+//                    $new_report_permission->setRole($role);
+//                    $new_report_permission->setPermission($body->value);
+//                    $em->persist($new_report_permission);
+//                }else{
+//                    $existing_report_permission->setPermission($body->value);
+//                }
+//                $em->flush();
+//                return $this->_handleSuccessfulRequest();
+//            }else{
+//                throw new \Exception("role_id, report_id or value is not set in request json", 412);
+//            }
+//        }else{
+//            $this->_throwNoPermissionException();
+//        }
+//    }
     
     /**
      * This function will convert the exception into a json response object 
