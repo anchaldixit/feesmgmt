@@ -2,6 +2,6 @@
 {# if custom access setting id done then allowed only for view & editview is true that is 1 or 2  #}
 
 {# relationship field need to pass further datatype field based on ['relationship_field_settings']['module_field_datatype'] array. this array belongs to relationship field datatype. NOt very complex   #}
-{{ include('IntelligentModuleBundle:Default:view/'~field_settings['relationship_field_settings']['module_field_datatype']~'.html.twig', { 'field_settings': field_settings['relationship_field_settings'],'data': data is not empty ? data : ''}) }}
+{{ include('IntelligentModuleBundle:Default:view/'~field_settings['core_field_settings']['module_field_datatype']~'.html.twig', { 'field_settings': field_settings['core_field_settings'],'data': data is not empty ? data : ''}) }}
 {% endif %}
 

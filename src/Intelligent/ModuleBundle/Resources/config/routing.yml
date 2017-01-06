@@ -19,7 +19,7 @@ intelligent_customerprojects_edit:
 intelligent_customerprojects_view:
     path:     /customerprojects/view/{page_no}
     defaults: { _controller: IntelligentModuleBundle:Customerprojects:view , page_no: 1 }
-intelligent_customerprojectsr_autocomplete:
+intelligent_customerprojects_autocomplete:
     path:     /customerprojects/autocomplete
     defaults: { _controller: IntelligentModuleBundle:Customerprojects:autocomplete}
 intelligent_marketingprojects:
