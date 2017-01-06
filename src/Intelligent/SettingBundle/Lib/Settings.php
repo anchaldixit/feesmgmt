@@ -20,6 +20,7 @@ class Settings extends ContainerAware {
      */
     var $module = array(
         'customer' => 'Customer',
+        'customer_projects' => 'Customer Projects',
         'marketing_projects' => 'Marketing Projects',
         'initiative' => 'Initiatives',
         'campaign' => 'Campaigns',
