@@ -53,6 +53,7 @@ class Settings extends ContainerAware {
     private $last_sql_withoutlimit_params; //store the parameters for $last_sql_withoutlimit variable sql
     private $module_column_added; //used to communicate between setting save & module alter actions
     private $backup; //incase update command need to rollbacked, variable will hold the previous version of data;
+    private $non_db_field_types = array('relationship', 'formulafield');
 
     public function __construct() {
 
@@ -353,6 +354,8 @@ class Settings extends ContainerAware {
                                 'module_field_name' => $data['module_field_name']));
 
                     //check the field
+                    $new = preg_replace('/[^a-zA-Z0-9_]/', '_', strtolower($post_data['relationship_module_unique_field']));
+                    $post_data['relationship_module_unique_field'] = strlen($new) > 50 ? substr($new, -50) : $new;
                     $result2 = $this->fetch(
                             array(
                                 'module' => $post_data['relationship_module'],
@@ -496,7 +499,7 @@ class Settings extends ContainerAware {
             //check if added formula dont have error
             $module = $this->container->get("intelligent.{$data['module']}.module");
 
-            
+
             try {
                 //just take 1 as dummy,only wana check syntax should be run fine
                 $module->getRow(1);
@@ -520,18 +523,20 @@ class Settings extends ContainerAware {
 
     public function afterDelete($data) {
 
-        $alt_sql = "ALTER TABLE `{$data['module']}` 
+        if (!in_array($data['module_field_datatype'], $this->non_db_field_types)) {
+            $alt_sql = "ALTER TABLE `{$data['module']}` 
             DROP COLUMN `{$data['module_field_name']}`";
-        $this->db->executeQuery($alt_sql);
+            $this->db->executeQuery($alt_sql);
 
-        if ($this->db->errorCode() != 0) {
+            if ($this->db->errorCode() != 0) {
 
-            throw new \Exception($this->db->errorInfo(), '004');
+                throw new \Exception($this->db->errorInfo(), '004');
+            }
         }
     }
 
     public function afterUpdate($data) {
-        
+
 
         if ($data['module_field_datatype'] == 'formulafield') {
             //keys required to be created

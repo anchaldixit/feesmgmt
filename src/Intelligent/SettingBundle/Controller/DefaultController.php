@@ -111,7 +111,6 @@ class DefaultController extends Controller {
         
         $this->initPermissionsDetails();
 
-        $conn = $this->get('database_connection');
 
         $request = Request::createFromGlobals();
         $settings = $this->get('intelligent.setting.module');
@@ -170,14 +169,14 @@ class DefaultController extends Controller {
 
     public function deleteAction($delete_id) {
 
-        $conn = $this->get('database_connection');
-
-        $settings = new Settings($conn);
+        $request = Request::createFromGlobals();
+        $settings = $this->get('intelligent.setting.module');
 
         $settings->delete($delete_id);
         
         $this->get('session')->getFlashBag()->add('success', "Row Deleted Successfully.");
-        return $this->redirectToRoute('intelligent_setting_view');
+        
+        return $this->redirectToRoute('intelligent_setting_view',$request->query->all());
     }
     function initPermissionsDetails() {
 

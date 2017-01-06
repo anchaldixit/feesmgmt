@@ -45,6 +45,13 @@ class RoleGlobalPermission
      * @ORM\Column(name="edit_app_structure_permission", type="boolean", nullable=false)
      */
     private $editAppStructurePermission;
+    
+    /**
+     * @var boolean
+     *
+     * @ORM\Column(name="report_permission", type="boolean", nullable=false)
+     */
+    private $reportPermission;
 
 
 
@@ -125,5 +132,28 @@ class RoleGlobalPermission
     public function getRole()
     {
         return $this->role;
+    }
+
+    /**
+     * Set reportPermission
+     *
+     * @param boolean $reportPermission
+     * @return RoleGlobalPermission
+     */
+    public function setReportPermission($reportPermission)
+    {
+        $this->reportPermission = $reportPermission;
+
+        return $this;
+    }
+
+    /**
+     * Get reportPermission
+     *
+     * @return boolean 
+     */
+    public function getReportPermission()
+    {
+        return $this->reportPermission;
     }
 }

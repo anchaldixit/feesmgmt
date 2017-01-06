@@ -160,7 +160,7 @@
                 <thead>
                     <tr>
                         <th>Module</th>
-                        <th>Field Name</th>
+                        <th>Field</th>
                         <th>Data Type</th>
                         <th>Display Position</th>
                         <th>Filtered Enable</th>
@@ -172,7 +172,7 @@
                 {% for row in rows %}
                     <tr>
                         <td>{{modules[row.module]}}</td>
-                        <td>{{row.module_field_display_name}}</td>
+                        <td style="text-align:left">{{row.module_field_display_name}} <span style="font-size:7px;float:right;">{{row.module_field_name}}</span></td>
                         <td>{{attribute(datatypes,row.module_field_datatype)}}</td>
                         <td>{{row.display_position}}</td>
                         <td>{{row.enable_filter}}</td>
