@@ -12,6 +12,8 @@ class Settings {
 
     var $db;
     var $table = 'module_settings';
+    var $group_table = 'module_fields_group';
+    var $modified_group_info;
     /*
      * module is variable that holds all the logical modules which this applicaiton support.
      * KEY is exact name of db table & VALUE is display name
@@ -115,7 +117,7 @@ class Settings {
     public function save($post_data) {
         
         $data = $this->validateAndSet($post_data, 'save');
-        print_r($data);
+        
         $data['modified_datetime'] = date("Y-m-d H:i:s");
 
         $this->db->insert(
@@ -125,14 +127,19 @@ class Settings {
 
             throw new \Exception($this->db->errorInfo(), '001');
         }
-
+        
         $this->last_insert_id = $new_id = $this->db->lastInsertId();
-
+        if(empty($post_data['group_dropdown'])){
+            //$newrowid = empty($this->last_insert_id)?$post_data['id']: $this->last_insert_id ;
+            $this->createNewGroup($post_data,$new_id);
+        }
         try {
             $this->afterSave($data);
+            
+        
         } catch (\Exception $ex) {
             //rollback the first insert of setting module
-            $this->delete($new_id);
+            //$this->delete($new_id);
             throw $ex;
         }
 
@@ -185,12 +192,88 @@ class Settings {
 
         return $respid;
     }
+    
+    /*
+     * Description: Create New field Group and insert created id into module setting Table
+     * Param1: array
+     * Param2: id
+     * Return: Nothing
+     */
+    
+    public function createNewGroup($postdata,$id){
+        $update_data = array();
+       $group_data = $this->modified_group_info;
+       $group_data['type'] = 'custom';
+       var_dump($group_data);
+       $this->db->insert(
+                $this->group_table, $group_data
+        );
+       $newgroupid = $this->db->lastInsertId();
+       $update_data['field_group_id'] = $newgroupid;
+       
+       $this->db->update(
+                    $this->table,  $update_data, array('id' => $id)
+            );
+       
+   }
+   
+   /*
+     * Description: To get All created groups
+     * 
+     * Return: array
+     */
+   
+   public function getGroupName(){
+       $result = $this->db->fetchAll("SELECT * FROM {$this->group_table}");
+        return $result;
+   }
+   /*
+     * Description: To get group data by id
+     * param1: condition array
+     * param2: sort array 
+     * Return: array
+     */
+   public function getGroupOrderById($nd_condition = array('field-name' => 'value'), $sort = array('field-name' => 'ASC')){
+       $extended_where = '';
+        $order_by = '';
+        $params = array();
+        if (!isset($nd_condition['field-name']) and is_array($nd_condition) and count($nd_condition)) {
+            //Parameter is not default, create the where clause
 
+            $arr_where = array();
+            foreach ($nd_condition as $column => $value) {
+                if (is_array($value) and isset($value['like'])) {
+                    //$arr_where[]= " $column like '{$value['like']}'";
+                    $arr_where[] = " $column like ?";
+                    $params[] = "%{$value['like']}%";
+                } else {
+                    $arr_where[] = " $column=?";
+                    $params[] = $value;
+                }
+            }
+            $extended_where = 'where ' . implode(' and ', $arr_where);
+        }
+        if (!isset($sort['field-name']) and is_array($sort)) {
+
+            $arr_orderby = array();
+            foreach ($sort as $column => $type) {
+                $arr_orderby[] = " $column $type";
+            }
+            $order_by = 'ORDER BY ' . implode(' , ', $arr_orderby);
+        }
+
+        $sql = "SELECT * FROM {$this->group_table} $extended_where $order_by";
+        
+        
+        $result = $this->db->fetchAll($sql, $params);
+        return $result;
+   }
+   
     public function validateAndSet($post_data, $type) {
 
         $data = array();
         $error = array();
-
+        $group_data = array();
         array_walk_recursive($post_data, function(&$val) {
             $val = trim($val);
             $val = stripslashes($val);
@@ -332,11 +415,26 @@ class Settings {
 //        if ($type == 'save') {//Edit not allowed on this field, set it only for new row
 //            $data['relationship_module'] = $post_data['relationship_module'];
 //        }
-        if($post_data['group_name'] == 'select_group'){
+        if($post_data['group_dropdown'] == 'select_group'){
             $error[] = "Required field cannot be empty";
         }
-        else{
-            $data['field_group_name'] = $post_data['group_name'];
+        elseif(empty($post_data['group_dropdown'])){
+            //$data['field_group_name'] = $post_data['field_group_name'];
+            if(empty($post_data['group_dropdown']) && empty($post_data['group_display_order'])){
+                $error[] = "Required field cannot be empty";
+            }
+            else{
+                $group_data['group_name'] = $post_data['field_group_name'];
+                $group_data['group_display_order'] = $post_data['group_display_order'];
+                $group_data['module_name'] = $post_data['module'];
+            }
+        }
+        else {
+            $data['field_group_id'] = $post_data['group_dropdown'];
+
+        }
+        if (count($group_data)) {
+            $this->setGroupInfo($group_data);
         }
         if (!empty($error)) {
             throw new \Exception(implode('<br>', $error), '001');
@@ -347,6 +445,7 @@ class Settings {
     public function afterSave($data) {
 
         $other_details = '';
+        $index_type = '';
         if ($data['module_field_datatype'] == 'varchar') {
             $other_details = $data['varchar_limit'];
         } elseif ($data['module_field_datatype'] == 'relationship') {
@@ -453,5 +552,8 @@ class Settings {
             }
         }
     }
-
+    
+    function setGroupInfo($data){
+        $this->modified_group_info = $data;
+    }
 }

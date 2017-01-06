@@ -26,6 +26,10 @@ class DefaultController extends Controller {
         $settings = new Settings($conn);
         $modules = $settings->getModule();
         $datatypes = $settings->getModuleDataTypes();
+        
+        // Get All group Name to Fill in Group Drop Down
+        $Allgroups = $settings->getGroupName();
+        
         //$columns = $settings->fetch(array('module'=>'marketing_projects'));
 
 
@@ -80,11 +84,15 @@ class DefaultController extends Controller {
             $this->get('session')->getFlashBag()->add('error', $e->getMessage() . '<br>' . $e->getTraceAsString());
             //var_dump($e);
         }
-
-
+        
+        $groupId = $result[0]['field_group_id'];
+        $groupOrder = $settings->getGroupOrderById(array('id'=>$groupId));
+        
         $parameters = array('field' => $result,
             'modules' => $modules,
             'datatypes' => $datatypes,
+            'allgroups' => $Allgroups,
+            'groupOrder' => $groupOrder[0]['group_display_order'],
             'id' => $id);
 
 //        if (!empty($message)) {
