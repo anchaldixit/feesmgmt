@@ -28,7 +28,7 @@ class DefaultController extends Controller {
         $datatypes = $settings->getModuleDataTypes();
         
         // Get All group Name to Fill in Group Drop Down
-        $Allgroups = $settings->getGroupName();
+        $allgroups = $settings->getGroupName();
         
         //$columns = $settings->fetch(array('module'=>'marketing_projects'));
 
@@ -85,14 +85,13 @@ class DefaultController extends Controller {
             //var_dump($e);
         }
         
-        $groupId = $result[0]['field_group_id'];
-        $groupOrder = $settings->getGroupOrderById(array('id'=>$groupId));
+        //$groupId = $result[0]['field_group_id'];
+        //$groupOrder = $settings->getGroupOrderById(array('id'=>$groupId));
         
         $parameters = array('field' => $result,
             'modules' => $modules,
             'datatypes' => $datatypes,
-            'allgroups' => $Allgroups,
-            'groupOrder' => $groupOrder[0]['group_display_order'],
+            'allgroups' => $allgroups,
             'id' => $id);
 
 //        if (!empty($message)) {

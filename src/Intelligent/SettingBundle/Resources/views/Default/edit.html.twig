@@ -95,14 +95,31 @@
             
             if($('#group_dd').length){
                 $('#group_dd').change(function(){
+                    //debugger;
                     var _val = $(this).find('option:selected').val();
                     if(_val == ''){
-                        $('#field_group_name').show();}
+                        $('#field_group_name').show();
+                        $('.group_display_li').show();
+                    }
                     else{
-                        $('#field_group_name').hide();}
+                        
+                        $('#field_group_name').hide();
+                        $('.group_display_li').hide();
+                    }
+                        
                 });
             }
-
+            
+            var moduleName = $('#module').find('option:selected').val();
+            if(moduleName != ''){
+                $('#group_dd').find('.'+moduleName).removeClass('hide');
+            }
+            $('#module').change(function(){
+               var moduleName = $(this).find('option:selected').val();
+               $('#group_dd').find('.module').addClass('hide');
+               $('#group_dd').find('.'+moduleName).removeClass('hide');
+            });
+            
         });
 
     </script>
@@ -132,37 +149,6 @@
             <form action="" method="POST">
                 <ul>
                     {% for config in field %}
-                        
-                        <li><label>Group:</label>
-                        <div class="field-wrap">
-                            <div class="dropdown">
-                                <select name="group_dropdown" class="selectbox" id="group_dd">
-                                    <option value="select_group">Select Group</option>
-                                    {% for group in allgroups %}
-                                        
-                                    <option value="{{group.id}}" {{group.id == config.field_group_id ? 'selected':''}}>{{group.group_name}}</option>
-                                    {% endfor %}
-                                    <option value="">Add New Group</option>
-                                </select>
-                            </div>
-                            <input type="text" name="field_group_name" id="field_group_name" placeholder="New Group Name" style="display:none;margin-top: 15px;"/>
-                        </div>
-                    </li>
-                    <li>
-                        <label>Group Display Order:</label>
-                        <div class="field-wrap">
-                            <div class="dropdown">
-                                <select name="group_display_order" class="selectbox">
-                                    <option value="">Select Group Display Order</option>
-                                    <option value="2" {{groupOrder == 2 ? 'selected':''}}>2</option>
-                                    <option value="3" {{groupOrder == 3 ? 'selected':''}}>3</option>
-                                    <option value="4" {{groupOrder == 4 ? 'selected':''}}>4</option>
-                                    <option value="5" {{groupOrder == 5 ? 'selected':''}}>5</option>
-                                    <option value="6" {{groupOrder == 6 ? 'selected':''}}>6</option>
-                                </select>
-                            </div>
-                        </div>
-                    </li>
                         <li><label>Module:</label> 
                             <div class="field-wrap">
                                 <div class="dropdown">
@@ -175,6 +161,42 @@
                                 </div>
                             </div>
                         </li>
+                        <li><label>Group:</label>
+                            
+                        <div class="field-wrap">
+                            <div class="dropdown">
+                                <select name="group_dropdown" class="selectbox" id="group_dd">
+                                    
+                                    <option value="1" {{config.field_group_id is defined and config.field_group_id == 1 ? 'selected':''}}>No Group</option>
+                                    {% for group in allgroups %}
+                                        {% if group.id != 1 %}
+                                            <option  class="{{group.module_name}} hide module" value="{{group.id}}" {{config.field_group_id is defined and group.id == config.field_group_id ? 'selected':''}}>{{group.group_name}}</option>
+                                        {% endif %}
+                                    {% endfor %}
+                                    <option value="">Add New Group</option>
+                                </select>
+                            </div>
+                                    
+                            <input type="text" name="field_group_name" id="field_group_name" placeholder="New Group Name" style="display:none;margin-top: 15px;"/>
+                        </div>
+                    </li>
+                    <li class="group_display_li" style="display: none;">
+                        <label>Group Display Order:</label>
+                        
+                        <div class="field-wrap">
+                            <div class="dropdown">
+                                <select name="group_display_order" class="selectbox">
+                                    <option value="">Select Group Display Order</option>
+                                    <option value="2">2</option>
+                                    <option value="3">3</option>
+                                    <option value="4">4</option>
+                                    <option value="5">5</option>
+                                    <option value="6">6</option>
+                                </select>
+                            </div>
+                        </div>
+                    </li>
+                        
 
                         <li><label>Module Field Name:</label> 
                             <div class="field-wrap">

@@ -238,7 +238,7 @@ class Settings extends ContainerAware {
         $update_data = array();
        $group_data = $this->modified_group_info;
        $group_data['type'] = 'custom';
-       var_dump($group_data);
+       //var_dump($group_data);
        $this->db->insert(
                 $this->group_table, $group_data
         );
@@ -258,50 +258,14 @@ class Settings extends ContainerAware {
      */
    
    public function getGroupName(){
+       $res = array();
        $result = $this->db->fetchAll("SELECT * FROM {$this->group_table}");
-        return $result;
+       foreach ($result as $key=>$value){
+          $res[$value['id']] =  $value;
+       }
+       return $res;
    }
-   /*
-     * Description: To get group data by id
-     * param1: condition array
-     * param2: sort array 
-     * Return: array
-     */
-   public function getGroupOrderById($nd_condition = array('field-name' => 'value'), $sort = array('field-name' => 'ASC')){
-       $extended_where = '';
-        $order_by = '';
-        $params = array();
-        if (!isset($nd_condition['field-name']) and is_array($nd_condition) and count($nd_condition)) {
-            //Parameter is not default, create the where clause
-
-            $arr_where = array();
-            foreach ($nd_condition as $column => $value) {
-                if (is_array($value) and isset($value['like'])) {
-                    //$arr_where[]= " $column like '{$value['like']}'";
-                    $arr_where[] = " $column like ?";
-                    $params[] = "%{$value['like']}%";
-                } else {
-                    $arr_where[] = " $column=?";
-                    $params[] = $value;
-                }
-            }
-            $extended_where = 'where ' . implode(' and ', $arr_where);
-        }
-        if (!isset($sort['field-name']) and is_array($sort)) {
-
-            $arr_orderby = array();
-            foreach ($sort as $column => $type) {
-                $arr_orderby[] = " $column $type";
-            }
-            $order_by = 'ORDER BY ' . implode(' , ', $arr_orderby);
-        }
-
-        $sql = "SELECT * FROM {$this->group_table} $extended_where $order_by";
-        
-        
-        $result = $this->db->fetchAll($sql, $params);
-        return $result;
-   }
+   
    
     public function validateAndSet($post_data, $type) {
 
@@ -458,10 +422,8 @@ class Settings extends ContainerAware {
 //        if ($type == 'save') {//Edit not allowed on this field, set it only for new row
 //            $data['relationship_module'] = $post_data['relationship_module'];
 //        }
-        if($post_data['group_dropdown'] == 'select_group'){
-            $error[] = "Required field cannot be empty";
-        }
-        elseif(empty($post_data['group_dropdown'])){
+        
+        if(empty($post_data['group_dropdown'])){
             //$data['field_group_name'] = $post_data['field_group_name'];
             if(empty($post_data['group_dropdown']) && empty($post_data['group_display_order'])){
                 $error[] = "Required field cannot be empty";
