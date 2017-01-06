@@ -23,7 +23,7 @@ class DefaultController extends Controller {
 
         $conn = $this->get('database_connection');
         #echo get_class($conn);
-        $settings = new Settings($conn);
+        $settings = $this->get('intelligent.setting.module');
         $modules = $settings->getModule();
         $datatypes = $settings->getModuleDataTypes();
         //$columns = $settings->fetch(array('module'=>'marketing_projects'));
@@ -106,7 +106,7 @@ class DefaultController extends Controller {
         $conn = $this->get('database_connection');
 
         $request = Request::createFromGlobals();
-        $settings = new Settings($conn);
+        $settings = $this->get('intelligent.setting.module');
 
         $filters = $request->query->all();
         array_walk_recursive($filters, function(&$val) {

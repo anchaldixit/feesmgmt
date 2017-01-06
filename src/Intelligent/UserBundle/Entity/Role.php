@@ -5,7 +5,9 @@ namespace Intelligent\UserBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use Intelligent\UserBundle\Entity\RoleGlobalPermission;
 use Intelligent\UserBundle\Entity\RoleModulePermission;
+use Intelligent\UserBundle\Entity\RoleReportPermission;
 use Doctrine\Common\Collections\Collection;
+use Doctrine\Common\Collections\Criteria;
 
 
 /**
@@ -75,6 +77,15 @@ class Role
      * @ORM\OneToMany(targetEntity="RoleModulePermission", mappedBy="role")
      */
     private $modulePermissions;
+    
+    /**
+     * @var Collection 
+     * 
+     * One role could have many report permissions 
+     * 
+     * @ORM\OneToMany(targetEntity="RoleReportPermission", mappedBy="role")
+     */
+    private $reportPermissions;
     
     
     /**
@@ -275,12 +286,53 @@ class Role
         }
         return null;
     }
+
+    /**
+     * Add reportPermissions
+     *
+     * @param \Intelligent\UserBundle\Entity\RoleReportPermission $reportPermissions
+     * @return Role
+     */
+    public function addReportPermission(RoleReportPermission $reportPermissions)
+    {
+        $this->reportPermissions[] = $reportPermissions;
+
+        return $this;
+    }
+
+    /**
+     * Remove reportPermissions
+     *
+     * @param \Intelligent\UserBundle\Entity\RoleReportPermission $reportPermissions
+     */
+    public function removeReportPermission(RoleReportPermission $reportPermissions)
+    {
+        $this->reportPermissions->removeElement($reportPermissions);
+    }
+
+    /**
+     * Get reportPermissions
+     *
+     * @return \Doctrine\Common\Collections\Collection 
+     */
+    public function getReportPermissions()
+    {
+        return $this->reportPermissions;
+    }
+    
+    public function getAllowedReportPermissions(){
+        $criteria = Criteria::create();
+        $criteria->where(Criteria::expr()->eq('permission', true));
+        return $this->reportPermissions->matching($criteria);
+    }
+    
     /**
      * Constructor
      */
     public function __construct()
     {
         $this->modulePermissions = new \Doctrine\Common\Collections\ArrayCollection();
+        $this->reportPermissions = new \Doctrine\Common\Collections\ArrayCollection();
     }
 
 }

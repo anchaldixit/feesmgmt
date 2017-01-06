@@ -49,6 +49,11 @@
                 if ($(this).val() != 'varchar' ) {
                     $('#enable_filter_with_option_row').slideUp('slow')
                 }
+                if ($(this).val() == 'formulafield') {
+                    $('#formulafield_row').slideDown('slow')
+                } else {
+                    $('#formulafield_row').slideUp('slow')
+                }
 
             }).trigger('change');
             
@@ -173,6 +178,16 @@
                                         {% endfor %}
                                     </select><br>
                                 </div>
+                            </div>
+                        </li>
+                        <li id="formulafield_row">
+                            <label>Formula:</label> 
+                            <div class="field-wrap">
+                                <textarea name="formulafield" id="formulafield" >{{config.formulafield is defined ? config.formulafield : 'module.fieldname * 100'}}</textarea><br>
+                                <small><i>Formula should be inline with mysql</i></small>
+                                <small><i>Only use field which are already added to module</i></small>
+                                <small><i>Use field module as prefix like customer.customer_name</i></small>
+                                <small><i>In case using relational module table. Use relationship module before the field</i></small>
                             </div>
                         </li>
                         <li id="relationship_module_row"> 

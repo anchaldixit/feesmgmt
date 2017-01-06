@@ -54,10 +54,20 @@ class UserPermissions {
         return $this->settings;
     }
     
+    /**
+     * This will return the current loggedin user
+     * 
+     * @return User
+     */
     public function getUser(){
         return $this->tokenStorage->getToken()->getUser();
     }
     
+    /**
+     * This will return the role of the current logged in user
+     * 
+     * @return Role
+     */
     public function getRole(){
         return $this->getUser()->getRole();
     }
@@ -256,6 +266,24 @@ class UserPermissions {
         }
     }
 
+    /**
+     * This will give the name and id of all the 
+     * permitted reports for the use
+     * 
+     * @return array
+     */
+    public function getVisibleReports(){
+        $visible_reports = array();
+        $allowed_report_permissions = $this->getUser()->getRole()->getAllowedReportPermissions();
+        foreach($allowed_report_permissions as $allowed_report){
+            $visible_reports[] = array(
+                'id' => $allowed_report->getReport()->getId(),
+                'name' => $allowed_report->getReport()->getName()
+            );
+        }
+        return $allowed_report_permissions;
+    }
+    
     /**
      * This function will tell you if the module is visible
      * 

@@ -10,6 +10,18 @@ intelligent_customer_view:
 intelligent_customer_autocomplete:
     path:     /customer/autocomplete
     defaults: { _controller: IntelligentModuleBundle:Customer:autocomplete}
+intelligent_customerprojects:
+    path:     /customerprojects
+    defaults: { _controller: IntelligentModuleBundle:Customerprojects:index }
+intelligent_customerprojects_edit:
+    path:     /customerprojects/edit/{edit_id}
+    defaults: { _controller: IntelligentModuleBundle:Customerprojects:edit }
+intelligent_customerprojects_view:
+    path:     /customerprojects/view/{page_no}
+    defaults: { _controller: IntelligentModuleBundle:Customerprojects:view , page_no: 1 }
+intelligent_customerprojectsr_autocomplete:
+    path:     /customerprojects/autocomplete
+    defaults: { _controller: IntelligentModuleBundle:Customerprojects:autocomplete}
 intelligent_marketingprojects:
     path:     /marketingprojects
     defaults: { _controller: IntelligentModuleBundle:Marketingprojects:index }

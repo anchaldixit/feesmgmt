@@ -9,6 +9,11 @@ services:
         calls: 
             - [setContainer, [@service_container]]
             - [init]
+    intelligent.customer_projects.module:
+        class: Intelligent\ModuleBundle\Lib\Customerprojects
+        calls: 
+            - [setContainer, [@service_container]]
+            - [init]            
     intelligent.marketing_projects.module:
         class: Intelligent\ModuleBundle\Lib\Marketingprojects
         calls: 
