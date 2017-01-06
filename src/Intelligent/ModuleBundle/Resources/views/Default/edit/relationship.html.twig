@@ -39,7 +39,11 @@
         </li>
     {% endif%}
 {% endif%}
-{% if data[field_settings.module_field_name] is defined and data[field_settings.module_field_name] is not empty%}
-    {# most propably this is edit field required. Relationship had to set yet  #}
-    {{ include('IntelligentModuleBundle:Default:edit/'~field_settings.relationship_field_settings.module_field_datatype~'.html.twig', { 'field_settings': field_settings.relationship_field_settings,'data': data[field_settings.module_field_name] is defined ? data[field_settings.module_field_name] : '' ,'permissions':permissions,'readonly':true}) }}
+{% if data[field_settings.module_field_name] is defined and data[field_settings.module_field_name] is not empty and data[field_settings.core_field_settings.module_field_name] is defined%}
+    {# most propably this is edit field required. Relationship had to set yet  
+    only proceed data[field_settings.core_field_settings.module_field_name] is defined, otherwise dont display#}
+    {% set d= field_settings.relationship_field_settings.module_field_datatype=='relationship'? data:data[field_settings.module_field_name]%}
+
+        {{ include('IntelligentModuleBundle:Default:edit/'~field_settings.core_field_settings.module_field_datatype~'.html.twig', { 'field_settings': field_settings,'data': data[field_settings.core_field_settings.module_field_name] is defined ? data[field_settings.core_field_settings.module_field_name] : '' ,'permissions':permissions,'readonly':true}) }}
+
 {% endif %}

@@ -39,7 +39,7 @@ abstract class Module extends ContainerAware {
     function init() {
 
         $this->db = $this->container->get('database_connection');
-        $this->module_settings = new Settings($this->db);
+        $this->module_settings = $this->container->get('intelligent.setting.module');
 
         $this->_init();
     }
@@ -343,19 +343,9 @@ abstract class Module extends ContainerAware {
                 //relationship datatype need to handle is separately.
                 //append module name before field name
                 $this->prepareSQLParams($row, $join, $fieldset, $where);
-//                if ($row['relationship_field_settings']['module_field_datatype'] == 'relationship') {
-//                    $join_table = $row['relationship_field_settings']['relationship_module'];
-//                    //one extra join required(nested)
-//                    $join[$row['relationship_module']] = array("$join_table.id" => "{$row['relationship_module']}." . $this->module_settings->prepareforeignKeyName($join_table));
-//
-//                    $join[$join_table] = array("{$row['relationship_module']}.id" => "{$this->module}." . $this->module_settings->prepareforeignKeyName($row['relationship_module']));
-//                } else {
-//                    $join_table = $row['relationship_module'];
-//
-//                    $join[$join_table] = array("$join_table.id" => "{$this->module}." . $this->module_settings->prepareforeignKeyName($join_table));
-//                }
-//                $name = "{$join_table}.{$row['module_field_name']}";
-//                $fieldset[] = $name;
+                
+            }elseif($row['module_field_datatype'] == 'formulafield'){
+                $fieldset[] = "{$row['formulafield']} as {$row['module_field_name']}";
             } else {
                 $fieldset[] = "{$row['module']}.{$row['module_field_name']}";
             }
@@ -389,7 +379,9 @@ abstract class Module extends ContainerAware {
                 //relationship datatype need to handle is separately.
                 //append module name before field name
                 $this->prepareSQLParams($row, $join, $fieldset, $where);
-            } else {
+            } elseif($row['module_field_datatype'] == 'formulafield'){
+                $fieldset[] = "{$row['formulafield']} as {$row['module_field_name']}";
+            }else {
                 $fieldset[] = "{$row['module']}.{$row['module_field_name']}";
                 if (isset($where[$row['module_field_name']])) {
                     $temp = $where[$row['module_field_name']];
@@ -401,7 +393,7 @@ abstract class Module extends ContainerAware {
         $fieldset[] = "{$this->table}.modified_datetime";
 
         $where = $this->addViewAccessCondition($where);
-
+        
         $result = $this->fetch($fieldset, $where, $join, $order_by, $limit);
 
         return array('schema' => $module_field_set, 'row' => $result);
@@ -426,6 +418,8 @@ abstract class Module extends ContainerAware {
                 //relationship field also required setting for relationship module
 
                 $result2 = $this->getFieldSettings($value['relationship_module'], $value['module_field_name']);
+                $core_field_settings = $this->getCoreSettingsOfRelationshipField($result2);
+                $value['core_field_settings'] = $core_field_settings;
 
                 # Add field setting to $fieldset only for if relationship settings found for it
                 if (count($result2)) {
@@ -461,6 +455,7 @@ abstract class Module extends ContainerAware {
             if ($result[0]['module_field_datatype'] == 'relationship') {
                 //Recursive call
                 $result2 = $this->getFieldSettings($result[0]['relationship_module'], $result[0]['module_field_name']);
+
                 if (count($result2)) {
                     $result[0]['relationship_field_settings'] = $result2;
                 }
@@ -478,7 +473,7 @@ abstract class Module extends ContainerAware {
 
     function prepareSQLParams($field_settings, &$join, &$select, &$where) {
 
-        if ($field_settings['relationship_field_settings']['module_field_datatype'] == 'relationship') {
+        if (isset($field_settings['relationship_field_settings']) and $field_settings['relationship_field_settings']['module_field_datatype'] == 'relationship') {
             $join_table = $field_settings['relationship_field_settings']['relationship_module'];
             //one extra join required(nested)
 
@@ -490,6 +485,9 @@ abstract class Module extends ContainerAware {
                 $where["$join_table.{$field_settings['module_field_name']}"] = $temp;
                 unset($where[$field_settings['module_field_name']]);
             }
+            $this->prepareSQLParams($field_settings['relationship_field_settings'], $join, $select, $where);
+            //do not proceed further
+            return;
         } else {
             $join_table = $field_settings['relationship_module'];
 
@@ -536,12 +534,14 @@ abstract class Module extends ContainerAware {
                     $value['relationship_field_name'] = $this->module_settings->prepareforeignKeyName($value['relationship_module']);
                     $value['relationship_module_display_name'] = $this->module_settings->getModule($value['relationship_module']);
                 }
-                $result2 = $this->module_settings->fetch(
-                        array('module' => $value['relationship_module'],
-                            'module_field_name' => $value['module_field_name']
-                        )
-                );
-                $value['relationship_field_settings'] = $result2[0];
+                $result2 = $this->getFieldSettings($value['relationship_module'], $value['module_field_name']);
+                
+                $core_field_settings = $this->getCoreSettingsOfRelationshipField($result2);
+                $value['core_field_settings']=$result2['core_field_settings'] = $core_field_settings;
+                if (count($result2)) {
+                    $value['relationship_field_settings'] = $result2;
+                }
+                
                 $fieldset[] = $value;
             }
             //$fieldset[]
@@ -655,8 +655,9 @@ abstract class Module extends ContainerAware {
 
     function getCoreSettingsOfRelationshipField($field_settings) {
 
-        if (isset($field_settings['relationship_field_settings']) and $field_settings['relationship_field_datatype'] == 'relationship' and count($field_settings['relationship_field_settings'])) {
-            $this->getCoreSettingsOfRelationshipField($field_settings['relationship_field_settings']);
+        if (isset($field_settings['relationship_field_settings']) and $field_settings['module_field_datatype'] == 'relationship' and count($field_settings['relationship_field_settings'])) {
+            return $this->getCoreSettingsOfRelationshipField($field_settings['relationship_field_settings']);
+
         } else {
             return $field_settings;
         }

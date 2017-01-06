@@ -8,7 +8,9 @@
 
 namespace Intelligent\SettingBundle\Lib;
 
-class Settings {
+use Symfony\Component\DependencyInjection\ContainerAware;
+
+class Settings extends ContainerAware {
 
     var $db;
     var $table = 'module_settings';
@@ -18,6 +20,7 @@ class Settings {
      */
     var $module = array(
         'customer' => 'Customer',
+        'customer_projects' => 'Customer Projects',
         'marketing_projects' => 'Marketing Projects',
         'initiative' => 'Initiatives',
         'campaign' => 'Campaigns',
@@ -26,7 +29,7 @@ class Settings {
         'assign_psuedo' => 'Assign Psuedo',
         'links' => 'Links',
         'link_rates' => 'Link Rates',
-        'dnc_lists' =>'DNC Lists'
+        'dnc_lists' => 'DNC Lists'
     );
     var $module_datatypes = array(
         'varchar' => 'Limited Character',
@@ -40,15 +43,27 @@ class Settings {
         'user' => 'User',
         'date' => 'Date',
 //        'datetime' => 'Datetime',
-        'relationship' => 'Relationship'
+        'relationship' => 'Relationship',
+        'formulafield' => 'Formula field'
     );
     private $last_insert_id; //initilized after new field created
     private $last_sql_withoutlimit; //sql will be store in case total number of count need to be fetched
     private $last_sql_withoutlimit_params; //store the parameters for $last_sql_withoutlimit variable sql
+    private $module_column_added; //used to communicate between setting save & module alter actions
+    private $backup; //incase update command need to rollbacked, variable will hold the previous version of data;
 
-    public function __construct($db) {
+    public function __construct() {
 
-        $this->db = $db;
+        //$this->db = $db;
+    }
+
+    /*
+     * Function will be called thru service
+     */
+
+    function init() {
+
+        $this->db = $this->container->get('database_connection');
     }
 
     /*
@@ -132,7 +147,16 @@ class Settings {
             $this->afterSave($data);
         } catch (\Exception $ex) {
             //rollback the first insert of setting module
-            $this->delete($new_id);
+            if (!$this->module_column_added) {
+                //rollback only when  module column is not created successfully
+                try {
+                    $this->delete($new_id);
+                } catch (\Exception $ex1) {
+                    //do nothing if not able to delete it
+                    //throwing first exeception is important
+                }
+            }
+
             throw $ex;
         }
 
@@ -154,10 +178,17 @@ class Settings {
 
             $data['modified_datetime'] = date("Y-m-d H:i:s");
 
+            //Backup the current state of row, before update
+            $this->backup = $this->fetch(array('id' => $post_data['id']));
+
 
             $this->db->update(
                     $this->table, $data, array('id' => $post_data['id'])
             );
+
+            $this->afterUpdate($post_data);
+
+
             if ($this->db->errorCode() != 0) {
 
                 throw new \Exception($this->db->errorInfo(), '002');
@@ -177,9 +208,9 @@ class Settings {
 
         //first fetch the details to know which column need to be deleted
         $data = $this->fetch(array('id' => $delete_id));
-        
+
         $respid = $this->db->delete("{$this->table}", array('id' => $delete_id));
-        
+
         $this->afterDelete($data[0]);
 
 
@@ -329,6 +360,12 @@ class Settings {
             $data['display_position'] = floor($post_data['display_position']);
         }
 
+        if ($post_data['module_field_datatype'] == 'formulafield' and empty($post_data['formulafield'])) {
+            $error[] = "Formula cannot be empty";
+        } else {
+            $data['formulafield'] = $post_data['formulafield'];
+        }
+
 //        if ($type == 'save') {//Edit not allowed on this field, set it only for new row
 //            $data['relationship_module'] = $post_data['relationship_module'];
 //        }
@@ -342,17 +379,33 @@ class Settings {
     public function afterSave($data) {
 
         $other_details = '';
+        $index_type = '';
         if ($data['module_field_datatype'] == 'varchar') {
             $other_details = $data['varchar_limit'];
         } elseif ($data['module_field_datatype'] == 'relationship') {
             $this->createForeignKey($data['module'], $this->prepareforeignKeyName($data['relationship_module']));
+            return;
+        } elseif ($data['module_field_datatype'] == 'formulafield') {
+            //keys required to be created
+            //check if added formula dont have error
+            $module = $this->container->get("intelligent.{$data['module']}.module");
+
+            
+            try {
+                //just take 1 as dummy,only wana check syntax should be run fine
+                $module->getRow(1);
+            } catch (\Exception $exc) {
+                $this->container->get('session')->getFlashBag()->add('error', "Either formula is not inline with mysql or field not added correctly. ");
+                throw $exc;
+            }
+
             return;
         }
         if ($data['unique_field'] == 'Y') {
             $index_type = 'UNIQUE';
         } elseif ($data['enable_filter'] == 'Y') {
             $index_type = 'INDEX';
-        } elseif($data['module_field_datatype'] != 'text') {
+        } elseif (!in_array($data['module_field_datatype'], array('text', 'link'))) {
             $index_type = 'INDEX';
         }
 
@@ -368,6 +421,33 @@ class Settings {
         if ($this->db->errorCode() != 0) {
 
             throw new \Exception($this->db->errorInfo(), '004');
+        }
+    }
+
+    public function afterUpdate($data) {
+        
+
+        if ($data['module_field_datatype'] == 'formulafield') {
+            //keys required to be created
+            //check if added formula dont have error
+            $results = $this->fetch(array('id' => $data['id']));
+            try {
+                $module = $this->container->get("intelligent.{$results[0]['module']}.module");
+
+                //just take 1 as dummy,only wana check syntax should be run fine
+                $module->getRow(1);
+            } catch (\Exception $exc) {
+                $this->container->get('session')->getFlashBag()->add('error', "Either formula is not inline with mysql or field not added correctly. ");
+
+                if (count($this->backup)) {
+                    //Some problem with formula, restore the previous stage of row
+                    $this->db->update(
+                            $this->table, $this->backup[0], array('id' => $this->backup[0]['id'])
+                    );
+                }
+                throw $exc;
+            }
+            return;
         }
     }
 
@@ -411,6 +491,7 @@ class Settings {
 
             throw new \Exception($this->db->errorInfo(), '002');
         }
+        $this->module_column_added = true;
     }
 
     function totalCountOfLastFetch() {

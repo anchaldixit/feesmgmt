@@ -8,12 +8,9 @@ services:
         tags:
             - { name: kernel.event_listener, event: kernel.controller}
         arguments: ["@controller_resolver"]
-    module_settings:
-        class: Intelligent\SettingBundle\Lib\Settings
-        arguments: ["@database_connection"]
     user_permissions:
         class: Intelligent\UserBundle\Services\UserPermissions
-        arguments: ["@security.token_storage","@module_settings"]
+        arguments: ["@security.token_storage","@intelligent.setting.module"]
     user_customers:
         class: Intelligent\UserBundle\Services\UserCustomers
         arguments: ["@user_permissions","@doctrine.orm.entity_manager"]
