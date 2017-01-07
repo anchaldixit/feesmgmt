@@ -12,6 +12,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Session\Session;
+use Intelligent\SettingBundle\Lib\Helper;
 
 abstract class ModulebaseController extends Controller {
 
@@ -21,6 +22,7 @@ abstract class ModulebaseController extends Controller {
     var $module_route_identifier;
     protected $permissions;
     protected $limit = 20;
+    protected $helper;
 
     function __construct() {
 
@@ -34,6 +36,8 @@ abstract class ModulebaseController extends Controller {
                 throw new \Exception("{$this->module_classname} Module class not found", '001');
             }
         }
+
+        $this->helper = new Helper();
     }
 
     /*
@@ -46,9 +50,9 @@ abstract class ModulebaseController extends Controller {
 
 
         $this->initPermissionsDetails();
-        
+
         //$this->initRowAccessPermission();
-        
+
         if ($this->noAccess('view')) {
             return $this->render('IntelligentUserBundle:Default:noaccess.html.twig', array());
         }
@@ -107,8 +111,8 @@ abstract class ModulebaseController extends Controller {
 
                     $result = $module->getRow($edit_id);
                     $id = $edit_id;
-                    
-                    
+
+
 
                     if (!count($result['row'])) {
                         //@todo: just for testing, redirect to listing page
@@ -138,9 +142,10 @@ abstract class ModulebaseController extends Controller {
             'schema' => $result['schema'],
             'id' => $id,
             'users' => $all_users,
-            'module_name' => $module_display_name,
+            'module_display_name' => $module_display_name,
             'module' => $this->module_route_identifier,
             'module_permission_asscess_key' => $this->moduleSessionKey(),
+            'module_name' => $this->module_name,
             'permissions' => $this->permissions
         );
 
@@ -152,12 +157,12 @@ abstract class ModulebaseController extends Controller {
 
         $this->initPermissionsDetails();
         //$this->initRowAccessPermission();
-        
+
         if ($this->noAccess('view')) {
             return $this->noAccessPage();
         }
 
-                
+
         $module = $this->get("intelligent.{$this->module_name}.module");
 
         $request = Request::createFromGlobals();
@@ -172,7 +177,8 @@ abstract class ModulebaseController extends Controller {
             $val = trim($val);
             $val = stripslashes($val);
         });
-        $filters = $this->removeEmptyConditions($filters);
+
+        $filters = $this->helper->removeEmptyConditions($filters);
 
         $params = $this->prepareFilterCondtion($filters);
 
@@ -194,9 +200,10 @@ abstract class ModulebaseController extends Controller {
             'selected_filters' => $filters,
             'pagination' => $pagination,
             'users' => $all_users,
-            'module_name' => $module_display_name,
+            'module_display_name' => $module_display_name,
             'module' => $this->module_route_identifier,
             'module_permission_asscess_key' => $this->moduleSessionKey(),
+            'module_name'=>  $this->module_name,
             'permissions' => $this->permissions
         );
         return $this->render('IntelligentModuleBundle:Default:view.html.twig', $parameters);
@@ -290,6 +297,8 @@ abstract class ModulebaseController extends Controller {
             $permission['custom_field'] = $user_permission->getAllFieldPermissions($this->module_name);
 
             $this->permissionHack($permission);
+            
+            $permission['setting_permissions'] = $user_permission->getEditAppStructurePermission();
 
             $session->set($this->moduleSessionKey(), $permission);
             $this->permissions = $permission;
@@ -371,55 +380,26 @@ abstract class ModulebaseController extends Controller {
     }
 
     /*
-     * Remove all empty value keys of array. Check it recursively
-     */
-    private function removeEmptyConditions($source) {
-        $final = $source;
-        if (is_array($source) and count($source))
-            foreach ($source as $key => $value) {
-                if ($value === '') {//clear empty string condition
-                    //do not use empty, we want zero to be based
-                    unset($final[$key]);
-                } elseif (is_array($value) and ! count($value)) {//clear empty array
-                    unset($final[$key]);
-                } elseif (is_array($value) and count($value)) {
-
-                    $filtered_array = array_filter($value, function($v) {//clear non empty array
-                        return $v === '' ? false : true;
-                    });
-                    //recursive call
-                    $filtered_array = $this->removeEmptyConditions($filtered_array);
-                    if (count($filtered_array)) {
-                        $final[$key] = $filtered_array;
-                    } else {
-                        unset($final[$key]);
-                    }
-                }
-            }
-        return $final;
-    }
-        
-    /*
      * NOt in use
      */
+
     function initRowAccessPermission() {
-        
+
         $user_permission = $this->get("user_permissions");
         $active_customer_filter = $user_permission->getCurrentViewCustomer()->getId();
-        
+
         $session = new Session();
-        
+
         $session->set('active_customer_filter', $active_customer_filter);
-        
     }
-    
+
     /*
      * Method to override 
      * param1: @mixed
      */
+
     protected function _afterSaveEvent($param) {
         //empty
     }
-
 
 }

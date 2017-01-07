@@ -8,10 +8,11 @@
 
 namespace Intelligent\SettingBundle\Lib;
 
-use Symfony\Component\DependencyInjection\ContainerAware;
+use Symfony\Component\DependencyInjection\ContainerAwareTrait;
 
-class Settings extends ContainerAware {
+class Settings {
 
+    use ContainerAwareTrait;
     var $db;
     var $table = 'module_settings';
     var $group_table = 'module_fields_group';
@@ -433,12 +434,10 @@ class Settings extends ContainerAware {
             else{
                 $group_data['group_name'] = $post_data['field_group_name'];
                 $group_data['group_display_order'] = $post_data['group_display_order'];
-                if($type == 'update'){
-                    $group_data['module_name'] = $post_data['module_name'];
-                }
-                else{
-                    $group_data['module_name'] = $post_data['module'];
-                }
+
+                //edit request will get empty $post_data['module']
+                $group_data['module_name'] = empty($post_data['module'])?$this->module:$post_data['module'];
+
             }
         }
         else {

@@ -10,10 +10,11 @@ namespace Intelligent\ModuleBundle\Lib;
 
 use Intelligent\SettingBundle\Lib\Settings;
 use Symfony\Component\HttpFoundation\Session\Session;
-use Symfony\Component\DependencyInjection\ContainerAware;
+use Symfony\Component\DependencyInjection\ContainerAwareTrait;
 
-abstract class Module extends ContainerAware {
+abstract class Module  {
 
+    use ContainerAwareTrait;
     var $db;
     protected $table;
     protected $module;
@@ -357,11 +358,6 @@ abstract class Module extends ContainerAware {
 
         return array('schema' => $module_field_set, 'row' => $result);
 
-
-
-        //Need list of all fields
-        //how many left join
-        //Fetch the data
     }
 
     function getRows($where, $order_by, $limit) {
@@ -480,12 +476,13 @@ abstract class Module extends ContainerAware {
             $join[$field_settings['relationship_module']] = array("{$field_settings['relationship_module']}.id" => "{$field_settings['module']}." . $this->module_settings->prepareforeignKeyName($field_settings['relationship_module']));
 
             $join[$join_table] = array("$join_table.id" => "{$field_settings['relationship_module']}." . $this->module_settings->prepareforeignKeyName($join_table));
+
+            $this->prepareSQLParams($field_settings['relationship_field_settings'], $join, $select, $where);
             if (isset($where[$field_settings['module_field_name']])) {
                 $temp = $where[$field_settings['module_field_name']];
                 $where["$join_table.{$field_settings['module_field_name']}"] = $temp;
                 unset($where[$field_settings['module_field_name']]);
             }
-            $this->prepareSQLParams($field_settings['relationship_field_settings'], $join, $select, $where);
             //do not proceed further
             return;
         } else {

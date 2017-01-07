@@ -78,31 +78,32 @@
                 return false;
 
             });
-            
-            if($('._id').length){
-               $('._id').css('width','50px');
+
+            if ($('._id').length) {
+                $('._id').css('width', '50px');
             }
-            if($('._varchar').length){
-               $('._varchar').css('width','200px');
+            if ($('._varchar').length) {
+                $('._varchar').css('width', '200px');
             }
-            if($('._relationship').length){
-               $('._relationship').css('width','150px');
+            if ($('._relationship').length) {
+                $('._relationship').css('width', '150px');
             }
-            if($('._enum').length){
-               $('._enum').css('width','100px');
+            if ($('._enum').length) {
+                $('._enum').css('width', '100px');
             }
-            if($('._link').length){
-               $('._link').css('width','110px');
+            if ($('._link').length) {
+                $('._link').css('width', '110px');
             }
-            if($('._user').length){
-               $('._user').css('width','200px');
+            if ($('._user').length) {
+                $('._user').css('width', '200px');
             }
-            if($('._number').length){
-               $('._number').css('width','100px');
+            if ($('._number').length) {
+                $('._number').css('width', '100px');
             }
-            if($('._decimal').length){
-               $('._decimal').css('width','100px');
+            if ($('._decimal').length) {
+                $('._decimal').css('width', '100px');
             }
+
             if($('._percentage').length){
                $('._percentage').css('width','150px');
             }
@@ -111,22 +112,23 @@
             }
             if($('._date').length){
                $('._date').css('width','150px');
+
             }
-            if($('._modified').length){
-                $('._modified').css('width','130px');
+            if ($('._modified').length) {
+                $('._modified').css('width', '130px');
             }
-            if($('._action').length){
-                $('._action').css('width','130px');
+            if ($('._action').length) {
+                $('._action').css('width', '130px');
             }
             var _width = 0;
             var th = $('.marketingProjects thead tr th');
-            th.each(function(){
+            th.each(function () {
                 w = $(this)[0].style.width;
                 console.log(w);
                 _width = _width + parseInt(w);
             });
-            
-            $('.marketingProjects').css('width',_width+'px')
+
+            $('.marketingProjects').css('width', _width + 'px')
         });
 
 
@@ -138,15 +140,23 @@
     {#% set permissions = app.session.get(module_permission_asscess_key) %#}
     <div class="bottom-sec">
         <div class="bread-crumb">
-            <span>{{module_name}}</span>
+            <span>{{module_display_name}}</span>
             <i class="fa fa-long-arrow-right"></i>
             <span>View</span>
         </div>
         <div class="custom-feature">
+            {% if permissions['setting_permissions'] %}
+                <a href="{{ path('intelligent_setting_view', {'filter[match][module]': module_name}) }}"><i class="fa "></i>Settings</a>
+            {% endif %}
+            
             {% if permissions['add'] %}
                 <a href="{{ path('intelligent_'~module~'_edit', {'edit_id': 'new'}) }}"><i class="fa "></i>New</a>
             {% endif %}
+            
+            
         </div>
+        
+        
     </div>
     <div class="full-container content-table">
         <div class="left-container left-sidebar">
@@ -197,49 +207,51 @@
                                             {{ include('IntelligentModuleBundle:Default:view/selected-labels.html.twig', { 'schema': schema,'selected_filters': selected_filters ,'users':users }) }}   
                                             {% if rows|length > 0 %}
                                                 <div class="table-outer">
-                                                <table class="marketingProjects">
-                                                    <thead>
-                                                        <tr>
+                                                    <table class="marketingProjects">
+                                                        <thead>
+                                                            <tr>
+                                                                <th class="_action">Action</th>
 
-                                                            <th class="_id">Id</th>
-                                                            
+                                                                <th class="_id">Id</th>
+
                                                                 {% for field_settings in schema %}
                                                                     {% if permissions.custom == false or  (permissions.custom == true and permissions.custom_field[field_settings.module_field_name]>0) %}
                                                                     {# if custom access setting id done then allowed only for view & editview is true that is 1 or 2  #}
-                                                                <th class="_{{field_settings.module_field_datatype}}">{{field_settings.module_field_display_name}}</th>
-                                                                    {% endif %}
-                                                                        {% endfor %}
-                                                                        <th class="_modified">Last Modified</th>
-                                                                        <th class="_action">Action</th>
-                                                                    </tr>
-                                                                </thead>
+                                                                    <th class="_{{field_settings.module_field_datatype}}">{{field_settings.module_field_display_name}}</th>
+                                                                        {% endif %}
+                                                                            {% endfor %}
+                                                                            <th class="_modified">Last Modified</th>
+                                                                            
+                                                                        </tr>
+                                                                    </thead>
 
-                                                                {% for row in rows %}
-                                                                    <tr>
-                                                                        <td>{{row.id}}
-
-                                                                            {% for field_settings in schema %}
-
-                                                                                {% if field_settings.module_field_datatype == 'user' %}
-                                                                                {{ include('IntelligentModuleBundle:Default:view/'~field_settings.module_field_datatype~'.html.twig', { 'field_settings': field_settings,'data': row[field_settings.module_field_name] is defined ? row[field_settings.module_field_name] : '','users':users,'permissions':permissions }) }}   
-                                                                            {% else %}
-                                                                                {{ include('IntelligentModuleBundle:Default:view/'~field_settings.module_field_datatype~'.html.twig', { 'field_settings': field_settings,'data': row[field_settings.module_field_name] is defined ? row[field_settings.module_field_name] : '','permissions':permissions}) }}      
+                                                                    {% for row in rows %}
+                                                                        <tr>
+                                                                            <td>
+                                                                                <a href="{{ path('intelligent_'~module~'_edit', {'edit_id': row.id}) }}">view</a>  
+                                                                                {% if permissions.edit %} 
+                                                                                    | <a href="{{ path('intelligent_'~module~'_edit', {'edit_id': row.id}) }}">edit</a> 
                                                                                 {% endif %}
-                                                                                    {% endfor %}
-                                                                                    <td>{{row.modified_datetime}}</td>
-                                                                                    <td>
-                                                                                        <a href="{{ path('intelligent_'~module~'_edit', {'edit_id': row.id}) }}">view</a>  
-                                                                                        {% if permissions.edit %} 
-                                                                                            | <a href="{{ path('intelligent_'~module~'_edit', {'edit_id': row.id}) }}">edit</a> 
-                                                                                        {% endif %}
-                                                                                        {% if permissions.delete %}     
-                                                                                            | <a href="{{ path('intelligent_'~module~'_view', {'delete_id': row.id}) }}" class="delete-link">delete</a>
-                                                                                        {% endif %}
-                                                                                    </td>
-                                                                                </tr>
-                                                                                {% endfor %}
+                                                                                {% if permissions.delete %}     
+                                                                                    | <a href="{{ path('intelligent_'~module~'_view', {'delete_id': row.id}) }}" class="delete-link">delete</a>
+                                                                                {% endif %}
+                                                                            </td>
+                                                                            <td>{{row.id}}
 
-                                                                                </table>
+                                                                                {% for field_settings in schema %}
+
+                                                                                    {% if field_settings.module_field_datatype == 'user' %}
+                                                                                    {{ include('IntelligentModuleBundle:Default:view/'~field_settings.module_field_datatype~'.html.twig', { 'field_settings': field_settings,'data': row[field_settings.module_field_name] is defined ? row[field_settings.module_field_name] : '','users':users,'permissions':permissions }) }}   
+                                                                                {% else %}
+                                                                                    {{ include('IntelligentModuleBundle:Default:view/'~field_settings.module_field_datatype~'.html.twig', { 'field_settings': field_settings,'data': row[field_settings.module_field_name] is defined ? row[field_settings.module_field_name] : '','permissions':permissions}) }}      
+                                                                                    {% endif %}
+                                                                                        {% endfor %}
+                                                                                        <td>{{row.modified_datetime}}</td>
+
+                                                                                    </tr>
+                                                                                    {% endfor %}
+
+                                                                                    </table>
                                                                                 </div>
                                                                                 {{ include('IntelligentModuleBundle:Default:pagination.html.twig', { 'pagination': pagination,'module':module }) }}
                                                                                 {% else %}
