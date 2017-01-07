@@ -12,6 +12,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Session\Session;
+use Intelligent\SettingBundle\Lib\Helper;
 
 abstract class ModulebaseController extends Controller {
 
@@ -21,8 +22,8 @@ abstract class ModulebaseController extends Controller {
     var $module_route_identifier;
     protected $permissions;
     protected $limit = 20;
-
-    function __construct() {
+    protected $helper;
+                function __construct() {
 
         if (empty($this->module_name)) {
             throw new \Exception('Module name not configured', '001');
@@ -34,6 +35,8 @@ abstract class ModulebaseController extends Controller {
                 throw new \Exception("{$this->module_classname} Module class not found", '001');
             }
         }
+        
+        $this->helper = new Helper();
     }
 
     /*
@@ -172,7 +175,8 @@ abstract class ModulebaseController extends Controller {
             $val = trim($val);
             $val = stripslashes($val);
         });
-        $filters = $this->removeEmptyConditions($filters);
+
+        $filters = $this->helper->removeEmptyConditions($filters);
 
         $params = $this->prepareFilterCondtion($filters);
 
@@ -368,35 +372,6 @@ abstract class ModulebaseController extends Controller {
 
         $classnamelike = ucfirst($this->module_route_identifier);
         return $this->forward("IntelligentModuleBundle:$classnamelike:view", array('page_no' => 1));
-    }
-
-    /*
-     * Remove all empty value keys of array. Check it recursively
-     */
-    private function removeEmptyConditions($source) {
-        $final = $source;
-        if (is_array($source) and count($source))
-            foreach ($source as $key => $value) {
-                if ($value === '') {//clear empty string condition
-                    //do not use empty, we want zero to be based
-                    unset($final[$key]);
-                } elseif (is_array($value) and ! count($value)) {//clear empty array
-                    unset($final[$key]);
-                } elseif (is_array($value) and count($value)) {
-
-                    $filtered_array = array_filter($value, function($v) {//clear non empty array
-                        return $v === '' ? false : true;
-                    });
-                    //recursive call
-                    $filtered_array = $this->removeEmptyConditions($filtered_array);
-                    if (count($filtered_array)) {
-                        $final[$key] = $filtered_array;
-                    } else {
-                        unset($final[$key]);
-                    }
-                }
-            }
-        return $final;
     }
         
     /*
