@@ -23,7 +23,8 @@ abstract class ModulebaseController extends Controller {
     protected $permissions;
     protected $limit = 20;
     protected $helper;
-                function __construct() {
+
+    function __construct() {
 
         if (empty($this->module_name)) {
             throw new \Exception('Module name not configured', '001');
@@ -35,7 +36,7 @@ abstract class ModulebaseController extends Controller {
                 throw new \Exception("{$this->module_classname} Module class not found", '001');
             }
         }
-        
+
         $this->helper = new Helper();
     }
 
@@ -49,9 +50,9 @@ abstract class ModulebaseController extends Controller {
 
 
         $this->initPermissionsDetails();
-        
+
         //$this->initRowAccessPermission();
-        
+
         if ($this->noAccess('view')) {
             return $this->render('IntelligentUserBundle:Default:noaccess.html.twig', array());
         }
@@ -110,8 +111,8 @@ abstract class ModulebaseController extends Controller {
 
                     $result = $module->getRow($edit_id);
                     $id = $edit_id;
-                    
-                    
+
+
 
                     if (!count($result['row'])) {
                         //@todo: just for testing, redirect to listing page
@@ -141,9 +142,10 @@ abstract class ModulebaseController extends Controller {
             'schema' => $result['schema'],
             'id' => $id,
             'users' => $all_users,
-            'module_name' => $module_display_name,
+            'module_display_name' => $module_display_name,
             'module' => $this->module_route_identifier,
             'module_permission_asscess_key' => $this->moduleSessionKey(),
+            'module_name' => $this->module_name,
             'permissions' => $this->permissions
         );
 
@@ -155,12 +157,12 @@ abstract class ModulebaseController extends Controller {
 
         $this->initPermissionsDetails();
         //$this->initRowAccessPermission();
-        
+
         if ($this->noAccess('view')) {
             return $this->noAccessPage();
         }
 
-                
+
         $module = $this->get("intelligent.{$this->module_name}.module");
 
         $request = Request::createFromGlobals();
@@ -198,9 +200,10 @@ abstract class ModulebaseController extends Controller {
             'selected_filters' => $filters,
             'pagination' => $pagination,
             'users' => $all_users,
-            'module_name' => $module_display_name,
+            'module_display_name' => $module_display_name,
             'module' => $this->module_route_identifier,
             'module_permission_asscess_key' => $this->moduleSessionKey(),
+            'module_name'=>  $this->module_name,
             'permissions' => $this->permissions
         );
         return $this->render('IntelligentModuleBundle:Default:view.html.twig', $parameters);
@@ -294,6 +297,8 @@ abstract class ModulebaseController extends Controller {
             $permission['custom_field'] = $user_permission->getAllFieldPermissions($this->module_name);
 
             $this->permissionHack($permission);
+            
+            $permission['setting_permissions'] = $user_permission->getEditAppStructurePermission();
 
             $session->set($this->moduleSessionKey(), $permission);
             $this->permissions = $permission;
@@ -373,28 +378,28 @@ abstract class ModulebaseController extends Controller {
         $classnamelike = ucfirst($this->module_route_identifier);
         return $this->forward("IntelligentModuleBundle:$classnamelike:view", array('page_no' => 1));
     }
-        
+
     /*
      * NOt in use
      */
+
     function initRowAccessPermission() {
-        
+
         $user_permission = $this->get("user_permissions");
         $active_customer_filter = $user_permission->getCurrentViewCustomer()->getId();
-        
+
         $session = new Session();
-        
+
         $session->set('active_customer_filter', $active_customer_filter);
-        
     }
-    
+
     /*
      * Method to override 
      * param1: @mixed
      */
+
     protected function _afterSaveEvent($param) {
         //empty
     }
-
 
 }
