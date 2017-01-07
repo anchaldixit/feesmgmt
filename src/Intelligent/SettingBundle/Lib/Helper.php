@@ -28,8 +28,6 @@ class Helper {
                         return $v === '' ? false : true;
                     });
                     //recursive call
-                    echo 'what';
-                    var_dump($filtered_array);
                     $filtered_array = $this->removeEmptyConditions($filtered_array);
                     if (count($filtered_array)) {
                         $final[$key] = $filtered_array;
