@@ -431,7 +431,8 @@ class Settings extends ContainerAware {
             else{
                 $group_data['group_name'] = $post_data['field_group_name'];
                 $group_data['group_display_order'] = $post_data['group_display_order'];
-                $group_data['module_name'] = $post_data['module'];
+                //edit request will get empty $post_data['module']
+                $group_data['module_name'] = empty($post_data['module'])?$this->module:$post_data['module'];
             }
         }
         else {
