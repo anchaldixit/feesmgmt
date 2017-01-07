@@ -13,6 +13,7 @@ use Symfony\Component\DependencyInjection\ContainerAwareTrait;
 class Settings {
 
     use ContainerAwareTrait;
+
     var $db;
     var $table = 'module_settings';
     var $group_table = 'module_fields_group';
@@ -108,6 +109,13 @@ class Settings {
                     //$arr_where[]= " $column like '{$value['like']}'";
                     $arr_where[] = " $column like ?";
                     $params[] = "%{$value['like']}%";
+                } elseif (is_array($value) and isset($value['in'])) {
+
+                    $value = "'" . implode("','", $value['in']) . "'";
+
+                    //@todo: convert it to param
+
+                    $arr_where[] = " $column in ($value)";
                 } else {
                     $arr_where[] = " $column=?";
                     $params[] = $value;
@@ -132,9 +140,9 @@ class Settings {
     }
 
     public function save($post_data) {
-        
+
         $data = $this->validateAndSet($post_data, 'save');
-        
+
         $data['modified_datetime'] = date("Y-m-d H:i:s");
 
         $this->db->insert(
@@ -144,16 +152,14 @@ class Settings {
 
             throw new \Exception($this->db->errorInfo(), '001');
         }
-        
+
         $this->last_insert_id = $new_id = $this->db->lastInsertId();
-        if(empty($post_data['group_dropdown'])){
+        if (empty($post_data['group_dropdown'])) {
             //$newrowid = empty($this->last_insert_id)?$post_data['id']: $this->last_insert_id ;
-            $this->createNewGroup($post_data,$new_id);
+            $this->createNewGroup($post_data, $new_id);
         }
         try {
             $this->afterSave($data);
-            
-        
         } catch (\Exception $ex) {
             //rollback the first insert of setting module
 
@@ -184,14 +190,13 @@ class Settings {
     function update($post_data) {
 
         if (!empty($post_data['id'])) {
-            $data = $this->validateAndSet($post_data, 'update');
-
-
-            $data['modified_datetime'] = date("Y-m-d H:i:s");
-
+            
             //Backup the current state of row, before update
             $this->backup = $this->fetch(array('id' => $post_data['id']));
+            
+            $data = $this->validateAndSet($post_data, 'update');
 
+            $data['modified_datetime'] = date("Y-m-d H:i:s");
 
             $this->db->update(
                     $this->table, $data, array('id' => $post_data['id'])
@@ -227,47 +232,45 @@ class Settings {
 
         return $respid;
     }
-    
+
     /*
      * Description: Create New field Group and insert created id into module setting Table
      * Param1: array
      * Param2: id
      * Return: Nothing
      */
-    
-    public function createNewGroup($postdata,$id){
+
+    public function createNewGroup($postdata, $id) {
         $update_data = array();
-       $group_data = $this->modified_group_info;
-       $group_data['type'] = 'custom';
-       //var_dump($group_data);
-       $this->db->insert(
+        $group_data = $this->modified_group_info;
+        $group_data['type'] = 'custom';
+        //var_dump($group_data);
+        $this->db->insert(
                 $this->group_table, $group_data
         );
-       $newgroupid = $this->db->lastInsertId();
-       $update_data['field_group_id'] = $newgroupid;
-       
-       $this->db->update(
-                    $this->table,  $update_data, array('id' => $id)
-            );
-       
-   }
-   
-   /*
+        $newgroupid = $this->db->lastInsertId();
+        $update_data['field_group_id'] = $newgroupid;
+
+        $this->db->update(
+                $this->table, $update_data, array('id' => $id)
+        );
+    }
+
+    /*
      * Description: To get All created groups
      * 
      * Return: array
      */
-   
-   public function getGroupName(){
-       $res = array();
-       $result = $this->db->fetchAll("SELECT * FROM {$this->group_table}");
-       foreach ($result as $key=>$value){
-          $res[$value['id']] =  $value;
-       }
-       return $res;
-   }
-   
-   
+
+    public function getGroupName() {
+        $res = array();
+        $result = $this->db->fetchAll("SELECT * FROM {$this->group_table}");
+        foreach ($result as $key => $value) {
+            $res[$value['id']] = $value;
+        }
+        return $res;
+    }
+
     public function validateAndSet($post_data, $type) {
 
         $data = array();
@@ -309,8 +312,6 @@ class Settings {
                 } elseif ($post_data['relationship_module'] == $post_data['module']) {
 
                     $error[] = "Relationship Module cannot be same as module name.";
-                } elseif (empty($post_data['relationship_module_unique_field'])) {
-                    $error[] = "Relationship Module unique field cannot be empty.";
                 } else {
                     //check the field name exist in relationship module
                     $result1 = $this->fetch(
@@ -318,24 +319,15 @@ class Settings {
                                 'module' => $post_data['relationship_module'],
                                 'module_field_name' => $data['module_field_name']));
 
-                    //check the field
-                    $new = preg_replace('/[^a-zA-Z0-9_]/', '_', strtolower($post_data['relationship_module_unique_field']));
-                    $post_data['relationship_module_unique_field'] = strlen($new) > 50 ? substr($new, -50) : $new;
-                    $result2 = $this->fetch(
-                            array(
-                                'module' => $post_data['relationship_module'],
-                                'module_field_name' => $post_data['relationship_module_unique_field']));
+
 
                     if (!count($result1)) {
                         //Field not found
                         $error[] = "{$data['module_field_name']} field not found for relationship module";
-                    } elseif (!count($result2)) {
-
-                        $error[] = "{$post_data['relationship_module_unique_field']} field not found for relationship module";
                     } else {
 
                         $data['relationship_module'] = $post_data['relationship_module'];
-                        $data['relationship_module_unique_field'] = $post_data['relationship_module_unique_field'];
+                        ;
                     }
                 }
             }
@@ -344,6 +336,31 @@ class Settings {
                 $error[] = "Module field's datatype cannot be empty";
             } else {
                 $data['module_field_datatype'] = $post_data['module_field_datatype'];
+            }
+        }
+
+        if ($post_data['module_field_datatype'] == 'relationship') {
+            //relationship_module_unique_field validation
+
+            if (empty($post_data['relationship_module_unique_field'])) {
+                $error[] = "Relationship Module unique field cannot be empty.";
+            } else {
+                //Field can have multiple columns saperated thru pipe delimiter
+                $all_fields =  explode('|', $post_data['relationship_module_unique_field']);
+                $result2 = $this->fetch(
+                        array(
+                            'module' => empty($post_data['relationship_module'])?$this->backup[0]['relationship_module']:$post_data['relationship_module'],
+                            'module_field_name' => array(
+                                'in' => $all_fields
+                            )
+                        )
+                );
+                if (count($result2) != count($all_fields) ) {
+
+                    $error[] = "{$post_data['relationship_module_unique_field']} field not found for relationship module";
+                } else {
+                    $data['relationship_module_unique_field'] = $post_data['relationship_module_unique_field'];
+                }
             }
         }
 
@@ -423,22 +440,19 @@ class Settings {
 //        if ($type == 'save') {//Edit not allowed on this field, set it only for new row
 //            $data['relationship_module'] = $post_data['relationship_module'];
 //        }
-        
-        if(empty($post_data['group_dropdown'])){
+
+        if (empty($post_data['group_dropdown'])) {
             //$data['field_group_name'] = $post_data['field_group_name'];
-            if(empty($post_data['group_dropdown']) && empty($post_data['group_display_order'])){
+            if (empty($post_data['group_dropdown']) && empty($post_data['group_display_order'])) {
                 $error[] = "Required field cannot be empty";
-            }
-            else{
+            } else {
                 $group_data['group_name'] = $post_data['field_group_name'];
                 $group_data['group_display_order'] = $post_data['group_display_order'];
                 //edit request will get empty $post_data['module']
-                $group_data['module_name'] = empty($post_data['module'])?$this->module:$post_data['module'];
+                $group_data['module_name'] = empty($post_data['module']) ? $this->module : $post_data['module'];
             }
-        }
-        else {
+        } else {
             $data['field_group_id'] = $post_data['group_dropdown'];
-
         }
         if (count($group_data)) {
             $this->setGroupInfo($group_data);
@@ -604,8 +618,9 @@ class Settings {
             }
         }
     }
-    
-    function setGroupInfo($data){
+
+    function setGroupInfo($data) {
         $this->modified_group_info = $data;
     }
+
 }

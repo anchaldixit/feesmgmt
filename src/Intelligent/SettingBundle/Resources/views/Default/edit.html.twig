@@ -46,7 +46,7 @@
                     $('#relationship_module_row').slideUp('slow')
                     $('#relationship_module_unique_field_row').slideUp('slow')
                 }
-                if (['varchar','relationship'].indexOf($(this).val()) == -1 ) {
+                if (['varchar', 'relationship'].indexOf($(this).val()) == -1) {
                     $('#enable_filter_with_option_row').slideUp('slow')
                 }
                 if ($(this).val() == 'formulafield') {
@@ -56,14 +56,14 @@
                 }
 
             }).trigger('change');
-            
+
             $('#enable_filter').on('change', function () {
-                 if ($(this).val() == 'Y' && ['varchar','relationship'].indexOf($('#module_field_datatype').val())>0){
-                      $('#enable_filter_with_option_row').slideDown('slow')
-                 }else{
-                     $('#enable_filter_with_option_row').slideUp('slow');
-                 }
-                
+                if ($(this).val() == 'Y' && ['varchar', 'relationship'].indexOf($('#module_field_datatype').val()) > 0) {
+                    $('#enable_filter_with_option_row').slideDown('slow')
+                } else {
+                    $('#enable_filter_with_option_row').slideUp('slow');
+                }
+
             }).trigger('change');
 
             /*field_has_relationship').on('change', function () {
@@ -92,34 +92,34 @@
                     }
                 });
             }
-            
-            if($('#group_dd').length){
-                $('#group_dd').change(function(){
+
+            if ($('#group_dd').length) {
+                $('#group_dd').change(function () {
                     //debugger;
                     var _val = $(this).find('option:selected').val();
-                    if(_val == ''){
+                    if (_val == '') {
                         $('#field_group_name').show();
                         $('.group_display_li').show();
                     }
-                    else{
-                        
+                    else {
+
                         $('#field_group_name').hide();
                         $('.group_display_li').hide();
                     }
-                        
+
                 });
             }
-            
+
             var moduleName = $('#module').find('option:selected').val();
-            if(moduleName != ''){
-                $('#group_dd').find('.'+moduleName).removeClass('hide');
+            if (moduleName != '') {
+                $('#group_dd').find('.' + moduleName).removeClass('hide');
             }
-            $('#module').change(function(){
-               var moduleName = $(this).find('option:selected').val();
-               $('#group_dd').find('.module').addClass('hide');
-               $('#group_dd').find('.'+moduleName).removeClass('hide');
+            $('#module').change(function () {
+                var moduleName = $(this).find('option:selected').val();
+                $('#group_dd').find('.module').addClass('hide');
+                $('#group_dd').find('.' + moduleName).removeClass('hide');
             });
-            
+
         });
 
     </script>
@@ -162,41 +162,41 @@
                             </div>
                         </li>
                         <li><label>Group:</label>
-                            
-                        <div class="field-wrap">
-                            <div class="dropdown">
-                                <select name="group_dropdown" class="selectbox" id="group_dd">
-                                    
-                                    <option value="1" {{config.field_group_id is defined and config.field_group_id == 1 ? 'selected':''}}>No Group</option>
-                                    {% for group in allgroups %}
-                                        {% if group.id != 1 %}
-                                            <option  class="{{group.module_name}} hide module" value="{{group.id}}" {{config.field_group_id is defined and group.id == config.field_group_id ? 'selected':''}}>{{group.group_name}}</option>
-                                        {% endif %}
-                                    {% endfor %}
-                                    <option value="">Add New Group</option>
-                                </select>
+
+                            <div class="field-wrap">
+                                <div class="dropdown">
+                                    <select name="group_dropdown" class="selectbox" id="group_dd">
+
+                                        <option value="1" {{config.field_group_id is defined and config.field_group_id == 1 ? 'selected':''}}>No Group</option>
+                                        {% for group in allgroups %}
+                                            {% if group.id != 1 %}
+                                                <option  class="{{group.module_name}} hide module" value="{{group.id}}" {{config.field_group_id is defined and group.id == config.field_group_id ? 'selected':''}}>{{group.group_name}}</option>
+                                            {% endif %}
+                                        {% endfor %}
+                                        <option value="">Add New Group</option>
+                                    </select>
+                                </div>
+
+                                <input type="text" name="field_group_name" id="field_group_name" placeholder="New Group Name" style="display:none;margin-top: 15px;"/>
                             </div>
-                                    
-                            <input type="text" name="field_group_name" id="field_group_name" placeholder="New Group Name" style="display:none;margin-top: 15px;"/>
-                        </div>
-                    </li>
-                    <li class="group_display_li" style="display: none;">
-                        <label>Group Display Order:</label>
-                        
-                        <div class="field-wrap">
-                            <div class="dropdown">
-                                <select name="group_display_order" class="selectbox">
-                                    <option value="">Select Group Display Order</option>
-                                    <option value="2">2</option>
-                                    <option value="3">3</option>
-                                    <option value="4">4</option>
-                                    <option value="5">5</option>
-                                    <option value="6">6</option>
-                                </select>
+                        </li>
+                        <li class="group_display_li" style="display: none;">
+                            <label>Group Display Order:</label>
+
+                            <div class="field-wrap">
+                                <div class="dropdown">
+                                    <select name="group_display_order" class="selectbox">
+                                        <option value="">Select Group Display Order</option>
+                                        <option value="2">2</option>
+                                        <option value="3">3</option>
+                                        <option value="4">4</option>
+                                        <option value="5">5</option>
+                                        <option value="6">6</option>
+                                    </select>
+                                </div>
                             </div>
-                        </div>
-                    </li>
-                        
+                        </li>
+
 
                         <li><label>Module Field Name:</label> 
                             <div class="field-wrap">
@@ -249,7 +249,8 @@
                         <li id="relationship_module_unique_field_row"> 
                             <label>Relationship Module Unique Field: </label>
                             <div class="field-wrap">
-                                    <input name="relationship_module_unique_field" id="relationship_module_unique_field"  value="{{config.relationship_module_unique_field is defined ? config.relationship_module_unique_field : ''}}" type="text" ><br><small><i>This field of relationship table will be displayed on edit/add form for setting relation. </i></small>
+                                <input name="relationship_module_unique_field" id="relationship_module_unique_field"  value="{{config.relationship_module_unique_field is defined ? config.relationship_module_unique_field : ''}}" type="text" ><br><small><i>This field of relationship table will be displayed on edit/add form for setting relation. </i></small>
+                                <small><i>Field can be combined with pipe separated name like field1|field2 </i></small>
                             </div>
                         </li>
                         <li><label>Display Position:</label> 
@@ -304,9 +305,9 @@
                                         <option value="N" {{config.enable_filter_with_option is defined and config.enable_filter_with_option == 'N' ? 'SELECTED': ''}}>No</option>
                                         <option value="Y" {{config.enable_filter_with_option is defined and config.enable_filter_with_option == 'Y' ? 'SELECTED': ''}}>Yes</option>
                                     </select><br>
-                                    
+
                                 </div>
-                                    <small><i>Enable this option only it is really required, it affects the performance in some means. </i></small>
+                                <small><i>Enable this option only it is really required, it affects the performance in some means. </i></small>
                             </div>
                         </li>
                         <li> <label>Show in Grid:</label> 

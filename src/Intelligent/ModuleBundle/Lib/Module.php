@@ -11,10 +11,12 @@ namespace Intelligent\ModuleBundle\Lib;
 use Intelligent\SettingBundle\Lib\Settings;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\DependencyInjection\ContainerAwareTrait;
+use Intelligent\SettingBundle\Lib\Helper;
 
-abstract class Module  {
+abstract class Module {
 
     use ContainerAwareTrait;
+
     var $db;
     protected $table;
     protected $module;
@@ -24,6 +26,7 @@ abstract class Module  {
     private $last_sql_withoutlimit_params; //store the parameters for $last_sql_withoutlimit variable sql
     private $db_manager;
     protected $row_filter_enabled = true;
+    protected $helper;
 
     /*
      * Leave the construct blank, dont remove
@@ -41,6 +44,7 @@ abstract class Module  {
 
         $this->db = $this->container->get('database_connection');
         $this->module_settings = $this->container->get('intelligent.setting.module');
+        $this->helper = new Helper();
 
         $this->_init();
     }
@@ -344,8 +348,7 @@ abstract class Module  {
                 //relationship datatype need to handle is separately.
                 //append module name before field name
                 $this->prepareSQLParams($row, $join, $fieldset, $where);
-                
-            }elseif($row['module_field_datatype'] == 'formulafield'){
+            } elseif ($row['module_field_datatype'] == 'formulafield') {
                 $fieldset[] = "{$row['formulafield']} as {$row['module_field_name']}";
             } else {
                 $fieldset[] = "{$row['module']}.{$row['module_field_name']}";
@@ -357,7 +360,6 @@ abstract class Module  {
         $result = $this->fetch($fieldset, $filters, $join);
 
         return array('schema' => $module_field_set, 'row' => $result);
-
     }
 
     function getRows($where, $order_by, $limit) {
@@ -375,9 +377,9 @@ abstract class Module  {
                 //relationship datatype need to handle is separately.
                 //append module name before field name
                 $this->prepareSQLParams($row, $join, $fieldset, $where);
-            } elseif($row['module_field_datatype'] == 'formulafield'){
+            } elseif ($row['module_field_datatype'] == 'formulafield') {
                 $fieldset[] = "{$row['formulafield']} as {$row['module_field_name']}";
-            }else {
+            } else {
                 $fieldset[] = "{$row['module']}.{$row['module_field_name']}";
                 if (isset($where[$row['module_field_name']])) {
                     $temp = $where[$row['module_field_name']];
@@ -389,7 +391,7 @@ abstract class Module  {
         $fieldset[] = "{$this->table}.modified_datetime";
 
         $where = $this->addViewAccessCondition($where);
-        
+
         $result = $this->fetch($fieldset, $where, $join, $order_by, $limit);
 
         return array('schema' => $module_field_set, 'row' => $result);
@@ -512,6 +514,13 @@ abstract class Module  {
 
     function getFormFields() {
 
+        $session = $this->container->get('session');
+        $cache = $session->get("formfields-{$this->module}");
+        if (0 and ! empty($cache)) {
+            return $cache;
+        }
+
+
         $results = $this->module_settings->fetch(
                 array('module' => $this->module), array('display_position' => 'ASC'));
         //@todo: give 
@@ -521,7 +530,7 @@ abstract class Module  {
         foreach ($results as $key => $value) {
 
             if ($value['module_field_datatype'] !== 'relationship') {
-                $fieldset[] = $value;
+                $fieldset[$value['module_field_name']] = $value;
             } else {
                 //In case there are multiple fields of same relationship table is there, do not send  all fields. Only send the one field.
                 if (!isset($dependencies[$value['relationship_module']])) {
@@ -532,17 +541,19 @@ abstract class Module  {
                     $value['relationship_module_display_name'] = $this->module_settings->getModule($value['relationship_module']);
                 }
                 $result2 = $this->getFieldSettings($value['relationship_module'], $value['module_field_name']);
-                
+
                 $core_field_settings = $this->getCoreSettingsOfRelationshipField($result2);
-                $value['core_field_settings']=$result2['core_field_settings'] = $core_field_settings;
+                $value['core_field_settings'] =  $core_field_settings;
                 if (count($result2)) {
                     $value['relationship_field_settings'] = $result2;
                 }
-                
-                $fieldset[] = $value;
+
+                $fieldset[$value['module_field_name']] = $value;
             }
             //$fieldset[]
         }
+        $session->set("formfields-{$this->module}", $fieldset);
+
 
         return $fieldset;
     }
@@ -654,10 +665,84 @@ abstract class Module  {
 
         if (isset($field_settings['relationship_field_settings']) and $field_settings['module_field_datatype'] == 'relationship' and count($field_settings['relationship_field_settings'])) {
             return $this->getCoreSettingsOfRelationshipField($field_settings['relationship_field_settings']);
-
         } else {
             return $field_settings;
         }
+    }
+
+    /*
+     * function get all parent relationship 
+     */
+
+    function collectParentRelationshipRows() {
+
+        $result_set = $result = array();
+        $fieldset = $this->getFormFields();
+        $marker=array();
+
+        foreach ($fieldset as $field) {
+
+            if ($field['module_field_datatype'] == 'relationship' and isset($field['relationship_foregin_key'])) {
+                //Only run for one time for relationship module, there may be multiple conditions
+                $result = array();
+
+                $parentRelationship = $this->container->get("intelligent.{$field['relationship_module']}.module");
+                $key = $this->module_settings->prepareforeignKeyName($field['relationship_module']);
+                $field_list = explode('|', $field['relationship_module_unique_field']);
+                $result[$key] = $parentRelationship->getFieldsAsString($field_list);
+                $result_set[$field['module_field_name']] = $result;
+            }
+        }
+        return $result_set;
+    }
+
+    function getFieldsAsString($fields) {
+
+        $join = $param = $where = $condition = array();
+
+        $fieldset = $fields;
+
+        $module_field_set = $this->getFormFields();
+
+        foreach ($module_field_set as $key => $row) {
+
+            if (in_array($row['module_field_name'], $fields)) {
+
+                if ($row['module_field_datatype'] == 'relationship') {
+                    //relationship datatype need to handle is separately.
+                    //append module name before field name
+                    $this->prepareSQLParams($row, $join, $fieldset, $where);
+                } elseif ($row['module_field_datatype'] == 'formulafield') {
+                    //$fieldset[] = "{$row['formulafield']} as {$row['module_field_name']}";
+                } else {
+                    $fieldset[] = "{$row['module']}.{$row['module_field_name']}";
+                }
+            }
+        }
+        //$string_field = implode('  ', $fieldset) . ' as field';
+        $order_by = array();
+        foreach ($fieldset as $value) {
+            $order_by[$value] = 'asc';
+        }
+
+        $where = $this->addViewAccessCondition($where);
+
+        $results = $this->fetch(array_merge(array("{$this->module}.id"), $fieldset), $where, $join, $order_by);
+        if (count($results)) {
+            $return = array();
+            foreach ($results as $value) {
+                $merged = '';
+                foreach ($fields as $field) {
+                    $merged .= isset($value[$field]) ? ' - ' . $value[$field] : '';
+                }
+                $return[$value['id']] = substr($merged, 2);
+            }
+            return $return;
+        } else {
+            return array();
+        }
+
+        //return count($field)? $res
     }
 
 }

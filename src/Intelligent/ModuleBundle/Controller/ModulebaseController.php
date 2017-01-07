@@ -134,6 +134,13 @@ abstract class ModulebaseController extends Controller {
                 $result['schema'] = $module->getFormFields();
             }
         }
+        
+        $parent_relationship_rows = $module->collectParentRelationshipRows();
+        
+        $result['schema'] = array_merge_recursive($result['schema'],$parent_relationship_rows);
+        //$this->helper->print_r($parent_relationship_rows);
+        //$this->helper->print_r($result['schema']);
+        
         //All active users
         $all_users = $this->getUsers();
 
@@ -146,7 +153,8 @@ abstract class ModulebaseController extends Controller {
             'module' => $this->module_route_identifier,
             'module_permission_asscess_key' => $this->moduleSessionKey(),
             'module_name' => $this->module_name,
-            'permissions' => $this->permissions
+            'permissions' => $this->permissions,
+            'parent_relationship_rows' => $parent_relationship_rows
         );
 
         return $this->render('IntelligentModuleBundle:Default:edit.html.twig', $parameters);
