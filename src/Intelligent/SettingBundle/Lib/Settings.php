@@ -8,10 +8,11 @@
 
 namespace Intelligent\SettingBundle\Lib;
 
-use Symfony\Component\DependencyInjection\ContainerAware;
+use Symfony\Component\DependencyInjection\ContainerAwareTrait;
 
-class Settings extends ContainerAware {
+class Settings {
 
+    use ContainerAwareTrait;
     var $db;
     var $table = 'module_settings';
     var $group_table = 'module_fields_group';

@@ -46,7 +46,7 @@
                     $('#relationship_module_row').slideUp('slow')
                     $('#relationship_module_unique_field_row').slideUp('slow')
                 }
-                if ($(this).val() != 'varchar' ) {
+                if (['varchar','relationship'].indexOf($(this).val()) == -1 ) {
                     $('#enable_filter_with_option_row').slideUp('slow')
                 }
                 if ($(this).val() == 'formulafield') {
@@ -58,7 +58,7 @@
             }).trigger('change');
             
             $('#enable_filter').on('change', function () {
-                 if ($(this).val() == 'Y' && $('#module_field_datatype').val()=='varchar'){
+                 if ($(this).val() == 'Y' && ['varchar','relationship'].indexOf($('#module_field_datatype').val())>0){
                       $('#enable_filter_with_option_row').slideDown('slow')
                  }else{
                      $('#enable_filter_with_option_row').slideUp('slow');
