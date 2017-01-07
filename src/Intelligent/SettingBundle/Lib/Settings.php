@@ -181,21 +181,24 @@ class Settings extends ContainerAware {
      */
 
     function update($post_data) {
-
+        
         if (!empty($post_data['id'])) {
             $data = $this->validateAndSet($post_data, 'update');
 
 
             $data['modified_datetime'] = date("Y-m-d H:i:s");
-
+            
             //Backup the current state of row, before update
             $this->backup = $this->fetch(array('id' => $post_data['id']));
 
-
+            
             $this->db->update(
                     $this->table, $data, array('id' => $post_data['id'])
             );
-
+            if(empty($post_data['group_dropdown'])){
+                //$newrowid = empty($this->last_insert_id)?$post_data['id']: $this->last_insert_id ;
+                $this->createNewGroup($post_data,$post_data['id']);
+            }
             $this->afterUpdate($post_data);
 
 
@@ -268,7 +271,6 @@ class Settings extends ContainerAware {
    
    
     public function validateAndSet($post_data, $type) {
-
         $data = array();
         $error = array();
         $group_data = array();
@@ -431,7 +433,12 @@ class Settings extends ContainerAware {
             else{
                 $group_data['group_name'] = $post_data['field_group_name'];
                 $group_data['group_display_order'] = $post_data['group_display_order'];
-                $group_data['module_name'] = $post_data['module'];
+                if($type == 'update'){
+                    $group_data['module_name'] = $post_data['module_name'];
+                }
+                else{
+                    $group_data['module_name'] = $post_data['module'];
+                }
             }
         }
         else {
