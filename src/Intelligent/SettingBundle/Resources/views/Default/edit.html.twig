@@ -366,7 +366,7 @@
                                     <input type="hidden" name="id" id="edit_id_hidden_field" value="{{id}}">
                                     <input type="hidden" name="module_field_datatype" value="{{config.module_field_datatype}}">
                                     {% if config.module is defined %}
-                                    <input type="hidden" name="module_name" value="{{config.module}}">
+                                        <input type="hidden" name="module_name" value="{{config.module}}">
                                     {% endif %}
                                     <input type="submit" name="edit_submit" value="Save" > 
                                     <input type="submit" name="delete_submit" value="Delete" id="delete_action" onsubmit="return confirm('Are you sure to delete the column with data, this step cannot be rollbacked')">

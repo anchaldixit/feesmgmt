@@ -436,7 +436,7 @@ class Settings {
                 $group_data['group_display_order'] = $post_data['group_display_order'];
 
                 //edit request will get empty $post_data['module']
-                $group_data['module_name'] = empty($post_data['module'])?$this->module:$post_data['module'];
+                $group_data['module_name'] = empty($post_data['module']) ? $post_data['module_name'] : $post_data['module'];
 
             }
         }
@@ -444,6 +444,7 @@ class Settings {
             $data['field_group_id'] = $post_data['group_dropdown'];
 
         }
+        
         if (count($group_data)) {
             $this->setGroupInfo($group_data);
         }
