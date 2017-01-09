@@ -38,6 +38,7 @@ security:
         - { path: ^/roles$ , roles: ROLE_USER_ADMIN }
         - { path: ^/rolePermissions , roles: ROLE_USER_ADMIN }
         - { path: ^/settings/view , roles: ROLE_APP_ADMIN }
+        - { path: ^/report , roles: ROLE_REPORT_USER }
         - { path: ^/ , roles: ROLE_USER }
             
     encoders:

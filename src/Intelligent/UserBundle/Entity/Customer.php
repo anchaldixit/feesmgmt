@@ -30,7 +30,7 @@ class Customer {
      * 
      * Many Customer have Many Reports.
      * @ORM\ManyToMany(targetEntity="Report")
-     * @ORM\JoinTable(name="customer_allowed_report",
+     * @ORM\JoinTable(name="customer_allowed_reports",
      *      joinColumns={@ORM\JoinColumn(name="customer_id", referencedColumnName="id")},
      *      inverseJoinColumns={@ORM\JoinColumn(name="report_id", referencedColumnName="id", unique=true)}
      *      )

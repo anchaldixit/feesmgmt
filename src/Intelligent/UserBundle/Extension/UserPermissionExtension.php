@@ -19,6 +19,7 @@ class UserPermissionExtension extends \Twig_Extension{
             new \Twig_SimpleFunction('is_module_visible', array($this->permissions, 'isModuleVisible')),
             new \Twig_SimpleFunction('is_user_admin', array($this->permissions, 'getManageUserAndShareAppPermission')),
             new \Twig_SimpleFunction('is_app_admin', array($this->permissions, 'getEditAppStructurePermission')),
+            new \Twig_SimpleFunction('is_report_visible', array($this->permissions, 'getReportPermission')),
         );
     }
 }

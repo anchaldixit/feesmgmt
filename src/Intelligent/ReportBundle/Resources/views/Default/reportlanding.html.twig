@@ -1,0 +1,39 @@
+{% extends 'loggedtemplate.html.twig' %}
+
+{% block title %}
+    <title>List of Reports</title>
+{% endblock %}
+{% block breadcrumb %}
+    <div class="bread-crumb">
+        <span><a href="/">Expertise.com Marketing Mgmt</a></span>
+        <i class="fa fa-long-arrow-right"></i>
+        <span>Reports</span>
+        
+    </div>
+{% endblock %}
+{% block custom_feature %}{% endblock %}
+
+{% block body %}
+    <div class="table-content user-table" style="width:400px;margin-left: auto;margin-right: auto">
+        <table id="reportList">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Report Name</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for report in reports %}
+                    <tr>
+                        <td><strong>{{report.id}}</strong></td>
+                        <td><strong><a href="/report/{{report.id}}">{{report.name}}</a></strong></td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+            <tbody>
+
+            </tbody>
+        </table>
+    </div>
+{% endblock %}
+

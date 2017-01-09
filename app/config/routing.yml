@@ -1,3 +1,7 @@
+intelligent_report:
+    resource: "@IntelligentReportBundle/Resources/config/routing.yml"
+    prefix:   /
+
 intelligent_user:
     resource: "@IntelligentUserBundle/Resources/config/routing.yml"
     prefix:   /

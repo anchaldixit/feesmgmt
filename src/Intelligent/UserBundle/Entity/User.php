@@ -171,6 +171,7 @@ class User implements AdvancedUserInterface, \Serializable
     public function getRoles() {
         $user_admin = $this->getRole()->getGlobalPermission()->getManageUserAppPermission();
         $app_admin  = $this->getRole()->getGlobalPermission()->getEditAppStructurePermission();
+        $report_user = $this->getRole()->getGlobalPermission()->getReportPermission();
         $roles = array("ROLE_USER");
         if($user_admin){
             $roles[] = "ROLE_USER_ADMIN"; 
@@ -178,6 +179,11 @@ class User implements AdvancedUserInterface, \Serializable
         if($app_admin){
             $roles[] = "ROLE_APP_ADMIN"; 
         }
+        if($report_user){
+            $roles[] = "ROLE_REPORT_USER"; 
+        }
+        
+        
         
         return $roles;
     }

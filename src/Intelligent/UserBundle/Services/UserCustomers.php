@@ -188,6 +188,7 @@ class UserCustomers {
      */
     public function getVisibleReports(){
         $allowed_reports = array();
+        $user = $this->permission->getUser();
         if($this->permission->getReportPermission()){
             $allowed_customers = $user->getAllowedCustomers(true);
             $allowed_reports = array();

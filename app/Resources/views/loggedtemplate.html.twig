@@ -114,6 +114,14 @@ and open the template in the editor.
                         </a>
                     </li>
                     {% endif %}
+                    {% if is_module_visible('customer_projects') %}
+                    <li> 
+                        <a href="/customer/view">
+                            <i class="fa fa-users"></i>
+                            <span>Customer Projects</span>
+                        </a>
+                    </li>
+                    {% endif %}
                     {% if is_module_visible('marketing_projects') %}
                     <li>
                         <a href="/marketingprojects/view">
@@ -122,12 +130,14 @@ and open the template in the editor.
                         </a>
                     </li>
                     {% endif %}
+                    {% if is_module_visible('initiative') %}
                     <li>
                         <a href="#">
                             <i class="fa fa-gears"></i>
                             <span>Initiatives</span>
                         </a>
                     </li>
+                    {% endif %}
                     {% if is_module_visible('campaign') %}
                     <li>
                         <a href="#">
@@ -160,36 +170,54 @@ and open the template in the editor.
                         </a>
                     </li>
                     {% endif %}
+                    {% if is_module_visible('agents') %}
                     <li>
                         <a href="#">
                             <i class="fa fa-user-circle "></i>
                             <span>Agents</span>
                         </a>
                     </li>
+                    {% endif %}
+                    {% if is_module_visible('agent_assignments') %}
                     <li>
                         <a href="#">
                             <i class="fa fa-folder-open"></i>
                             <span>Agent Assignments</span>
                         </a>
                     </li>
+                    {% endif %}
+                    {% if is_module_visible('links') %}
                     <li>
                         <a href="#">
                             <i class="fa fa-dollar"></i>
                             <span>Links</span>
                         </a>
                     </li>
+                    {% endif %}
+                    {% if is_module_visible('link_rates') %}
                     <li>
                         <a href="#">
                             <i class="fa fa-tachometer"></i>
                             <span>Link Rates</span>
                         </a>
                     </li>
+                    {% endif %}
+                    {% if is_module_visible('dnc_lists') %}
                     <li>
                         <a href="#">
                             <i class="fa fa-list-alt"></i>
                             <span>DNS List</span>
                         </a>
                     </li>
+                    {% endif %}
+                    {% if is_report_visible() %}
+                    <li>
+                        <a href="/reports">
+                            <i class="fa fa-list-alt"></i>
+                            <span>Reports</span>
+                        </a>
+                    </li>
+                    {% endif %}
                 </ul>
                 <div class="next"><i class="fa fa-chevron-right"></i></div>
             </div>

@@ -25,6 +25,7 @@ class AppKernel extends Kernel
             new Intelligent\SharedBundle\IntelligentSharedBundle(),
             new Intelligent\SettingBundle\IntelligentSettingBundle(),
             new Intelligent\ModuleBundle\IntelligentModuleBundle(),
+            new Intelligent\ReportBundle\IntelligentReportBundle(),
         );
 
         if (in_array($this->getEnvironment(), array('dev', 'test'), true)) {

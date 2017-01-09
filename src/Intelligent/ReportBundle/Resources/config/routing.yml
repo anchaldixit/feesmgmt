@@ -1,0 +1,8 @@
+# Report landing page
+intelligent_report_landing:
+    path:     /reports
+    defaults: { _controller: IntelligentReportBundle:Default:reportLanding }
+# Report individual page
+intelligent_report_individual:
+    path:     /report/{reportId}
+    defaults: { _controller: IntelligentReportBundle:Default:report }
