@@ -255,5 +255,23 @@ class DefaultController extends Controller {
         return $routes->get($routename)->getDefaults()['_controller'];
         
     }
+    
+    public function importAction() {
+        
+        //
+        
+        $parameters=array();
+        $request = Request::createFromGlobals();
+        $path=$request->get('path');
+        $m=$request->get('module');
+        
+        $import = $this->get('intelligent.import.module');
+        $import->init($m);
+        $import->csvUpload($path);
+        
+        
+        return $this->render('IntelligentSettingBundle:Default:import.html.twig', $parameters);
+        
+    }
 
 }

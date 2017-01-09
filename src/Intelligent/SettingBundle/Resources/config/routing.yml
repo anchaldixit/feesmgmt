@@ -14,3 +14,6 @@ intelligent_setting_fieldset:
     path:     /settings/fieldset/{module_name}
     defaults: { _controller: IntelligentSettingBundle:Default:fieldset }
     
+intelligent_import_temp:
+    path:     /settings/import
+    defaults: { _controller: IntelligentSettingBundle:Default:import }    
