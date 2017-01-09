@@ -6,5 +6,5 @@ services:
     intelligent.setting.module:
         class: Intelligent\SettingBundle\Lib\Settings
         calls: 
-            - [setContainer, [@service_container]]
+            - [setContainer, ["@service_container"]]
             - [init]
