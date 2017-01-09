@@ -1251,6 +1251,7 @@ $.extend(Permission.prototype, {
             that.changeModuleEditPermission();
             that.changeModuleDeletePermission();
             that.appStructurePermission();
+            that.viewReportPermission();
             that.shareAppPermission();
             that.changeModuleFieldPermission();
             that.customFieldPopup();
@@ -1276,8 +1277,10 @@ $.extend(Permission.prototype, {
         Permission.user.getAjaxData(User.ajaxLink2, _obj, function (data) {
             $('#loader').hide();
             var _data = data.body.modulePermissions;
+            console.log(data.body.globalPermissions);
             var shareAppPermission = data.body.globalPermissions.userPermission;
             var appStructurePermission = data.body.globalPermissions.appChangePermission;
+            var reportPermission = data.body.globalPermissions.reportPermission;
             var roleName = data.body.name;
             var roleDesc = data.body.description;
             var html = '';
@@ -1362,6 +1365,10 @@ $.extend(Permission.prototype, {
             if ($('#app_structure_permission').length) {
                 $("#app_structure_permission").prop("checked", appStructurePermission);
                 $("#app_structure_permission").attr('data-role-id', roleId);
+            }
+            if ($('#view_report_permission').length) {
+                $("#view_report_permission").prop("checked", reportPermission);
+                $("#view_report_permission").attr('data-role-id', roleId);
             }
 
             $('#roleName').val(roleName);
@@ -1665,6 +1672,31 @@ $.extend(Permission.prototype, {
             Permission.user.getAjaxData(User.ajaxLink2, _obj, function (data) {
                 $('#loader').hide();
                 var ajax_msg = 'App Structure Permission changed';
+                $('.info-notice').html(ajax_msg);
+                $('.notify').addClass('n-animation');
+                setTimeout(function () {
+                    $('.notify').removeClass('n-animation');
+                }, 2500);
+            });
+        });
+    },
+    viewReportPermission: function () {
+        $("#view_report_permission").click(function () {
+            var roleId = $(this).attr('data-role-id');
+            var _val = $(this).is(':checked');
+            var obj = {
+                head: {
+                    action: "changeReportPermission"
+                },
+                body: {
+                    role_id: parseInt(roleId),
+                    value: _val
+                }
+            };
+            var _obj = JSON.stringify(obj);
+            Permission.user.getAjaxData(User.ajaxLink2, _obj, function (data) {
+                $('#loader').hide();
+                var ajax_msg = 'View Report Permission changed';
                 $('.info-notice').html(ajax_msg);
                 $('.notify').addClass('n-animation');
                 setTimeout(function () {
