@@ -10,6 +10,11 @@ intelligent_customer_view:
 intelligent_customer_autocomplete:
     path:     /customer/autocomplete
     defaults: { _controller: IntelligentModuleBundle:Customer:autocomplete}
+intelligent_customer_fieldset:
+    path:     /customer/fieldset
+    defaults: { _controller: IntelligentModuleBundle:Customer:fieldset }
+    
+    
 intelligent_customerprojects:
     path:     /customerprojects
     defaults: { _controller: IntelligentModuleBundle:Customerprojects:index }
@@ -22,6 +27,11 @@ intelligent_customerprojects_view:
 intelligent_customerprojects_autocomplete:
     path:     /customerprojects/autocomplete
     defaults: { _controller: IntelligentModuleBundle:Customerprojects:autocomplete}
+intelligent_customerprojects_fieldset:
+    path:     /customerprojects/fieldset
+    defaults: { _controller: IntelligentModuleBundle:Customerprojects:fieldset }
+    
+    
 intelligent_marketingprojects:
     path:     /marketingprojects
     defaults: { _controller: IntelligentModuleBundle:Marketingprojects:index }
@@ -34,6 +44,11 @@ intelligent_marketingprojects_view:
 intelligent_marketingprojects_autocomplete:
     path:     /marketingprojects/autocomplete
     defaults: { _controller: IntelligentModuleBundle:Marketingprojects:autocomplete }
+intelligent_marketingprojects_fieldset:
+    path:     /marketingprojects/fieldset
+    defaults: { _controller: IntelligentModuleBundle:Marketingprojects:fieldset }
+    
+    
 intelligent_initiative:
     path:     /initiative
     defaults: { _controller: IntelligentModuleBundle:Initiative:index }
@@ -46,6 +61,11 @@ intelligent_initiative_view:
 intelligent_initiative_autocomplete:
     path:     /initiative/autocomplete
     defaults: { _controller: IntelligentModuleBundle:Initiative:autocomplete }
+intelligent_initiative_fieldset:
+    path:     /initiative/fieldset
+    defaults: { _controller: IntelligentModuleBundle:Initiative:fieldset }
+    
+    
 intelligent_campaign:
     path:     /campaign
     defaults: { _controller: IntelligentModuleBundle:Campaign:index }
@@ -58,6 +78,11 @@ intelligent_campaign_view:
 intelligent_campaign_autocomplete:
     path:     /campaign/autocomplete
     defaults: { _controller: IntelligentModuleBundle:Campaign:autocomplete }
+intelligent_campaign_fieldset:
+    path:     /campaign/fieldset
+    defaults: { _controller: IntelligentModuleBundle:Campaign:fieldset }
+    
+    
 intelligent_campaigncontacts:
     path:     /campaigncontacts
     defaults: { _controller: IntelligentModuleBundle:Campaigncontacts:index }
@@ -70,6 +95,11 @@ intelligent_campaigncontacts_view:
 intelligent_campaigncontacts_autocomplete:
     path:     /campaigncontacts/autocomplete
     defaults: { _controller: IntelligentModuleBundle:Campaigncontacts:autocomplete }
+intelligent_campaigncontacts_fieldset:
+    path:     /campaigncontacts/fieldset
+    defaults: { _controller: IntelligentModuleBundle:Campaigncontacts:fieldset }
+    
+    
 intelligent_psuedoemailaccounts:
     path:     /psuedoemailaccounts
     defaults: { _controller: IntelligentModuleBundle:Psuedoemailaccounts:index }
@@ -81,6 +111,11 @@ intelligent_psuedoemailaccounts_view:
     defaults: { _controller: IntelligentModuleBundle:Psuedoemailaccounts:view , page_no: 1 }
 intelligent_psuedoemailaccounts_autocomplete:
     path:     /psuedoemailaccounts/autocomplete
+intelligent_psuedoemailaccounts_fieldset:
+    path:     /psuedoemailaccounts/fieldset
+    defaults: { _controller: IntelligentModuleBundle:Psuedoemailaccounts:fieldset }
+    
+    
 intelligent_assignpsuedo:
     path:     /assignpsuedo
     defaults: { _controller: IntelligentModuleBundle:Assignpsuedo:index }
@@ -93,6 +128,11 @@ intelligent_assignpsuedo_view:
 intelligent_assignpsuedo_autocomplete:
     path:     /assignpsuedo/autocomplete
     defaults: { _controller: IntelligentModuleBundle:Assignpsuedo:autocomplete }
+intelligent_assignpsuedo_fieldset:
+    path:     /assignpsuedo/fieldset
+    defaults: { _controller: IntelligentModuleBundle:Assignpsuedo:fieldset }
+    
+    
 intelligent_links:
     path:     /links
     defaults: { _controller: IntelligentModuleBundle:Links:index }
@@ -105,6 +145,11 @@ intelligent_links_view:
 intelligent_links_autocomplete:
     path:     /links/autocomplete
     defaults: { _controller: IntelligentModuleBundle:Links:autocomplete }
+intelligent_links_fieldset:
+    path:     /links/fieldset
+    defaults: { _controller: IntelligentModuleBundle:Links:fieldset }
+    
+    
 intelligent_linkrates:
     path:     /linkrates
     defaults: { _controller: IntelligentModuleBundle:Linkrates:index }
@@ -117,6 +162,11 @@ intelligent_linkrates_view:
 intelligent_linkrates_autocomplete:
     path:     /linkrates/autocomplete
     defaults: { _controller: IntelligentModuleBundle:Linkrates:autocomplete }
+intelligent_linkrates_fieldset:
+    path:     /linkrates/fieldset
+    defaults: { _controller: IntelligentModuleBundle:Linkrates:fieldset }
+    
+      
 intelligent_dnclists:
     path:     /dnclists
     defaults: { _controller: IntelligentModuleBundle:Dnclists:index }
@@ -129,3 +179,6 @@ intelligent_dnclists_view:
 intelligent_dnclists_autocomplete:
     path:     /dnclists/autocomplete
     defaults: { _controller: IntelligentModuleBundle:Dnclists:autocomplete }
+intelligent_dnclists_fieldset:
+    path:     /dnclists/fieldset
+    defaults: { _controller: IntelligentModuleBundle:Dnclists:fieldset }

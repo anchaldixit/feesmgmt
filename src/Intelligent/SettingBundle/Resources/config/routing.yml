@@ -10,4 +10,7 @@ intelligent_setting_delete:
 intelligent_setting_view:
     path:     /settings/view/{page_no}
     defaults: { _controller: IntelligentSettingBundle:Default:view , page_no: 1 }
+intelligent_setting_fieldset:
+    path:     /settings/fieldset/{module_name}
+    defaults: { _controller: IntelligentSettingBundle:Default:fieldset }
     

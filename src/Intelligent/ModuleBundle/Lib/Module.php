@@ -728,6 +728,8 @@ abstract class Module {
         $where = $this->addViewAccessCondition($where);
 
         $results = $this->fetch(array_merge(array("{$this->module}.id"), $fieldset), $where, $join, $order_by);
+        
+        //All circus to prepare key value pare
         if (count($results)) {
             $return = array();
             foreach ($results as $value) {

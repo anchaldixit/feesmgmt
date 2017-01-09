@@ -134,13 +134,11 @@ abstract class ModulebaseController extends Controller {
                 $result['schema'] = $module->getFormFields();
             }
         }
-        
+
         $parent_relationship_rows = $module->collectParentRelationshipRows();
-        
-        $result['schema'] = array_merge_recursive($result['schema'],$parent_relationship_rows);
-        //$this->helper->print_r($parent_relationship_rows);
-        //$this->helper->print_r($result['schema']);
-        
+
+        $result['schema'] = array_merge_recursive($result['schema'], $parent_relationship_rows);
+
         //All active users
         $all_users = $this->getUsers();
 
@@ -211,7 +209,7 @@ abstract class ModulebaseController extends Controller {
             'module_display_name' => $module_display_name,
             'module' => $this->module_route_identifier,
             'module_permission_asscess_key' => $this->moduleSessionKey(),
-            'module_name'=>  $this->module_name,
+            'module_name' => $this->module_name,
             'permissions' => $this->permissions
         );
         return $this->render('IntelligentModuleBundle:Default:view.html.twig', $parameters);
@@ -305,7 +303,7 @@ abstract class ModulebaseController extends Controller {
             $permission['custom_field'] = $user_permission->getAllFieldPermissions($this->module_name);
 
             $this->permissionHack($permission);
-            
+
             $permission['setting_permissions'] = $user_permission->getEditAppStructurePermission();
 
             $session->set($this->moduleSessionKey(), $permission);
@@ -408,6 +406,35 @@ abstract class ModulebaseController extends Controller {
 
     protected function _afterSaveEvent($param) {
         //empty
+    }
+
+    /*
+     * Get all field names for mudle
+     * 
+     */
+
+    public function fieldsetAction() {
+
+        $module = $this->get("intelligent.{$this->module_name}.module");
+
+
+        $module_display_name = $module->module_settings->getModule($this->module_name);
+
+        $fields = $module->getFormFields();
+        $key_pair = array();
+        foreach ($fields as $key => $value) {
+
+            if ($value['module_field_datatype'] == 'relationship') {
+                //field name of relationship table
+                $k = $value['core_field_settings']['module'] . '.' . $value['core_field_settings']['module_field_name'];
+                $key_pair[$k] = $value['module_field_display_name'];
+            } elseif ($value['module_field_datatype'] != 'formulafield') {
+                //other than formulative
+                $k = $value['module'] . '.' . $value['module_field_name'];
+                $key_pair[$k] = $value['module_field_display_name'];
+            }
+        }
+        return new JsonResponse($key_pair);
     }
 
 }
