@@ -37,7 +37,7 @@ class Import {
         $this->module_name = $module;
         $this->module = $this->container->get("intelligent.{$this->module_name}.module");
         $this->field_set = $this->module->getFormFields();
-        $this->logger = $this->container->get('monolog.logger.import_logger');
+        //$this->logger = $this->container->get('monolog.logger.import_logger');
         $this->helper = new Helper();
     }
 
