@@ -1692,3 +1692,10 @@ input[type="submit"],input[type="button"]{
         }
     }
 }
+table{
+    tr{
+        &.bg{
+            background-color: #dfe2e2 !important;
+        }
+    }
+}

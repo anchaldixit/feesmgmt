@@ -1334,3 +1334,6 @@ input[type="submit"]:focus, input[type="button"]:focus {
     font-size: 12px; }
     .add_f_field a i, .add_r_field a i {
       margin-right: 5px; }
+
+table tr.bg {
+  background-color: #dfe2e2 !important; }

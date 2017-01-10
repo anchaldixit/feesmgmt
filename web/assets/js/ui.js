@@ -342,6 +342,7 @@ $.extend(User.prototype, {
         User.customer.init();
         that.featureSlider();
         that.bindCustomerChangeAction();
+        that.highLightTable();
         if ($('#userList').length) {
             that.createUserPage();
         }
@@ -960,6 +961,18 @@ $.extend(User.prototype, {
             _permission = 'Basic';
         }
         return _permission;
+    },
+    highLightTable: function(){
+        
+        $('table').on('mouseenter','tr',function(){
+            $(this).css('background-color','#dfe2e2');
+        });
+        $('table').on('mouseleave','tr',function(){
+            $(this).css('background-color','');
+        });
+        $('table').on('click','tr',function(){
+            $(this).toggleClass('bg');
+        });
     },
     getAjaxData: function (_ajaxLink, _obj, callback) {
         $.ajax({

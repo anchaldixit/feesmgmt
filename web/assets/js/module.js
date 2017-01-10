@@ -28,7 +28,7 @@ $.extend(Module.prototype,{
         that.bindAddRelationalFieldAction();
         that.bindAddFieldAction();
         that.bindModuleIdentifierField();
-        
+        that.highLightTable();
     },
     bindModuleFieldTypeAction: function(){
         $('#module_field_datatype').change(function(){
@@ -271,6 +271,16 @@ $.extend(Module.prototype,{
         }
         
         callback(res);
+    },
+    highLightTable: function(){
+        $('table tr').hover(function(){
+            $(this).css('background-color','#dfe2e2');
+        },function(){
+            $(this).css('background-color','');
+        });
+        $('table').on('click','tr',function(){
+            $(this).toggleClass('bg');
+        });
     },
     getAjaxData: function(_url, _data, callback){
         $.ajax({
