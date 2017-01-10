@@ -92,9 +92,11 @@
                         event.stopPropagation()
                     }
                 });
+                
+                $('.open_module_field_identifier_popup').hide();
             }
 
-            
+
 
         });
 
@@ -173,8 +175,6 @@
                                 </div>
                             </div>
                         </li>
-
-
                         <li><label>Module Field Name:</label> 
                             <div class="field-wrap">
                                 <input name="module_field_display_name" id="module_field_display_name"  value="{{config.module_field_display_name is defined ? config.module_field_display_name : ''}}" type="text" ><br>
@@ -227,14 +227,25 @@
                         <li id="relationship_module_unique_field_row"> 
                             <label class="m_top">Relationship Module Unique Field: </label>
                             <div class="field-wrap">
-                                <div class="add_r_field" style=""><a href="#" class="open_relationship_popup" data-modal-id="#relationalFields"><i class="fa fa-pencil"></i>Add Relational Field</a></div>
-                                <input name="relationship_module_unique_field" id="relationship_module_unique_field"  value="{{config.relationship_module_unique_field is defined ? config.relationship_module_unique_field : ''}}" type="text" ><br><small><i>This field of relationship table will be displayed on edit/add form for setting relation. </i></small>
+                                <div class="add_r_field" style="">
+                                    <a href="#" class="open_module_field_identifier_popup" data-modal-id="#moduleIdentifierFields">
+                                        <i class="fa fa-pencil"></i>Add Relationship Table Identifier
+                                    </a>&nbsp;&nbsp;&nbsp;
+                                    <a href="#" class="open_relationship_popup" data-modal-id="#relationalFields">
+                                        <i class="fa fa-pencil"></i>Add Relational Field
+                                    </a>
+                                </div>
+                                <input name="relationship_module_unique_field" id="relationship_module_unique_field"  value="{{config.relationship_module_unique_field is defined ? config.relationship_module_unique_field : ''}}" type="text" >
+                                <br>
+                                <small><i>This field of relationship table will be displayed on edit/add form for setting relation. </i></small>
                                 <small><i>Field can be combined with pipe separated name like field1|field2 </i></small>
                             </div>
                         </li>
                         <li><label>Display Position:</label> 
                             <div class="field-wrap">
-                                <input name="display_position" id="display_position"  value="{{config.display_position is defined ? config.display_position : '100'}}" type="text" ><br><small><i>To move column position to left, reduce the value of display position field. </i></small>
+                                <input name="display_position" id="display_position"  value="{{config.display_position is defined ? config.display_position : '100'}}" type="text" />
+                                <br>
+                                <small><i>To move column position to left, reduce the value of display position field. </i></small>
                             </div>
                         </li>
                         <li id="varchar_limit_row">
@@ -311,7 +322,8 @@
                                 </div>
                             </div>
 
-                        </li>                        <li id="field_has_relationship_row">
+                        </li>                        
+                        <li id="field_has_relationship_row">
                             <label>Is a foreign key:</label> 
                             <div class="field-wrap">
                                 <div class="dropdown">
@@ -361,66 +373,87 @@
         </div>
     </div>
 
-<div class="popup-wrapper" id="formulaFields" style="display:none;">
-            <div class="popup" style="width:650px;">
-                <div class="create-roles-outer">
-                    <div class="popup-header">
-                        <h4>Formula Fields</h4>
-                        <a class="close-popup" href="#"><i class="fa fa-times red"></i></a>
+    <div class="popup-wrapper" id="formulaFields" style="display:none;">
+        <div class="popup" style="width:650px;">
+            <div class="create-roles-outer">
+                <div class="popup-header">
+                    <h4>Formula Fields</h4>
+                    <a class="close-popup" href="#"><i class="fa fa-times red"></i></a>
+                </div>
+                <div class="popup-body">
+                    <div class="create-roles" style="max-height:400px; margin-bottom: 10px; overflow: auto;">
+                        <table id="formula_popup" class="popup_table">
+                            <thead>
+                                <tr>
+                                    <th>Action</th>
+                                    <th>Field Name</th>
+
+                                </tr>
+                            </thead>
+                            <tbody>
+
+                            </tbody>
+                        </table>
+
                     </div>
-                    <div class="popup-body">
-                        <div class="create-roles" style="max-height:400px; margin-bottom: 10px; overflow: auto;">
-                            <table id="formula_popup" class="popup_table">
-                                <thead>
-                                    <tr>
-                                        <th>Action</th>
-                                        <th>Field Name</th>
-                                        
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    
-                                </tbody>
-                            </table>
-                            
-                        </div>
-                        <input type="submit" name="formula_field_btn" class="formula_field_btn" value="Add" />
-                            <input type="button" name="cancel" class="close-popup cancel-popup" value="Cancel">
-                            <div class="msg" style="display: none; clear: both"><p></p></div>
-                    </div>
+                    <input type="submit" name="formula_field_btn" class="formula_field_btn" value="Add" />
+                    <input type="button" name="cancel" class="close-popup cancel-popup" value="Cancel">
+                    <div class="msg" style="display: none; clear: both"><p></p></div>
                 </div>
             </div>
         </div>
-                    
+    </div>
+
     <div class="popup-wrapper" id="relationalFields" style="display:none;">
-            <div class="popup" style="width:650px;">
-                <div class="create-roles-outer">
-                    <div class="popup-header">
-                        <h4>Relational Module Fields</h4>
-                        <a class="close-popup" href="#"><i class="fa fa-times red"></i></a>
+        <div class="popup" style="width:650px;">
+            <div class="create-roles-outer">
+                <div class="popup-header">
+                    <h4>Relational Module Fields</h4>
+                    <a class="close-popup" href="#"><i class="fa fa-times red"></i></a>
+                </div>
+                <div class="popup-body">
+                    <div class="create-roles" style="max-height:400px; margin-bottom: 10px; overflow: auto;">
+                        <table id="relation_popup" class="popup_table">
+                            <thead>
+                                <tr>
+                                    <th>Action</th>
+                                    <th>Field Name</th>
+
+                                </tr>
+                            </thead>
+                            <tbody>
+
+                            </tbody>
+                        </table>
+
                     </div>
-                    <div class="popup-body">
-                        <div class="create-roles" style="max-height:400px; margin-bottom: 10px; overflow: auto;">
-                            <table id="relation_popup" class="popup_table">
-                                <thead>
-                                    <tr>
-                                        <th>Action</th>
-                                        <th>Field Name</th>
-                                        
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    
-                                </tbody>
-                            </table>
-                            
-                        </div>
-                        <input type="submit" name="relation_field_btn" class="relation_field_btn" value="Add" />
-                            <input type="button" name="cancel" class="close-popup cancel-popup" value="Cancel">
-                            <div class="msg" style="display: none; clear: both"><p></p></div>
-                    </div>
+                    <input type="submit" name="relation_field_btn" class="relation_field_btn" value="Add" />
+                    <input type="button" name="cancel" class="close-popup cancel-popup" value="Cancel">
+                    <div class="msg" style="display: none; clear: both"><p></p></div>
                 </div>
             </div>
         </div>
+    </div>
+                    
+    <div class="popup-wrapper" id="moduleIdentifierFields" style="display:none;">
+        <div class="popup" style="width:350px;">
+            <div class="create-roles-outer">
+                <div class="popup-header">
+                    <h4>Module Field Identifier</h4>
+                    <a class="close-popup" href="#"><i class="fa fa-times red"></i></a>
+                </div>
+                <div class="popup-body">
+                    <div class="create-roles" style="max-height:400px; margin-bottom: 10px; overflow: auto;">
+                        <select id="module_field_identifiers" style="width:100%">
+                            
+                        </select>    
+
+                    </div>
+                    <input type="button" name="cancel" class="close-popup cancel-popup" value="Close">
+                    <div class="msg" id="re_response" style="display: none; clear: both"><p></p></div>
+                </div>
+            </div>
+        </div>
+    </div>
 
 {% endblock %}
