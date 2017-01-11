@@ -156,6 +156,21 @@
                     </div>-->
                 {% endif %}
             </div>
+            
+                {% if pagination.total_record > 0 %}
+                    <div id="display-count">
+                        <p>
+                            Displaying 
+                            <span class="lower-limit"> {{((pagination.active - 1)*pagination.limit) + 1 }} </span>
+                            to 
+                            <span class="upper-limit"> {{((pagination.active * pagination.limit) > pagination.total_record) ? pagination.total_record : pagination.active * pagination.limit}} </span>
+                            out of 
+                            <span class="total-result">{{pagination.total_record}}</span> 
+                            Fields
+                        </p>
+                    </div>
+                {% endif %}
+            
             <table>
                 <thead>
                     <tr>
