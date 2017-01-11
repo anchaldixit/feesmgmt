@@ -210,6 +210,20 @@
                                         <div class="right-container table-content">
 
                                             {{ include('IntelligentModuleBundle:Default:view/selected-labels.html.twig', { 'schema': schema,'selected_filters': selected_filters ,'users':users }) }}   
+                                            
+                                            {% if pagination.total_record > 0 %}
+                                                <div id="display-count">
+                                                    <p>
+                                                        Displaying 
+                                                        <span class="lower-limit"> {{((pagination.active - 1)*pagination.limit) + 1 }} </span>
+                                                        to 
+                                                        <span class="upper-limit"> {{((pagination.active * pagination.limit) > pagination.total_record) ? pagination.total_record : pagination.active * pagination.limit}} </span>
+                                                        out of 
+                                                        <span class="total-result">{{pagination.total_record}}</span> 
+                                                        {{module_display_name}}
+                                                    </p>
+                                                </div>
+                                            {% endif %}
                                             {% if rows|length > 0 %}
                                                 <div class="table-outer">
                                                     <table class="marketingProjects">

@@ -197,7 +197,7 @@ abstract class ModulebaseController extends Controller {
 
         $count = $module->totalCountOfLastFetch();
         $total_page_count = ceil($count / $this->limit);
-        $pagination = array('active' => $page_no, 'total_count' => $total_page_count);
+        $pagination = array('active' => $page_no,'limit'=>$this->limit,'total_record'=>$count , 'total_count' => $total_page_count);
 
         $all_users = $this->getUsers();
 
