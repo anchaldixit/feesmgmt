@@ -18,13 +18,15 @@
             <span>Edit</span>
         </div>
         <div class="custom-feature">
-            {% if permissions['setting_permissions'] %}
-                <a href="{{ path('intelligent_setting_view', {'filter[match][module]': module_name}) }}"><i class="fa "></i>Settings</a>
-            {% endif %}
             {% if permissions['add'] %}
-                <a href="{{ path('intelligent_'~module~'_edit', {'edit_id': 'new'}) }}"><i class="fa "></i>New</a>
+                <a class="red-btn" href="{{ path('intelligent_'~module~'_edit', {'edit_id': 'new'}) }}"><i class="fa fa-plus"></i>New {{module_name}}</a>
             {% endif %}
-            <a href="{{ path('intelligent_'~module~'_view') }}"><i class="fa"></i>Back</a>
+            
+            {% if permissions['setting_permissions'] %}
+                <a class="grey-btn" href="{{ path('intelligent_setting_view', {'filter[match][module]': module_name}) }}"><i class="fa fa-gears"></i>Settings</a>
+            {% endif %}
+            
+            <a class="grey-btn" href="{{ path('intelligent_'~module~'_view') }}"><i class="fa fa-arrow-circle-left"></i>Back</a>
 
 
         </div>

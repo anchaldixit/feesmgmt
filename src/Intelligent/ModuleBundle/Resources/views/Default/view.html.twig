@@ -145,18 +145,20 @@
     {#% set permissions = app.session.get(module_permission_asscess_key) %#}
     <div class="bottom-sec">
         <div class="bread-crumb">
-            <span>{{module_display_name}}</span>
+            <span id="module_name">{{module_display_name}}</span>
             <i class="fa fa-long-arrow-right"></i>
             <span>View</span>
         </div>
         <div class="custom-feature">
-            {% if permissions['setting_permissions'] %}
-                <a href="{{ path('intelligent_setting_view', {'filter[match][module]': module_name}) }}"><i class="fa "></i>Settings</a>
+            {% if permissions['add'] %}
+                <a class="red-btn" href="{{ path('intelligent_'~module~'_edit', {'edit_id': 'new'}) }}"><i class="fa fa-plus"></i>New {{module_display_name}}</a>
             {% endif %}
             
-            {% if permissions['add'] %}
-                <a href="{{ path('intelligent_'~module~'_edit', {'edit_id': 'new'}) }}"><i class="fa "></i>New</a>
+            {% if permissions['setting_permissions'] %}
+                <a class="green-btn" href="{{ path('intelligent_setting_view', {'filter[match][module]': module_name}) }}"><i class="fa fa-gears"></i>Settings</a>
             {% endif %}
+            
+            
             
             
         </div>
