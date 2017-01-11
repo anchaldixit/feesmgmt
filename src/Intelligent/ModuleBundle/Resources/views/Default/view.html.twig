@@ -113,6 +113,10 @@
                $('._date').css('width','150px');
 
             }
+            if($('._text').length){
+               $('._text').css('width','150px');
+
+            }
             if ($('._modified').length) {
                 $('._modified').css('width', '130px');
             }
@@ -123,11 +127,13 @@
             var th = $('.marketingProjects thead tr th');
             th.each(function () {
                 w = $(this)[0].style.width;
-                console.log(w);
+                //console.log(w);
                 _width = _width + parseInt(w);
+                //alert(w);
             });
 
-            $('.marketingProjects').css('width', _width + 'px')
+            $('.marketingProjects').css('width', _width + 'px');
+            
         });
 
 

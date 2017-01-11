@@ -401,6 +401,8 @@ input[type="submit"],input[type="button"]{
     overflow:hidden;
     position:relative;
     height:63px;
+    background-color:#5aa3ff;
+    border-top:1px solid #fff;
     .prev{
         position: absolute;
         left:0;
@@ -432,7 +434,7 @@ input[type="submit"],input[type="button"]{
         }
     }
     ul{
-        border-top:1px solid #fff;
+        
         background-color:#5aa3ff; 
         overflow:hidden;
         position:absolute;
@@ -988,12 +990,15 @@ input[type="submit"],input[type="button"]{
                     line-height: 20px;
                     padding-top: 8px;
                     padding-right: 15px;
+                    &.m_top{
+                        padding-top: 20px;
+                    }
                 }
                 .field-wrap{
                     width: 65%;
                     float: left;
                     input[type="text"],input[type="email"]{
-                        width: 100%;
+                        width: 96%;
 
                         padding: 8px 2%;
                         border:1px solid #dadbdd;
@@ -1006,7 +1011,7 @@ input[type="submit"],input[type="button"]{
                         }
                     }
                     textarea{
-                        width: 100%;
+                        width: 96%;
                         padding: 8px 2%;
                         border:1px solid #dadbdd;
                         font-size: 16px;
@@ -1035,7 +1040,7 @@ input[type="submit"],input[type="button"]{
                         vertical-align: middle;
                         font-size: 16px;
                         line-height: 20px;
-                        width: 465px;
+                        width: 446px;
                         border:1px solid #dadbdd;
                         overflow: hidden;
                         color: #000;
@@ -1623,4 +1628,74 @@ input[type="submit"],input[type="button"]{
 }
 .hide{
     display: none;
+}
+
+.popup_table{
+    border: 1px solid #cacaca;
+    margin-bottom: 15px;
+    width:100%;
+    max-width:100%;
+    thead{
+        tr{
+            th{
+                font-size: 12px;
+                border: 1px solid #454545;
+                border-collapse: collapse;
+                padding: 10px 5px;
+                background-color: #b5d5fd;
+                vertical-align: middle;
+                color: #000;
+            }
+        }
+    }
+    tbody{
+        tr{
+            td{
+                font-size: 12px;
+                border: 1px solid #454545;
+                border-collapse: collapse;
+                padding: 7px 10px;
+                vertical-align: middle;
+                text-align: center;
+                
+                
+            }
+        }
+    }
+}
+
+.formula_field_btn, .relation_field_btn{
+    background-color: #5aa3ff;
+    color: #fff;
+    padding: 8px 20px;
+    border: 1px solid transparent;
+    font-size: 16px;
+    line-height: 20px;
+}
+.cancel-popup{
+    background-color: #d5d5d5;
+    color: #fff;
+    margin-left: 20px;
+    padding: 10px 15px;
+    border: 0px solid ;
+    font-size: 16px;
+    line-height: 20px;
+}
+.add_f_field,.add_r_field{
+    text-align: right;
+    padding-bottom:5px;
+    a{
+        text-decoration: none;
+        font-size: 12px;
+        i{
+            margin-right: 5px;
+        }
+    }
+}
+table{
+    tr{
+        &.bg{
+            background-color: #dfe2e2 !important;
+        }
+    }
 }

@@ -342,6 +342,7 @@ $.extend(User.prototype, {
         User.customer.init();
         that.featureSlider();
         that.bindCustomerChangeAction();
+        that.highLightTable();
         if ($('#userList').length) {
             that.createUserPage();
         }
@@ -349,7 +350,8 @@ $.extend(User.prototype, {
     },
     featureSlider: function () {
         if ($('.feature-list').length) {
-            var li_width = 30;
+            var li_width = 60;
+            
             $('.feature-list ul li').each(function () {
                 li_width = li_width + $(this).outerWidth();
             });
@@ -360,9 +362,10 @@ $.extend(User.prototype, {
                 if (diff > 0) {
                     $('.feature-list ul').animate({'left': '-' + diff + 'px'}, 500);
                 }
+                
             });
             $('.prev').click(function () {
-
+                
                 var diff = $('.feature-list ul').width() - $(window).width();
                 var pos = 0;
                 if (diff > 0) {
@@ -377,6 +380,7 @@ $.extend(User.prototype, {
                     }
                     $('.feature-list ul').animate({'left': '+' + pos + 'px'}, 500);
                 }
+                
             });
         }
     },
@@ -960,6 +964,18 @@ $.extend(User.prototype, {
             _permission = 'Basic';
         }
         return _permission;
+    },
+    highLightTable: function(){
+        
+        $('table').on('mouseenter','tr',function(){
+            $(this).css('background-color','#dfe2e2');
+        });
+        $('table').on('mouseleave','tr',function(){
+            $(this).css('background-color','');
+        });
+        $('table').on('click','tr',function(){
+            $(this).toggleClass('bg');
+        });
     },
     getAjaxData: function (_ajaxLink, _obj, callback) {
         $.ajax({
