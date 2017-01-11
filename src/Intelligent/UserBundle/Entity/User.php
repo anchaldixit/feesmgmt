@@ -53,6 +53,13 @@ class User implements AdvancedUserInterface, \Serializable
      * @ORM\Column(name="name", type="string", length=100, nullable=true)
      */
     private $name;
+    
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="quickbase_id", type="string", length=100, nullable=true)
+     */
+    private $quickbaseId;
 
     /**
      * @var string
@@ -553,5 +560,28 @@ class User implements AdvancedUserInterface, \Serializable
             return $this->allowedCustomers;
         }
         
+    }
+
+    /**
+     * Set quickbaseId
+     *
+     * @param string $quickbaseId
+     * @return User
+     */
+    public function setQuickbaseId($quickbaseId)
+    {
+        $this->quickbaseId = $quickbaseId;
+
+        return $this;
+    }
+
+    /**
+     * Get quickbaseId
+     *
+     * @return string 
+     */
+    public function getQuickbaseId()
+    {
+        return $this->quickbaseId;
     }
 }
