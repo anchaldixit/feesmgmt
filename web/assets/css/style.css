@@ -1337,3 +1337,10 @@ input[type="submit"]:focus, input[type="button"]:focus {
 
 table tr.bg {
   background-color: #dfe2e2 !important; }
+
+#display-count {
+  padding: 0 0 10px 0; }
+  #display-count p {
+    padding-top: 8px;
+    font-size: 12px;
+    font-weight: 600; }
