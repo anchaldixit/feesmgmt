@@ -343,10 +343,25 @@ $.extend(User.prototype, {
         that.featureSlider();
         that.bindCustomerChangeAction();
         that.highLightTable();
+        that.activeModule();
         if ($('#userList').length) {
             that.createUserPage();
         }
 
+    },
+    activeModule: function(){
+        var _mod = $('#module_name').text().toLowerCase();
+        
+        var _featur_list = $('.feature-list ul li');
+        _featur_list.removeClass('active');
+        _featur_list.each(function(){
+            var _text = $.trim($(this).find('a').text());
+            _text = _text.toLowerCase();
+            if(_text == _mod){
+                $(this).addClass('active');
+            }
+                
+        });
     },
     featureSlider: function () {
         if ($('.feature-list').length) {

@@ -121,6 +121,34 @@ body{font-family: helvetica; font-weight: 300;}
         background-color: #1fa67a;
     }
 }
+.red-btn{
+   padding: 5px 10px;
+    color: #fff !important;
+    border-radius: 3px;
+    display: inline-block;
+    text-decoration: none;
+    font-size: 12px;
+    margin: 0 4px;
+    background-color: #f20431;
+
+    &:hover{
+        background-color: #1fa67a;
+    } 
+}
+.grey-btn{
+   padding: 5px 10px;
+    color: #fff !important;
+    border-radius: 3px;
+    display: inline-block;
+    text-decoration: none;
+    font-size: 12px;
+    margin: 0 4px;
+    background-color: #b6b5b5;
+
+    &:hover{
+        background-color: #1fa67a;
+    } 
+}
 .g-btn{
     background-color:transparent;
     padding: 5px 10px;
@@ -135,7 +163,7 @@ body{font-family: helvetica; font-weight: 300;}
     }
 }
 .green-btn{
-    background-color:green;
+    background-color:#1fa67a;
     padding: 5px 10px;
     color: #fff;
     border-radius: 3px;
@@ -144,7 +172,8 @@ body{font-family: helvetica; font-weight: 300;}
     font-size: 12px;
     margin: 0 4px;
     &:hover, &.active{
-        background-color: #00593c;
+        background-color: #5aa3ff;
+        color:#fff !important;
     }
 }
 .green{
@@ -461,7 +490,7 @@ input[type="submit"],input[type="button"]{
                     font-size: 20px;
                 }
             }
-            &:hover{
+            &:hover, &.active{
                 background-color: #fff;
                 a{
                     color: #5aa3ff;
@@ -477,8 +506,9 @@ input[type="submit"],input[type="button"]{
         overflow: hidden;
         padding:10px 15px;
         float:left;
+        font-weight:600;
         span{
-            font-size: 12px;
+            font-size: 14px;
             line-height: 16px;
             float: left;
         }
