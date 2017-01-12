@@ -1311,7 +1311,8 @@ input[type="submit"]:focus, input[type="button"]:focus {
 
 .table-outer {
   overflow: auto;
-  padding-bottom: 15px; }
+  padding-bottom: 15px;
+  max-height: 500px; }
 
 .hide {
   display: none; }
