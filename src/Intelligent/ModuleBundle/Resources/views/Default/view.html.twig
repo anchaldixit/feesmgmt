@@ -31,7 +31,11 @@
 
         .marketingProjects thead tr th:first-child, .marketingProjects tbody tr td:first-child{text-align: center;}
 
-
+        .table-outer{
+    overflow: auto;
+    padding-bottom: 15px;
+    height:500px;
+}
 
 
     </style>
@@ -134,6 +138,17 @@
 
             $('.marketingProjects').css('width', _width + 'px');
             
+            if($('.marketingProjects').length){
+                var table = $('table.marketingProjects');
+               //console.log(jQuery.floatThead());
+                table.floatThead({
+                    position: 'absolute',
+                    scrollContainer: function(table){
+                        return table.closest('.table-outer');
+                    }
+                });
+            }
+
         });
 
 
@@ -244,8 +259,9 @@
                                                                             <th class="_modified">Last Modified</th>
                                                                             
                                                                         </tr>
+                                                                    
                                                                     </thead>
-
+                                                                    <tbody>
                                                                     {% for row in rows %}
                                                                         <tr>
                                                                             <td>
@@ -271,7 +287,7 @@
 
                                                                                     </tr>
                                                                                     {% endfor %}
-
+                                                                                    </tbody>
                                                                                     </table>
                                                                                 </div>
                                                                                 {{ include('IntelligentModuleBundle:Default:pagination.html.twig', { 'pagination': pagination,'module':module }) }}
