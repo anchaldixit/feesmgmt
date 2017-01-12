@@ -31,7 +31,7 @@ class Import {
     ); //tracker of header
     var $test_only_header = false;
     var $delete_before_insert = false;
-    var $module_has_nested_relationship_inkey = false;
+    var $module_has_nested_relationship_inkey = true;
     var $usernotfound =array();
     var $users_list = array();
 
@@ -121,6 +121,12 @@ class Import {
 
 
                 break;
+            case 'number':
+                
+                $return = str_replace(',', '', $value);
+
+
+                break;
             case 'date':
                 
                 if(!empty($value)){
@@ -166,11 +172,15 @@ class Import {
                     $m = $this->container->get("intelligent.{$r_module}.module");
                     if (!$this->module_has_nested_relationship_inkey) {
                         $select = array("$r_module.id");
+                        $nd_condition=array();
                         foreach ($set as $key => $field) {
-                            $nd_condition = array("{$r_module}.$field" => $row[$key]);
+                            //$nd_condition = array("{$r_module}.$field" => $row[$key]);
+                            $nd_condition["{$r_module}.$field"] = $row[$key];
+                           // $nd_condition = array()
                         }
+                        $row = $m->getRows($nd_condition,array(),10);
 
-                        $row = $m->fetch($select, $nd_condition);
+                        //$row = $m->fetch($select, $nd_condition);
 
                         if (count($row) == 1) {
                             $foreign_key_id = $this->module->module_settings->prepareforeignKeyName($r_module);
