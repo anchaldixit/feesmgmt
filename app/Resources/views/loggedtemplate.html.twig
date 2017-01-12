@@ -92,7 +92,7 @@ and open the template in the editor.
                     </li>
                     {% if is_app_admin() %}
                     <li>
-                        <a href="/settings/view">
+                        <a href="{{ path('intelligent_setting_view')}}">
                             <i class="fa fa-gears"></i>
                             <span>Module Settings</span>
                         </a>
@@ -108,7 +108,7 @@ and open the template in the editor.
                     {% endif %}
                     {% if is_module_visible('customer') %}
                     <li> 
-                        <a href="/customer/view">
+                        <a href="{{ path('intelligent_customer_view')}}">
                             <i class="fa fa-users"></i>
                             <span>Customer</span>
                         </a>
@@ -116,7 +116,7 @@ and open the template in the editor.
                     {% endif %}
                     {% if is_module_visible('customer_projects') %}
                     <li> 
-                        <a href="/customer/view">
+                        <a href="{{ path('intelligent_customerprojects_view')}}">
                             <i class="fa fa-users"></i>
                             <span>Customer Projects</span>
                         </a>
@@ -124,7 +124,7 @@ and open the template in the editor.
                     {% endif %}
                     {% if is_module_visible('marketing_projects') %}
                     <li>
-                        <a href="/marketingprojects/view">
+                        <a href="{{ path('intelligent_marketingprojects_view')}}">
                             <i class="fa fa-list-alt"></i>
                             <span>Marketing Projects</span>
                         </a>
@@ -132,7 +132,7 @@ and open the template in the editor.
                     {% endif %}
                     {% if is_module_visible('initiative') %}
                     <li>
-                        <a href="#">
+                        <a href="{{ path('intelligent_initiative_view')}}">
                             <i class="fa fa-gears"></i>
                             <span>Initiatives</span>
                         </a>
@@ -140,7 +140,7 @@ and open the template in the editor.
                     {% endif %}
                     {% if is_module_visible('campaign') %}
                     <li>
-                        <a href="#">
+                        <a href="{{ path('intelligent_campaign_view')}}">
                             <i class="fa fa-bullhorn"></i>
                             <span>Campaign</span>
                         </a>
@@ -148,7 +148,7 @@ and open the template in the editor.
                     {% endif %}
                     {% if is_module_visible('campaign_contacts') %}
                     <li>
-                        <a href="#">
+                        <a href="{{ path('intelligent_campaigncontacts_view')}}">
                             <i class="fa fa-address-book"></i>
                             <span>Campaign Contacts</span>
                         </a>
@@ -156,7 +156,7 @@ and open the template in the editor.
                     {% endif %}
                     {% if is_module_visible('psuedo_email_accounts') %}
                     <li>
-                        <a href="#">
+                        <a href="{{ path('intelligent_psuedoemailaccounts_view')}}">
                             <i class="fa fa-envelope"></i>
                             <span>Psuedo Email Accounts</span>
                         </a>
@@ -164,7 +164,7 @@ and open the template in the editor.
                     {% endif %}
                     {% if is_module_visible('assign_psuedo') %}
                     <li>
-                        <a href="#">
+                        <a href="{{ path('intelligent_assignpsuedo_view')}}">
                             <i class="fa fa-desktop"></i>
                             <span>Assign Psudeo</span>
                         </a>
@@ -188,7 +188,7 @@ and open the template in the editor.
                     {% endif %}
                     {% if is_module_visible('links') %}
                     <li>
-                        <a href="#">
+                        <a href="{{ path('intelligent_links_view')}}">
                             <i class="fa fa-dollar"></i>
                             <span>Links</span>
                         </a>
@@ -196,7 +196,7 @@ and open the template in the editor.
                     {% endif %}
                     {% if is_module_visible('link_rates') %}
                     <li>
-                        <a href="#">
+                        <a href="{{ path('intelligent_linkrates_view')}}">
                             <i class="fa fa-tachometer"></i>
                             <span>Link Rates</span>
                         </a>
@@ -204,7 +204,7 @@ and open the template in the editor.
                     {% endif %}
                     {% if is_module_visible('dnc_lists') %}
                     <li>
-                        <a href="#">
+                        <a href="{{ path('intelligent_dnclists_view')}}">
                             <i class="fa fa-list-alt"></i>
                             <span>DNS List</span>
                         </a>
