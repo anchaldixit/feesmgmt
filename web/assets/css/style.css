@@ -494,7 +494,8 @@ input[type="submit"]:focus, input[type="button"]:focus {
       font-weight: 600; }
 
 .content-table {
-  overflow: hidden; }
+  overflow: hidden;
+  min-height: 500px; }
   .content-table .left-sidebar {
     float: left;
     width: 150px;

@@ -590,7 +590,7 @@ input[type="submit"],input[type="button"]{
 }
 .content-table{
     overflow: hidden;
-
+    min-height:500px;
     .left-sidebar{
         float: left;
         width: 150px;
