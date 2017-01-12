@@ -48,6 +48,7 @@ class Settings {
         'date' => 'Date',
 //        'datetime' => 'Datetime',
         'relationship' => 'Relationship',
+        'relationship-aggregator' => 'Aggregator',
         'formulafield' => 'Formula field'
     );
     private $last_insert_id; //initilized after new field created
@@ -55,7 +56,7 @@ class Settings {
     private $last_sql_withoutlimit_params; //store the parameters for $last_sql_withoutlimit variable sql
     private $module_column_added; //used to communicate between setting save & module alter actions
     private $backup; //incase update command need to rollbacked, variable will hold the previous version of data;
-    private $non_db_field_types = array('relationship', 'formulafield');
+    private $non_db_field_types = array('relationship', 'formulafield','relationship-aggregator');
 
     public function __construct() {
 
@@ -93,6 +94,11 @@ class Settings {
 
         $result = $this->db->fetchAll("SELECT * FROM {$this->table} limit 1");
         return $result;
+    }
+    
+    public function isNonDbField($type){
+     
+        return in_array($type, $this->non_db_field_types);
     }
 
     public function fetch($nd_condition = array('field-name' => 'value'), $sort = array('field-name' => 'ASC'), $limit = '1000') {
@@ -307,11 +313,11 @@ class Settings {
                 $data['module_field_name'] = strlen($new) > 50 ? substr($new, -50) : $new;
             }
 
-            if ($post_data['module_field_datatype'] == 'relationship') {
+            if (in_array($post_data['module_field_datatype'], array('relationship', 'relationship-aggregator'))) {
 //If Type is set as relationship then need to validate extra for module_field_name also
                 if (empty($post_data['relationship_module'])) {
 
-                    $error[] = "Relationship Module cannot be empty for 'relationship' datatype";
+                    $error[] = "Relationship Module cannot be empty for '{$post_data['module_field_datatype']}' datatype";
                 } elseif ($post_data['relationship_module'] == $post_data['module']) {
 
                     $error[] = "Relationship Module cannot be same as module name.";
@@ -365,6 +371,28 @@ class Settings {
                     $data['relationship_module_unique_field'] = $post_data['relationship_module_unique_field'];
                 }
             }
+        }
+        if ($post_data['module_field_datatype'] == 'relationship-aggregator') {
+
+            if (empty($post_data['aggregator_function'])) {
+                $error[] = "Aggregator function cannot be empty";
+            } else {
+                $data['aggregator_function'] = $post_data['aggregator_function'];
+
+                //Check one - many relationship is already set between this and relationship module. Only then relationship-aggregator is possible
+                if ($type == 'save') {
+                    $result1 = $this->fetch(
+                            array(
+                                'module' => $post_data['relationship_module'],
+                                'module_field_datatype' => 'relationship',
+                                'relationship_module' => $post_data['module']));
+
+                    if (empty($result1)) {
+                        $error[] = "No one to many relationship found bewteen {$post_data['relationship_module']} and {$post_data['module']}. Aggregator field cannot be created without that. Please create the field after creating one to many relationship between both the modules";
+                    }
+                }
+            }
+            //
         }
 
         if ($post_data['module_field_datatype'] == 'link' and empty($post_data['link_text'])) {
@@ -478,7 +506,7 @@ class Settings {
         } elseif ($data['module_field_datatype'] == 'relationship') {
             $this->createForeignKey($data['module'], $this->prepareforeignKeyName($data['relationship_module']));
             return;
-        } elseif ($data['module_field_datatype'] == 'formulafield') {
+        } elseif (in_array($data['module_field_datatype'], array('formulafield'))) {
             //keys required to be created
             //check if added formula dont have error
             $module = $this->container->get("intelligent.{$data['module']}.module");
@@ -492,6 +520,9 @@ class Settings {
                 throw $exc;
             }
 
+            return;
+        } elseif ($data['module_field_datatype'] == 'relationship-aggregator') {
+            //@todo: combine this with formulative
             return;
         }
         if ($data['unique_field'] == 'Y') {

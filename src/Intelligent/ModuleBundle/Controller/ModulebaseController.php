@@ -214,6 +214,32 @@ abstract class ModulebaseController extends Controller {
         );
         return $this->render('IntelligentModuleBundle:Default:view.html.twig', $parameters);
     }
+    
+        /*
+     * Delete action
+     * Param1: number $delete_id
+     */
+
+    public function deleteAction($delete_id) {
+
+        $this->initPermissionsDetails();
+        //$this->initRowAccessPermission();
+
+        if ($this->noAccess('view')) {
+            return $this->noAccessPage();
+        }
+
+
+        $module = $this->get("intelligent.{$this->module_name}.module");
+        $request = Request::createFromGlobals();
+
+        
+        $module->delete($delete_id);
+
+        $this->get('session')->getFlashBag()->add('success', "Row Deleted Successfully.");
+
+        return $this->redirectToRoute("intelligent_".str_replace('_', '', $this->module_name)."_view");
+    }
 
     function getUsers() {
 
@@ -221,10 +247,12 @@ abstract class ModulebaseController extends Controller {
         $query = $em->createQueryBuilder();
         $query->select("u")
                 ->from("IntelligentUserBundle:User", "u");
-        $query->andWhere($query->expr()->in("u.status", 1));
+        //$query->andWhere($query->expr()->in("u.status", 1));
 
         $dql = $query->getQuery();
         $results = $dql->getResult();
+        
+        //$this->helper->print_r($results);
         $userlist = array();
         foreach ($results as $key => $user) {
             $userlist[$user->getId()] = $user->getName();
@@ -428,7 +456,7 @@ abstract class ModulebaseController extends Controller {
                 //field name of relationship table
                 $k = $value['core_field_settings']['module'] . '.' . $value['core_field_settings']['module_field_name'];
                 $key_pair[$k] = $value['module_field_display_name'];
-            } elseif ($value['module_field_datatype'] != 'formulafield') {
+            } elseif (!$module->module_settings->isNonDbField($value['module_field_datatype'])) {
                 //other than formulative
                 $k = $value['module'] . '.' . $value['module_field_name'];
                 $key_pair[$k] = $value['module_field_display_name'];

@@ -13,46 +13,58 @@
             $('#module_field_datatype').on('change', function () {
 
                 if ($(this).val() == 'enum') {
-                    $('#value_row').slideDown('slow')
+                    $('#value_row').slideDown('slow');
                 } else {
-                    $('#value_row').slideUp('slow')
+                    $('#value_row').slideUp('slow');
                 }
                 if ($(this).val() == 'link') {
-                    $('#link_text_row').slideDown('slow')
+                    $('#link_text_row').slideDown('slow');
                 } else {
-                    $('#link_text_row').slideUp('slow')
+                    $('#link_text_row').slideUp('slow');
                 }
                 if ($(this).val() == 'varchar') {
-                    $('#varchar_limit_row').slideDown('slow')
+                    $('#varchar_limit_row').slideDown('slow');
                 } else {
-                    $('#varchar_limit_row').slideUp('slow')
+                    $('#varchar_limit_row').slideUp('slow');
                 }
                 if ($(this).val() == 'text' || $(this).val() == 'link') {
-                    jQuery("#enable_filter").val('N')
-                    $('#enable_filter_row').slideUp('slow')
+                    jQuery("#enable_filter").val('N');
+                    $('#enable_filter_row').slideUp('slow');
                 } else {
-                    $('#enable_filter_row').slideDown('slow')
+                    $('#enable_filter_row').slideDown('slow');
                 }
+                
                 if ($(this).val() == 'varchar' || $(this).val() == 'number') {
-                    $('#unique_field_row').slideDown('slow')
+                    $('#unique_field_row').slideDown('slow');
                 } else {
-                    $('#unique_field_row').slideUp('slow')
+                    $('#unique_field_row').slideUp('slow');
                 }
+                
                 if ($(this).val() == 'relationship') {
-
-                    $('#relationship_module_row').slideDown('slow')
-                    $('#relationship_module_unique_field_row').slideDown('slow')
+                    $('#relationship_module_unique_field_row').slideDown('slow');
                 } else {
-                    $('#relationship_module_row').slideUp('slow')
-                    $('#relationship_module_unique_field_row').slideUp('slow')
+                    $('#relationship_module_unique_field_row').slideUp('slow');
                 }
+                
+                if (['relationship-aggregator', 'relationship'].indexOf($(this).val()) > -1 ) {
+                    $('#relationship_module_row').slideDown('slow');
+                } else {
+                    $('#relationship_module_row').slideUp('slow');
+                }
+                
+                if ($(this).val() == 'relationship-aggregator') {
+                    $('#aggregator_function_row').slideDown('slow');
+                } else {
+                    $('#aggregator_function_row').slideUp('slow');
+                }
+                
                 if (['varchar', 'relationship'].indexOf($(this).val()) == -1) {
                     $('#enable_filter_with_option_row').slideUp('slow')
                 }
                 if ($(this).val() == 'formulafield') {
-                    $('#formulafield_row').slideDown('slow')
+                    $('#formulafield_row').slideDown('slow');
                 } else {
-                    $('#formulafield_row').slideUp('slow')
+                    $('#formulafield_row').slideUp('slow');
                 }
 
             }).trigger('change');
@@ -222,6 +234,21 @@
 
                                 </div>
                                 <small><i>Module Field Identifier should be same as Field Identifier of Relationship Module</i></small>
+                            </div>
+                        </li>
+                        <li id="aggregator_function_row"> 
+                            <label>Aggregator Function: </label>
+                            <div class="field-wrap">
+                                <div class="dropdown">
+                                    <select name="aggregator_function" id="aggregator_function"  class="selectbox" >
+                                        <option value="">Select Aggregator..</option>
+                                        <option value="count" {{ config.aggregator_function is defined and config.aggregator_function == 'count' ? 'SELECTED': ''}}>Count</option>
+                                            <option value="sum" {{config.aggregator_function is defined and config.aggregator_function == 'sum' ? 'SELECTED': ''}}>Sum</option>
+                                            <option value="avg" {{config.aggregator_function is defined and config.aggregator_function == 'avg' ? 'SELECTED': ''}}>Avg</option>
+                                    </select>
+
+                                </div>
+                                <small><i>Not sure</i></small>
                             </div>
                         </li>
                         <li id="relationship_module_unique_field_row"> 
