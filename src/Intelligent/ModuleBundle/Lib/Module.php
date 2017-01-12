@@ -64,13 +64,14 @@ abstract class Module {
      * param5: $limit = '1000'
      */
 
-    function fetch($fields = array(), $nd_condition = array(), $join = array(), $sort = array(), $limit = '1000') {
+    function fetch($fields = array(), $nd_condition = array(), $join = array(), $sort = array(), $group_by=array(), $limit = '1000') {
 
         $extended_where = '';
         $order_by = '';
         $join_condition = '';
         $params = array();
         $select_fields = '*';
+        $groupby_part = '';
 
         if (!isset($nd_condition['field-name']) and is_array($nd_condition) and count($nd_condition)) {
             //prepare where clause based on condition
@@ -106,6 +107,11 @@ abstract class Module {
             }
             $order_by = 'ORDER BY ' . implode(' , ', $arr_orderby);
         }
+        
+        if(is_array($group_by) and count($group_by)){
+            
+            $groupby_part = "GROUP BY  {$group_by[0]}";
+        }
 
         if (!isset($join['tablename']) and is_array($join) and count($join)) {
             $arr_join_part = array();
@@ -124,8 +130,11 @@ abstract class Module {
             $select_fields = implode(' , ', $fields);
         }
 
-        $sql = "SELECT $select_fields FROM {$this->table} $join_condition $extended_where $order_by limit $limit";
-        $this->last_sql_withoutlimit = "SELECT count(*) FROM {$this->table} $join_condition $extended_where ";
+        $sql = "SELECT $select_fields FROM {$this->table} $join_condition $extended_where $groupby_part $order_by limit $limit";
+        $this->last_sql_withoutlimit = "SELECT count(*) FROM {$this->table} $join_condition $extended_where $groupby_part ";
+        if(count($group_by)){
+            $this->last_sql_withoutlimit = "select count(*) from ({$this->last_sql_withoutlimit}) a ";
+        }
         $this->last_sql_withoutlimit_params = $params;
         $result = $this->db->fetchAll($sql, $params);
         return $result;
@@ -342,6 +351,7 @@ abstract class Module {
         $join = array();
         $fieldset = array();
         $where = array("{$this->module}.id" => $id);
+        $groupby = array();
 
         $module_field_set = $this->getFormFields();
 
@@ -355,6 +365,14 @@ abstract class Module {
                 $this->prepareSQLParams($row, $join, $fieldset, $where);
             } elseif ($row['module_field_datatype'] == 'formulafield') {
                 $fieldset[] = "{$row['formulafield']} as {$row['module_field_name']}";
+            } elseif($row['module_field_datatype'] == 'relationship-aggregator'){
+                
+                $fieldset[] = "{$row['aggregator_function']}({$row['relationship_module']}.{$row['module_field_name']}) as {$row['module_field_name']}";
+                $join[$row['relationship_module']] = array("{$row['module']}.id" => "{$row['relationship_module']}." . $this->module_settings->prepareforeignKeyName($row['module']));
+                //$this->module_settings->prepareforeignKeyName
+                $groupby= array("{$this->table}.id");
+                
+                
             } else {
                 $fieldset[] = "{$row['module']}.{$row['module_field_name']}";
             }
@@ -362,7 +380,7 @@ abstract class Module {
 
         $filters = $this->addViewAccessCondition($where);
 
-        $result = $this->fetch($fieldset, $filters, $join);
+        $result = $this->fetch($fieldset, $filters, $join, array(),$groupby);
 
         return array('schema' => $module_field_set, 'row' => $result);
     }
@@ -371,8 +389,11 @@ abstract class Module {
 
         $join = array();
         $fieldset = array("{$this->table}.id");
+        $groupby = array();
 
         $module_field_set = $this->getDisplayGridFields();
+        
+        //$this->helper->print_r($module_field_set);
 
         foreach ($module_field_set as $key => $row) {
 
@@ -384,7 +405,15 @@ abstract class Module {
                 $this->prepareSQLParams($row, $join, $fieldset, $where);
             } elseif ($row['module_field_datatype'] == 'formulafield') {
                 $fieldset[] = "{$row['formulafield']} as {$row['module_field_name']}";
-            } else {
+            } elseif($row['module_field_datatype'] == 'relationship-aggregator'){
+                
+                $fieldset[] = "{$row['aggregator_function']}({$row['relationship_module']}.{$row['module_field_name']}) as {$row['module_field_name']}";
+                $join[$row['relationship_module']] = array("{$row['module']}.id" => "{$row['relationship_module']}." . $this->module_settings->prepareforeignKeyName($row['module']));
+                //$this->module_settings->prepareforeignKeyName
+                $groupby= array("{$this->table}.id");
+                
+                
+            }else {
                 $fieldset[] = "{$row['module']}.{$row['module_field_name']}";
                 if (isset($where[$row['module_field_name']])) {
                     $temp = $where[$row['module_field_name']];
@@ -397,7 +426,7 @@ abstract class Module {
 
         $where = $this->addViewAccessCondition($where);
 
-        $result = $this->fetch($fieldset, $where, $join, $order_by, $limit);
+        $result = $this->fetch($fieldset, $where, $join, $order_by, $groupby, $limit);
 
         return array('schema' => $module_field_set, 'row' => $result);
     }
@@ -417,7 +446,7 @@ abstract class Module {
         foreach ($results as $value) {
 
             # If datatype is relationship then extract the field setting of relationship field and include into relationship table
-            if ($value['module_field_datatype'] == 'relationship') {
+            if (in_array($value['module_field_datatype'], array('relationship','relationship-aggregator'))) {
                 //relationship field also required setting for relationship module
 
                 $result2 = $this->getFieldSettings($value['relationship_module'], $value['module_field_name']);
@@ -455,7 +484,7 @@ abstract class Module {
                 )
         );
         if (count($result)) {
-            if ($result[0]['module_field_datatype'] == 'relationship') {
+            if (in_array($result[0]['module_field_datatype'] , array('relationship','relationship-aggregator'))) {
                 //Recursive call
                 $result2 = $this->getFieldSettings($result[0]['relationship_module'], $result[0]['module_field_name']);
 
@@ -668,7 +697,7 @@ abstract class Module {
 
     function getCoreSettingsOfRelationshipField($field_settings) {
 
-        if (isset($field_settings['relationship_field_settings']) and $field_settings['module_field_datatype'] == 'relationship' and count($field_settings['relationship_field_settings'])) {
+        if (isset($field_settings['relationship_field_settings']) and in_array($field_settings['module_field_datatype'] , array('relationship','relationship-aggregator')) and count($field_settings['relationship_field_settings'])) {
             return $this->getCoreSettingsOfRelationshipField($field_settings['relationship_field_settings']);
         } else {
             return $field_settings;
@@ -732,7 +761,7 @@ abstract class Module {
 
         $where = $this->addViewAccessCondition($where);
 
-        $results = $this->fetch(array_merge(array("{$this->module}.id"), $fieldset), $where, $join, $order_by);
+        $results = $this->fetch(array_merge(array("{$this->module}.id"), $fieldset), $where, $join, $order_by, $groupby);
 
         //All circus to prepare key value pare
         if (count($results)) {

@@ -7,6 +7,9 @@ intelligent_customer_edit:
 intelligent_customer_view:
     path:     /customer/view/{page_no}
     defaults: { _controller: IntelligentModuleBundle:Customer:view , page_no: 1 }
+intelligent_customer_delete:
+    path:     /customer/delete/{delete_id}
+    defaults: { _controller: IntelligentModuleBundle:Customer:delete }
 intelligent_customer_autocomplete:
     path:     /customer/autocomplete
     defaults: { _controller: IntelligentModuleBundle:Customer:autocomplete}
@@ -24,6 +27,9 @@ intelligent_customerprojects_edit:
 intelligent_customerprojects_view:
     path:     /customerprojects/view/{page_no}
     defaults: { _controller: IntelligentModuleBundle:Customerprojects:view , page_no: 1 }
+intelligent_customerprojects_delete:
+    path:     /customerprojects/delete/{delete_id}
+    defaults: { _controller: IntelligentModuleBundle:Customerprojects:delete }
 intelligent_customerprojects_autocomplete:
     path:     /customerprojects/autocomplete
     defaults: { _controller: IntelligentModuleBundle:Customerprojects:autocomplete}
@@ -41,6 +47,9 @@ intelligent_marketingprojects_edit:
 intelligent_marketingprojects_view:
     path:     /marketingprojects/view/{page_no}
     defaults: { _controller: IntelligentModuleBundle:Marketingprojects:view , page_no: 1 }
+intelligent_marketingprojects_delete:
+    path:     /marketingprojects/delete/{delete_id}
+    defaults: { _controller: IntelligentModuleBundle:Marketingprojects:delete }
 intelligent_marketingprojects_autocomplete:
     path:     /marketingprojects/autocomplete
     defaults: { _controller: IntelligentModuleBundle:Marketingprojects:autocomplete }
@@ -58,6 +67,9 @@ intelligent_initiative_edit:
 intelligent_initiative_view:
     path:     /initiative/view/{page_no}
     defaults: { _controller: IntelligentModuleBundle:Initiative:view , page_no: 1 }
+intelligent_initiative_delete:
+    path:     /initiative/delete/{delete_id}
+    defaults: { _controller: IntelligentModuleBundle:Initiative:delete }
 intelligent_initiative_autocomplete:
     path:     /initiative/autocomplete
     defaults: { _controller: IntelligentModuleBundle:Initiative:autocomplete }
@@ -75,6 +87,9 @@ intelligent_campaign_edit:
 intelligent_campaign_view:
     path:     /campaign/view/{page_no}
     defaults: { _controller: IntelligentModuleBundle:Campaign:view , page_no: 1 }
+intelligent_campaign_delete:
+    path:     /campaign/delete/{delete_id}
+    defaults: { _controller: IntelligentModuleBundle:Campaign:delete }
 intelligent_campaign_autocomplete:
     path:     /campaign/autocomplete
     defaults: { _controller: IntelligentModuleBundle:Campaign:autocomplete }
@@ -92,6 +107,9 @@ intelligent_campaigncontacts_edit:
 intelligent_campaigncontacts_view:
     path:     /campaigncontacts/view/{page_no}
     defaults: { _controller: IntelligentModuleBundle:Campaigncontacts:view , page_no: 1 }
+intelligent_campaigncontacts_delete:
+    path:     /campaigncontacts/delete/{delete_id}
+    defaults: { _controller: IntelligentModuleBundle:Campaigncontacts:delete }
 intelligent_campaigncontacts_autocomplete:
     path:     /campaigncontacts/autocomplete
     defaults: { _controller: IntelligentModuleBundle:Campaigncontacts:autocomplete }
@@ -109,6 +127,9 @@ intelligent_psuedoemailaccounts_edit:
 intelligent_psuedoemailaccounts_view:
     path:     /psuedoemailaccounts/view/{page_no}
     defaults: { _controller: IntelligentModuleBundle:Psuedoemailaccounts:view , page_no: 1 }
+intelligent_psuedoemailaccounts_delete:
+    path:     /psuedoemailaccounts/delete/{delete_id}
+    defaults: { _controller: IntelligentModuleBundle:Psuedoemailaccounts:delete }
 intelligent_psuedoemailaccounts_autocomplete:
     path:     /psuedoemailaccounts/autocomplete
 intelligent_psuedoemailaccounts_fieldset:
@@ -125,6 +146,9 @@ intelligent_assignpsuedo_edit:
 intelligent_assignpsuedo_view:
     path:     /assignpsuedo/view/{page_no}
     defaults: { _controller: IntelligentModuleBundle:Assignpsuedo:view , page_no: 1 }
+intelligent_assignpsuedo_delete:
+    path:     /assignpsuedo/delete/{delete_id}
+    defaults: { _controller: IntelligentModuleBundle:Assignpsuedo:delete }
 intelligent_assignpsuedo_autocomplete:
     path:     /assignpsuedo/autocomplete
     defaults: { _controller: IntelligentModuleBundle:Assignpsuedo:autocomplete }
@@ -142,6 +166,9 @@ intelligent_links_edit:
 intelligent_links_view:
     path:     /links/view/{page_no}
     defaults: { _controller: IntelligentModuleBundle:Links:view , page_no: 1 }
+intelligent_links_delete:
+    path:     /links/delete/{delete_id}
+    defaults: { _controller: IntelligentModuleBundle:Links:delete }
 intelligent_links_autocomplete:
     path:     /links/autocomplete
     defaults: { _controller: IntelligentModuleBundle:Links:autocomplete }
@@ -159,6 +186,9 @@ intelligent_linkrates_edit:
 intelligent_linkrates_view:
     path:     /linkrates/view/{page_no}
     defaults: { _controller: IntelligentModuleBundle:Linkrates:view , page_no: 1 }
+intelligent_linkrates_delete:
+    path:     /linkrates/delete/{delete_id}
+    defaults: { _controller: IntelligentModuleBundle:Linkrates:delete }
 intelligent_linkrates_autocomplete:
     path:     /linkrates/autocomplete
     defaults: { _controller: IntelligentModuleBundle:Linkrates:autocomplete }
@@ -176,6 +206,9 @@ intelligent_dnclists_edit:
 intelligent_dnclists_view:
     path:     /dnclists/view/{page_no}
     defaults: { _controller: IntelligentModuleBundle:Dnclists:view , page_no: 1 }
+intelligent_dnclists_delete:
+    path:     /dnclists/delete/{delete_id}
+    defaults: { _controller: IntelligentModuleBundle:Dnclists:delete }
 intelligent_dnclists_autocomplete:
     path:     /dnclists/autocomplete
     defaults: { _controller: IntelligentModuleBundle:Dnclists:autocomplete }

@@ -254,7 +254,7 @@
                                                                                     | <a href="{{ path('intelligent_'~module~'_edit', {'edit_id': row.id}) }}">edit</a> 
                                                                                 {% endif %}
                                                                                 {% if permissions.delete %}     
-                                                                                    | <a href="{{ path('intelligent_'~module~'_view', {'delete_id': row.id}) }}" class="delete-link">delete</a>
+                                                                                    | <a href="{{ path('intelligent_'~module~'_delete', {'delete_id': row.id}) }}" class="delete-link">delete</a>
                                                                                 {% endif %}
                                                                             </td>
                                                                             <td>{{row.id}}
