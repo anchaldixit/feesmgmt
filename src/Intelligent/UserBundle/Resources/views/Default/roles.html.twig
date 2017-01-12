@@ -38,7 +38,8 @@
         {% if app.request.get('new_role') > 0 %}
             <div style="color:green; margin: 10px 0;">A new role successfully created.</div>
         {% endif %}
-        <table id="roleList" style="display:none;">
+        <div class="table-outer">
+        <table id="roleList" class="fix_table" style="display:table;">
             <thead>
                 <tr>
                     
@@ -52,7 +53,7 @@
 
             </tbody>
         </table>
-        
+        </div>
         
     </div>
     
@@ -93,5 +94,17 @@
                 </div>
             </div>
         </div>
+    <script>
+        if($('.fix_table').length){ 
+            var table = $('table.fix_table');
+           //console.log(jQuery.floatThead());
+            table.floatThead({
+                position: 'absolute',
+                scrollContainer: function(table){
+                    return table.closest('.table-outer');
+                }
+            });
+        }
+    </script>
 {% endblock %}
 
