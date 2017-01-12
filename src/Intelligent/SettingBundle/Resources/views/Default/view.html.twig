@@ -73,12 +73,12 @@
 
     <div class="bottom-sec">
         <div class="bread-crumb">
-            <span>Module Settings</span>
+            <span id="module_name">Module Settings</span>
             <i class="fa fa-long-arrow-right"></i>
             <span>View</span>
         </div>
         <div class="custom-feature">
-            <a href="{{ path('intelligent_setting_edit',  app.request.query.all| merge( {'edit_id': 'new'})) }}"><i class="fa "></i>New</a>
+            <a class="red-btn" href="{{ path('intelligent_setting_edit',  app.request.query.all| merge( {'edit_id': 'new'})) }}"><i class="fa fa-plus"></i>New Module</a>
         </div>
     </div>
     <div class="full-container content-table">
@@ -156,6 +156,21 @@
                     </div>-->
                 {% endif %}
             </div>
+            
+                {% if pagination.total_record > 0 %}
+                    <div id="display-count">
+                        <p>
+                            Displaying 
+                            <span class="lower-limit"> {{((pagination.active - 1)*pagination.limit) + 1 }} </span>
+                            to 
+                            <span class="upper-limit"> {{((pagination.active * pagination.limit) > pagination.total_record) ? pagination.total_record : pagination.active * pagination.limit}} </span>
+                            out of 
+                            <span class="total-result">{{pagination.total_record}}</span> 
+                            Fields
+                        </p>
+                    </div>
+                {% endif %}
+            
             <table>
                 <thead>
                     <tr>

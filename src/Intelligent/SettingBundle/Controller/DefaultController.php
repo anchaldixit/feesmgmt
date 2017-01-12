@@ -147,7 +147,7 @@ class DefaultController extends Controller {
 
         $count = $settings->totalCountOfLastFetch();
         $total_page_count = ceil($count / $limit);
-        $pagination = array('active' => $page_no, 'total_count' => $total_page_count);
+        $pagination = array('active' => $page_no,'limit'=>$limit,'total_record'=>$count ,'total_count' => $total_page_count);
 
 
         $modules = $settings->getModule();

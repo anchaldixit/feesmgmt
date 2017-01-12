@@ -106,13 +106,13 @@
     <div id="setting_edit_template" style="display: none;"></div>
     <div class="bottom-sec">
         <div class="bread-crumb">
-            <span>Module Settings</span>
+            <span id="module_name">Module Settings</span>
             <i class="fa fa-long-arrow-right"></i>
             <span>Edit</span>
         </div>
         <div class="custom-feature">
-            <a href="{{ path('intelligent_setting_edit', app.request.query.all| merge( {'edit_id': 'new'})) }}"><i class="fa"></i>New</a>
-            <a href="{{ path('intelligent_setting_view', app.request.query.all) }}"><i class="fa"></i>Back</a>
+            <a class="red-btn" href="{{ path('intelligent_setting_edit', app.request.query.all| merge( {'edit_id': 'new'})) }}"><i class="fa fa-plus"></i>New Module Fields</a>
+            <a class="grey-btn" href="{{ path('intelligent_setting_view', app.request.query.all) }}"><i class="fa fa-arrow-circle-left"></i>Back</a>
         </div>
     </div>
 

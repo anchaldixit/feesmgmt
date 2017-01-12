@@ -145,18 +145,20 @@
     {#% set permissions = app.session.get(module_permission_asscess_key) %#}
     <div class="bottom-sec">
         <div class="bread-crumb">
-            <span>{{module_display_name}}</span>
+            <span id="module_name">{{module_display_name}}</span>
             <i class="fa fa-long-arrow-right"></i>
             <span>View</span>
         </div>
         <div class="custom-feature">
-            {% if permissions['setting_permissions'] %}
-                <a href="{{ path('intelligent_setting_view', {'filter[match][module]': module_name}) }}"><i class="fa "></i>Settings</a>
+            {% if permissions['add'] %}
+                <a class="red-btn" href="{{ path('intelligent_'~module~'_edit', {'edit_id': 'new'}) }}"><i class="fa fa-plus"></i>New {{module_display_name}}</a>
             {% endif %}
             
-            {% if permissions['add'] %}
-                <a href="{{ path('intelligent_'~module~'_edit', {'edit_id': 'new'}) }}"><i class="fa "></i>New</a>
+            {% if permissions['setting_permissions'] %}
+                <a class="green-btn" href="{{ path('intelligent_setting_view', {'filter[match][module]': module_name}) }}"><i class="fa fa-gears"></i>Settings</a>
             {% endif %}
+            
+            
             
             
         </div>
@@ -210,6 +212,20 @@
                                         <div class="right-container table-content">
 
                                             {{ include('IntelligentModuleBundle:Default:view/selected-labels.html.twig', { 'schema': schema,'selected_filters': selected_filters ,'users':users }) }}   
+                                            
+                                            {% if pagination.total_record > 0 %}
+                                                <div id="display-count">
+                                                    <p>
+                                                        Displaying 
+                                                        <span class="lower-limit"> {{((pagination.active - 1)*pagination.limit) + 1 }} </span>
+                                                        to 
+                                                        <span class="upper-limit"> {{((pagination.active * pagination.limit) > pagination.total_record) ? pagination.total_record : pagination.active * pagination.limit}} </span>
+                                                        out of 
+                                                        <span class="total-result">{{pagination.total_record}}</span> 
+                                                        {{module_display_name}}
+                                                    </p>
+                                                </div>
+                                            {% endif %}
                                             {% if rows|length > 0 %}
                                                 <div class="table-outer">
                                                     <table class="marketingProjects">

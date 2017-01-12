@@ -104,6 +104,30 @@ body {
   .b-btn:hover {
     background-color: #1fa67a; }
 
+.red-btn {
+  padding: 5px 10px;
+  color: #fff !important;
+  border-radius: 3px;
+  display: inline-block;
+  text-decoration: none;
+  font-size: 12px;
+  margin: 0 4px;
+  background-color: #f20431; }
+  .red-btn:hover {
+    background-color: #1fa67a; }
+
+.grey-btn {
+  padding: 5px 10px;
+  color: #fff !important;
+  border-radius: 3px;
+  display: inline-block;
+  text-decoration: none;
+  font-size: 12px;
+  margin: 0 4px;
+  background-color: #b6b5b5; }
+  .grey-btn:hover {
+    background-color: #1fa67a; }
+
 .g-btn {
   background-color: transparent;
   padding: 5px 10px;
@@ -117,7 +141,7 @@ body {
     background-color: #00593c; }
 
 .green-btn {
-  background-color: green;
+  background-color: #1fa67a;
   padding: 5px 10px;
   color: #fff;
   border-radius: 3px;
@@ -126,7 +150,8 @@ body {
   font-size: 12px;
   margin: 0 4px; }
   .green-btn:hover, .green-btn.active {
-    background-color: #00593c; }
+    background-color: #5aa3ff;
+    color: #fff !important; }
 
 .green {
   color: #02ca48; }
@@ -396,9 +421,9 @@ input[type="submit"]:focus, input[type="button"]:focus {
           margin-top: 8px; }
         .feature-list ul li a .fa {
           font-size: 20px; }
-      .feature-list ul li:hover {
+      .feature-list ul li:hover, .feature-list ul li.active {
         background-color: #fff; }
-        .feature-list ul li:hover a {
+        .feature-list ul li:hover a, .feature-list ul li.active a {
           color: #5aa3ff; }
 
 .bottom-sec {
@@ -407,9 +432,10 @@ input[type="submit"]:focus, input[type="button"]:focus {
   .bottom-sec .bread-crumb {
     overflow: hidden;
     padding: 10px 15px;
-    float: left; }
+    float: left;
+    font-weight: 600; }
     .bottom-sec .bread-crumb span {
-      font-size: 12px;
+      font-size: 14px;
       line-height: 16px;
       float: left; }
     .bottom-sec .bread-crumb i {
@@ -1337,3 +1363,10 @@ input[type="submit"]:focus, input[type="button"]:focus {
 
 table tr.bg {
   background-color: #dfe2e2 !important; }
+
+#display-count {
+  padding: 0 0 10px 0; }
+  #display-count p {
+    padding-top: 8px;
+    font-size: 12px;
+    font-weight: 600; }
