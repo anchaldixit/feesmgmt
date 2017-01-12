@@ -54,7 +54,8 @@
             {% if app.request.get('invitation_send') != '' %}
                 <div style="color:green; margin: 10px 0;" id="inviteMsg"> '{{ app.request.get('invitation_send') }}' email has been registered and An invitation has been sent to this email.</div>
             {% endif %}
-            <table id="userList" style="display:none;">
+            <div class="table-outer">
+            <table id="userList" class="fix_table" style="display:table;">
                 <thead>
                     <tr>
                         <th class="sort_table" data-order-by="name" data-order-type="desc">Name<i class="fa fa-sort"></i></th>
@@ -68,6 +69,7 @@
                 <tbody>
                 </tbody>
             </table>
+            </div>
         </div>
     </div>
     <div class="popup-wrapper" id="inviteUsers" style="display:none;">
@@ -184,4 +186,16 @@
             </div>
         </div>
     </div>
+    <script>
+    if($('.fix_table').length){ 
+        var table = $('table.fix_table');
+       //console.log(jQuery.floatThead());
+        table.floatThead({
+            position: 'absolute',
+            scrollContainer: function(table){
+                return table.closest('.table-outer');
+            }
+        });
+    }
+</script>
 {% endblock %}
