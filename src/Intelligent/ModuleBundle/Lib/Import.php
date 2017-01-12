@@ -74,7 +74,7 @@ class Import {
                 $this->prepareHeader($csv_row);
                 //reaching this point means header validation is passed and header array is set. Otherwise exception was thrown in previous run
 
-                $this->helper->print_r($this->t);
+                //$this->helper->print_r($this->t);
                 if ($this->test_only_header) {
                     break;
                 }
@@ -97,6 +97,7 @@ class Import {
                 }
 
                 $this->helper->print_r($data);
+                //exit;
 
                 $this->module->save($data);
             }
@@ -170,15 +171,18 @@ class Import {
 
                 if (count($set)) {
                     $m = $this->container->get("intelligent.{$r_module}.module");
-                    if (!$this->module_has_nested_relationship_inkey) {
+                    if ($this->module_has_nested_relationship_inkey) {
                         $select = array("$r_module.id");
                         $nd_condition=array();
                         foreach ($set as $key => $field) {
                             //$nd_condition = array("{$r_module}.$field" => $row[$key]);
-                            $nd_condition["{$r_module}.$field"] = $row[$key];
+                            $nd_condition["$field"] = $row[$key];
                            // $nd_condition = array()
                         }
-                        $row = $m->getRows($nd_condition,array(),10);
+                        $row_result = $m->getRows($nd_condition,array(),10);
+                        $row=$row_result['row'];
+                        
+                        //var_dump($row);exit;
 
                         //$row = $m->fetch($select, $nd_condition);
 
