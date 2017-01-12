@@ -602,7 +602,7 @@ abstract class Module {
         $query = $this->db_manager->createQueryBuilder();
         $query->select("u")
                 ->from("IntelligentUserBundle:User", "u");
-        $query->andWhere($query->expr()->in("u.status", 1));
+       // $query->andWhere($query->expr()->in("u.status", 1));
 
         $dql = $query->getQuery();
         $results = $dql->getResult();
@@ -761,7 +761,7 @@ abstract class Module {
 
         $where = $this->addViewAccessCondition($where);
 
-        $results = $this->fetch(array_merge(array("{$this->module}.id"), $fieldset), $where, $join, $order_by, $groupby);
+        $results = $this->fetch(array_merge(array("{$this->module}.id"), $fieldset), $where, $join, $order_by);
 
         //All circus to prepare key value pare
         if (count($results)) {

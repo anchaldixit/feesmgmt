@@ -147,7 +147,7 @@ class DefaultController extends Controller {
 
         $count = $settings->totalCountOfLastFetch();
         $total_page_count = ceil($count / $limit);
-        $pagination = array('active' => $page_no,'limit'=>$limit,'total_record'=>$count ,'total_count' => $total_page_count);
+        $pagination = array('active' => $page_no, 'limit' => $limit, 'total_record' => $count, 'total_count' => $total_page_count);
 
 
         $modules = $settings->getModule();
@@ -272,24 +272,32 @@ class DefaultController extends Controller {
         $path = $request->get('path');
         $m = $request->get('module');
         $c = $request->get('config');
+        echo $customer = $request->get('customer');
 
-        //var_dump($c);
-        if (!empty($m) and !empty($path)) {
-            $import = $this->get('intelligent.import.module');
-            if($c){
-                
-                $import->setTestOnlyHeader(isset($c['test_header']));
-                $import->setDeleteBeforeInsert(isset($c['delete_existing_before_insert']));
+        $user_permission = $this->get("user_permissions");
+        echo $active_customer_filter = $user_permission->getCurrentViewCustomer()->getId();
 
+        if ($active_customer_filter != $customer) {
+            echo 'customer dont match';
+        } else {
+
+            //var_dump($c);
+            if (!empty($customer) and ! empty($m) and ! empty($path)) {
+                $import = $this->get('intelligent.import.module');
+                if ($c) {
+
+                    $import->setTestOnlyHeader(isset($c['test_header']));
+                    $import->setDeleteBeforeInsert(isset($c['delete_existing_before_insert']));
+                }
+                $import->init($m);
+
+                 $import->csvUpload($path);
+            } else {
+                //throw new \Exception('Missing parameters');
             }
-            $import->init($m);
-            
-            $import->csvUpload($path);
-        }else{
-            //throw new \Exception('Missing parameters');
         }
 
-        
+
 
 
         return $this->render('IntelligentSettingBundle:Default:import.html.twig', $parameters);

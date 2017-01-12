@@ -247,10 +247,12 @@ abstract class ModulebaseController extends Controller {
         $query = $em->createQueryBuilder();
         $query->select("u")
                 ->from("IntelligentUserBundle:User", "u");
-        $query->andWhere($query->expr()->in("u.status", 1));
+        //$query->andWhere($query->expr()->in("u.status", 1));
 
         $dql = $query->getQuery();
         $results = $dql->getResult();
+        
+        //$this->helper->print_r($results);
         $userlist = array();
         foreach ($results as $key => $user) {
             $userlist[$user->getId()] = $user->getName();
