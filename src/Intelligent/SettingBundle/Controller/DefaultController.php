@@ -8,10 +8,10 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\Session;
 
 class DefaultController extends Controller {
-
     /*
      * Not in use
      */
+
     public function indexAction() {
         return $this->render('IntelligentSettingBundle:Default:index.html.twig');
     }
@@ -19,6 +19,7 @@ class DefaultController extends Controller {
     /*
      * Edit Action
      */
+
     public function editAction($edit_id) {
 
         $this->initPermissionsDetails();
@@ -98,6 +99,7 @@ class DefaultController extends Controller {
     /*
      * View action
      */
+
     public function viewAction($page_no) {
 
         $this->initPermissionsDetails();
@@ -166,6 +168,7 @@ class DefaultController extends Controller {
      * Delete action
      * Param1: number $delete_id
      */
+
     public function deleteAction($delete_id) {
 
         $request = Request::createFromGlobals();
@@ -181,6 +184,7 @@ class DefaultController extends Controller {
     /*
      * Initialize the permissions to session.
      */
+
     private function initPermissionsDetails() {
 
 
@@ -209,6 +213,7 @@ class DefaultController extends Controller {
     /*
      * Return the key to store permssion in session. 
      */
+
     private function moduleSessionKey() {
 
         return "access-key-settings-permission";
@@ -219,6 +224,7 @@ class DefaultController extends Controller {
      * Param1 : string $action
      * return : boolean
      */
+
     private function noAccess($action) {
 
         return isset($this->permissions[$action]) ? !$this->permissions[$action] : true;
@@ -227,6 +233,7 @@ class DefaultController extends Controller {
     /*
      * Show No access page to user
      */
+
     private function noAccessPage() {
 
         return $this->render('IntelligentUserBundle:Default:noaccess.html.twig', array());
@@ -236,6 +243,7 @@ class DefaultController extends Controller {
      * Get all field names of module
      * 
      */
+
     public function fieldsetAction($module_name) {
 
         $var = str_replace('_', '', $module_name);
@@ -243,35 +251,48 @@ class DefaultController extends Controller {
         $response = $this->forward($controller_class);
 
         return $response;
-
     }
 
     /*
      * Get the Controller name from the route name
      */
+
     private function routeToControllerName($routename) {
-        
+
         $routes = $this->get('router')->getRouteCollection();
         return $routes->get($routename)->getDefaults()['_controller'];
-        
     }
-    
+
     public function importAction() {
-        
+
         //
-        
-        $parameters=array();
+
+        $parameters = array();
         $request = Request::createFromGlobals();
-        $path=$request->get('path');
-        $m=$request->get('module');
+        $path = $request->get('path');
+        $m = $request->get('module');
+        $c = $request->get('config');
+
+        //var_dump($c);
+        if (!empty($m) and !empty($path)) {
+            $import = $this->get('intelligent.import.module');
+            if($c){
+                
+                $import->setTestOnlyHeader(isset($c['test_header']));
+                $import->setDeleteBeforeInsert(isset($c['delete_existing_before_insert']));
+
+            }
+            $import->init($m);
+            
+            $import->csvUpload($path);
+        }else{
+            //throw new \Exception('Missing parameters');
+        }
+
         
-        $import = $this->get('intelligent.import.module');
-        $import->init($m);
-        $import->csvUpload($path);
-        
-        
+
+
         return $this->render('IntelligentSettingBundle:Default:import.html.twig', $parameters);
-        
     }
 
 }

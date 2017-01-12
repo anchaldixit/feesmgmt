@@ -259,7 +259,7 @@ abstract class Module {
                             break;
                         case 'link':
 
-                            if (filter_var($field_value, FILTER_VALIDATE_URL) === false) {
+                            if (!empty($field_value) and filter_var($field_value, FILTER_VALIDATE_URL, ~FILTER_FLAG_SCHEME_REQUIRED) === false) {
                                 $error[] = "$field_display_name should be a URL.";
                             }
                             break;
@@ -300,14 +300,19 @@ abstract class Module {
                     if ($field_schema['required_field'] == 'Y' and empty($post_data[$field_name])) {
                         $error[] = "{$field_schema['relationship_module']} Relationship field cannot be empty";
                     } else {
-                        $field_value = $post_data[$field_name];
-                        $data[$field_name] = $field_value;
+                        if (isset($post_data[$field_name])) {
+                            $field_value = $post_data[$field_name];
+                            $data[$field_name] = $field_value;
+                        }
                     }
                 }
             }
         }
 
-        ;
+        if (!empty($post_data['quickbase_id'])) {
+            //only get in case of bulk upload  process(first quickbase migration)
+            $data['quickbase_id'] = $post_data['quickbase_id'];
+        }
 
 
         if (!empty($error)) {
@@ -543,7 +548,7 @@ abstract class Module {
                 $result2 = $this->getFieldSettings($value['relationship_module'], $value['module_field_name']);
 
                 $core_field_settings = $this->getCoreSettingsOfRelationshipField($result2);
-                $value['core_field_settings'] =  $core_field_settings;
+                $value['core_field_settings'] = $core_field_settings;
                 if (count($result2)) {
                     $value['relationship_field_settings'] = $result2;
                 }
@@ -678,7 +683,7 @@ abstract class Module {
 
         $result_set = $result = array();
         $fieldset = $this->getFormFields();
-        $marker=array();
+        $marker = array();
 
         foreach ($fieldset as $field) {
 
@@ -728,7 +733,7 @@ abstract class Module {
         $where = $this->addViewAccessCondition($where);
 
         $results = $this->fetch(array_merge(array("{$this->module}.id"), $fieldset), $where, $join, $order_by);
-        
+
         //All circus to prepare key value pare
         if (count($results)) {
             $return = array();
