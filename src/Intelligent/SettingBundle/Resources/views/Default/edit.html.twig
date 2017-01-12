@@ -106,6 +106,7 @@
                 });
                 
                 $('.open_module_field_identifier_popup').hide();
+                $('.open_aggregator_popup').hide();
             }
 
 
@@ -239,6 +240,11 @@
                         <li id="aggregator_function_row"> 
                             <label>Aggregator Function: </label>
                             <div class="field-wrap">
+                                <div class="add_r_field" style="">
+                                    <a href="#" class="open_aggregator_popup" data-modal-id="#aggregatorFields">
+                                        <i class="fa fa-pencil"></i>Add Module Field Identifier
+                                    </a>
+                                </div>
                                 <div class="dropdown">
                                     <select name="aggregator_function" id="aggregator_function"  class="selectbox" >
                                         <option value="">Select Aggregator..</option>
@@ -478,6 +484,27 @@
                     </div>
                     <input type="button" name="cancel" class="close-popup cancel-popup" value="Close">
                     <div class="msg" id="re_response" style="display: none; clear: both"><p></p></div>
+                </div>
+            </div>
+        </div>
+    </div>
+                    
+    <div class="popup-wrapper" id="aggregatorFields" style="display:none;">
+        <div class="popup" style="width:350px;">
+            <div class="create-roles-outer">
+                <div class="popup-header">
+                    <h4>Aggregator Module Field Identifier</h4>
+                    <a class="close-popup" href="#"><i class="fa fa-times red"></i></a>
+                </div>
+                <div class="popup-body">
+                    <div class="create-roles" style="max-height:400px; margin-bottom: 10px; overflow: auto;">
+                        <select id="aggregator_field_identifiers" style="width:100%">
+                            
+                        </select>    
+
+                    </div>
+                    <input type="button" name="cancel" class="close-popup cancel-popup" value="Close">
+                    <div class="msg" id="ag_response" style="display: none; clear: both"><p></p></div>
                 </div>
             </div>
         </div>
