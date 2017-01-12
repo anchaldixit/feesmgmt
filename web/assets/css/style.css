@@ -1087,7 +1087,7 @@ input[type="submit"]:focus, input[type="button"]:focus {
   width: 100%;
   overflow: hidden;
   height: 100%;
-  z-index: 99; }
+  z-index: 9999; }
   .popup-wrapper .popup {
     width: 400px;
     margin: 0 auto;
