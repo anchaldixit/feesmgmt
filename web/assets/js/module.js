@@ -25,9 +25,11 @@ $.extend(Module.prototype,{
         that.bindFormulaFieldPopup();
         that.bindRelationalFieldPopup();
         that.bindModuleFieldIdentifierPopup();
+        that.bindAggregatorFieldIdentifierPopup();
         that.bindAddRelationalFieldAction();
         that.bindAddFieldAction();
         that.bindModuleIdentifierField();
+        that.bindAggModuleIdentifierField();
         //that.highLightTable();
     },
     bindModuleFieldTypeAction: function(){
@@ -71,6 +73,28 @@ $.extend(Module.prototype,{
                 setTimeout(function(){
                     $('#re_response').hide();
                     $('#re_response').html('');
+                    
+                },4000);
+            });
+        });
+    },
+    bindAggModuleIdentifierField: function(){
+        var that = this;
+        $('#aggregator_field_identifiers').change(function(){
+            var _val = $(this).val();
+            that.setModuleIdentifier(_val,function(res){
+                
+                if(res.success !== undefined){
+                    $('#ag_response').html('');
+                    $('#ag_response').html(res.success);
+                    $('#ag_response').show();
+                }
+                if(res.error !== undefined){
+                    alert(res.error);
+                }
+                setTimeout(function(){
+                    $('#ag_response').hide();
+                    $('#ag_response').html('');
                     
                 },4000);
             });
@@ -175,11 +199,37 @@ $.extend(Module.prototype,{
                     var html = '<option value="">Select</option>';
                     $.each(res,function(key,value){
                         html += '<option value="'+key+'" >'+value+'</option>';
-                        $('#module_field_identifiers').html('');
-                        $('#module_field_identifiers').html(html);
-                        $(modalId).show();
-
                     });
+                    $('#module_field_identifiers').html('');
+                    $('#module_field_identifiers').html(html);
+                    $(modalId).show();
+                });
+
+            }
+            else{
+                alert('Please choose Relational Table');   
+            }
+            return false;
+        });
+    },
+    bindAggregatorFieldIdentifierPopup : function(){
+        var that = this;
+        $('.open_aggregator_popup').click(function(){ 
+            var modalId = $(this).attr('data-modal-id');
+            var _relationalModuleName = $('#relationship_module').find('option:selected').val();
+            if(_relationalModuleName != ''){
+
+                //var _moduleName = 'marketing_projects';
+                var url = Module.baseurl+ _relationalModuleName;
+                var _data = '{}';
+                that.getAjaxData(url, _data,function(res){
+                    var html = '<option value="">Select</option>';
+                    $.each(res,function(key,value){
+                        html += '<option value="'+key+'" >'+value+'</option>';
+                    });
+                    $('#aggregator_field_identifiers').html('');
+                    $('#aggregator_field_identifiers').html(html);
+                    $(modalId).show();
                 });
 
             }
