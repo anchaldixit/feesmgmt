@@ -12,7 +12,6 @@ use Symfony\Component\DependencyInjection\ContainerAwareTrait;
 use Intelligent\SettingBundle\Lib\Helper;
 use \SplFileObject;
 
-
 class Import {
 
     use ContainerAwareTrait;
@@ -32,8 +31,9 @@ class Import {
     var $test_only_header = false;
     var $delete_before_insert = false;
     var $module_has_nested_relationship_inkey = true;
-    var $usernotfound =array();
+    var $usernotfound = array();
     var $users_list = array();
+    var $quickbase_keyname;
 
     function init($module) {
 
@@ -50,6 +50,10 @@ class Import {
 
     function setDeleteBeforeInsert($v) {
         $this->delete_before_insert = $v;
+    }
+
+    function setForeignKey($v) {
+        $this->quickbase_keyname = $v;
     }
 
     function csvUpload($path) {
@@ -74,7 +78,7 @@ class Import {
                 $this->prepareHeader($csv_row);
                 //reaching this point means header validation is passed and header array is set. Otherwise exception was thrown in previous run
 
-                //$this->helper->print_r($this->t);
+                $this->helper->print_r($this->t);
                 if ($this->test_only_header) {
                     break;
                 }
@@ -91,7 +95,7 @@ class Import {
                 foreach ($this->t['savelist'] as $column_no => $field_name) {
 
                     $data[$field_name] = $this->formate($csv_row[$column_no], $field_name);
-                    if($data[$field_name] == null){
+                    if ($data[$field_name] == null) {
                         unset($data[$field_name]);
                     }
                 }
@@ -112,43 +116,44 @@ class Import {
 
     private function formate($value, $fieldname) {
 
-        $fieldtype = isset($this->field_set[$fieldname])?$this->field_set[$fieldname]['module_field_datatype']:'';
+        $fieldtype = isset($this->field_set[$fieldname]) ? $this->field_set[$fieldname]['module_field_datatype'] : '';
         $return = $value;
 
         switch ($fieldtype) {
             case 'percentage':
-                
+
                 $return = str_replace('%', '', $value);
+                $return = str_replace(',', '', $return);
 
 
                 break;
             case 'number':
-                
+
                 $return = str_replace(',', '', $value);
 
 
                 break;
             case 'date':
-                
-                if(!empty($value)){
-                    $d = explode('-', $value);
-                    $return = date('Y-m-d',  mktime(0, 0, 0, $d[0], $d[1], $d[2]));
-                }else{
+
+                if (!empty($value)) {
+                    $dilmiter = strpos($value, '-') !==false? '-':'/';
+                    $d = explode($dilmiter, $value);
+                    $return = date('Y-m-d', mktime(0, 0, 0, $d[0], $d[1], $d[2]));
+                } else {
                     $return = null;
                 }
 
                 break;
             case 'user':
-                
-                $user_id =  $this->extractAizanId($value);
-                
-                if(empty($user_id)){
-                    
+
+                $user_id = $this->extractAizanId($value);
+
+                if (empty($user_id)) {
+
                     $this->usernotfound[] = $value;
                     $return = '';
-                }else{
+                } else {
                     $return = $user_id;
-                    
                 }
 
 
@@ -158,7 +163,7 @@ class Import {
                 $return = $value;
                 break;
         }
-        
+
         return $return;
     }
 
@@ -173,29 +178,38 @@ class Import {
                     $m = $this->container->get("intelligent.{$r_module}.module");
                     if ($this->module_has_nested_relationship_inkey) {
                         $select = array("$r_module.id");
-                        $nd_condition=array();
+                        $nd_condition = array();
                         foreach ($set as $key => $field) {
                             //$nd_condition = array("{$r_module}.$field" => $row[$key]);
                             $nd_condition["$field"] = $row[$key];
-                           // $nd_condition = array()
+                            // $nd_condition = array()
                         }
-                        $row_result = $m->getRows($nd_condition,array(),10);
-                        $row=$row_result['row'];
-                        
-                        //var_dump($row);exit;
+                        $row_result = $m->getRows($nd_condition, array(), 10);
+                        $results = $row_result['row'];
+                    } else {
 
-                        //$row = $m->fetch($select, $nd_condition);
-
-                        if (count($row) == 1) {
-                            $foreign_key_id = $this->module->module_settings->prepareforeignKeyName($r_module);
-                            $data[$foreign_key_id] = $row[0]['id'];
-                        } elseif (count($row) > 1) {
-                            $this->helper->print_r($row);
-                            throw new \Exception('Multiple foreign key ids found', '111');
-                        } else {
-                            //below condition not required, there are few data where mapping is optional like in CMN/marketing_projects
-                            //throw new \Exception('Foreign Key Not found', '111');
+                        $select = array("$r_module.id");
+                        $nd_condition = array();
+                        foreach ($set as $key => $field) {
+                            $nd_condition = array("{$r_module}.$field" => $row[$key]);
+                            //$nd_condition["$field"] = $row[$key];
+                            // $nd_condition = array()
                         }
+                        $results = $m->fetch($select, $nd_condition);
+                    }
+
+                    //var_dump($row);exit;
+                    //$row = $m->fetch($select, $nd_condition);
+
+                    if (count($results) == 1) {
+                        $foreign_key_id = $this->module->module_settings->prepareforeignKeyName($r_module);
+                        $data[$foreign_key_id] = $results[0]['id'];
+                    } elseif (count($results) > 1) {
+                        $this->helper->print_r($results);
+                        throw new \Exception('Multiple foreign key ids found', '111');
+                    } else {
+                        //below condition not required, there are few data where mapping is optional like in CMN/marketing_projects
+                        //throw new \Exception('Foreign Key Not found', '111');
                     }
                 }
             }
@@ -223,12 +237,15 @@ class Import {
 
                 if ($field['module_field_datatype'] == 'relationship') {
                     //check foregin key
-                    if (!isset($this->t['keylist'][$field['relationship_module']])) {
-                        $this->t['keylist'][$field['relationship_module']] = array();
-                    }
+                    if(empty($this->quickbase_keyname)) {
+                        
+                        if (!isset($this->t['keylist'][$field['relationship_module']])) {
+                            $this->t['keylist'][$field['relationship_module']] = array();
+                        }
 
-                    $this->t['keylist'][$field['relationship_module']][$match_key] = $field['module_field_name'];
-                } elseif ($field['module_field_datatype'] != 'formulafield') {
+                        $this->t['keylist'][$field['relationship_module']][$match_key] = $field['module_field_name'];
+                    }
+                } elseif (! in_array($field['module_field_datatype'],array('formulafield', 'relationship-aggregator'))) {
 
                     $this->t['savelist'][$match_key] = $field['module_field_name'];
                 } else {
@@ -244,6 +261,22 @@ class Import {
 
             $this->t['savelist']['0'] = 'quickbase_id';
             unset($this->t['csv_field_notfoundlist'][0]);
+        }
+        if(!empty($this->quickbase_keyname)){
+            foreach ($this->quickbase_keyname as $module => $head_col) {
+                //only for one time
+                $match_key = array_search($head_col, $csv_header);
+                if ($match_key !== FALSE) {
+                    if (!isset($this->t['keylist'][$module])) {
+                            $this->t['keylist'][$module] = array();
+                        }
+                    $this->t['keylist'][$module][$match_key] = "$module.quickbase_id";
+                }else{
+                    throw new \Exception('Foriegn key name match not found. LINENO:'.__LINE__);
+                }
+            }
+            
+            
         }
 
         //@todo total number of keys to match
@@ -265,50 +298,41 @@ class Import {
             $this->t['expected_keylist'][$field['relationship_module']]['all'][] = $field['module_field_name'];
         }
     }
-    
+
     function extractAizanId($quickbase_user) {
-        
+
         $return = '';
         $users = $this->getAllUsers();
         //var_dump($users);
-        preg_match_all("/([^<]*)<(.*)>/",$quickbase_user,$match);
-        
+        preg_match_all("/([^<]*)<(.*)>/", $quickbase_user, $match);
+
         //var_dump($match);
-        
-        if(!empty($match[2])){
+
+        if (!empty($match[2])) {
             //quickbase key id match found
             $u_id = trim($match[2][0]);
-            
-            if(!empty($users[$u_id])){
+
+            if (!empty($users[$u_id])) {
                 //user match found
-                
+
                 $return = $users[$u_id][0]['id'];
             }
-            
-            
         }
         return $return;
-        
-        
     }
-    
-    function getAllUsers(){
-        
-        if(empty($this->users_list)){
-            
+
+    function getAllUsers() {
+
+        if (empty($this->users_list)) {
+
             $db = $this->container->get('database_connection');
             $sql = "select * from user where quickbase_id != '' ";
             $data = $db->fetchAll($sql);
-            $data = $this->helper->groupByField($data  , 'quickbase_id');
-            $this->users_list = $data ;
-            
+            $data = $this->helper->groupByField($data, 'quickbase_id');
+            $this->users_list = $data;
         }
-        
+
         return $this->users_list;
-        
-        
-        
-        
     }
 
 }

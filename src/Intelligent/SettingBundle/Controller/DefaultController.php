@@ -266,6 +266,9 @@ class DefaultController extends Controller {
     public function importAction() {
 
         //
+        ini_set('memory_limit','25600M');
+        ini_set('max_execution_time', 0);
+
 
         $parameters = array();
         $request = Request::createFromGlobals();
@@ -273,6 +276,7 @@ class DefaultController extends Controller {
         $m = $request->get('module');
         $c = $request->get('config');
         echo $customer = $request->get('customer');
+        $f = trim($request->get('foreign_key'));
 
         $user_permission = $this->get("user_permissions");
         echo $active_customer_filter = $user_permission->getCurrentViewCustomer()->getId();
@@ -288,6 +292,11 @@ class DefaultController extends Controller {
 
                     $import->setTestOnlyHeader(isset($c['test_header']));
                     $import->setDeleteBeforeInsert(isset($c['delete_existing_before_insert']));
+                }
+                if(!empty($f) and strpos($f, '|') !== false){
+                    $f2 = explode('|', $f);
+                    $import->setForeignKey(array($f2[0]=>$f2[1]));
+                    
                 }
                 $import->init($m);
 
