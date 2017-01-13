@@ -1,11 +1,60 @@
-{% if pagination.total_count > 0 %}
-    <div class="paging">
-    {% for i in 1..pagination.total_count %}
-        {% if i== pagination.active %}
-            <span>{{i}}</span> 
-        {% else %}
-            <a href="{{ path('intelligent_'~module~'_view', app.request.query.all| merge( {'page_no': i})) }}">{{i}}</a>
-        {% endif %}
-    {% endfor %}
-    </div>
-{% endif %}
+{% if pagination.total_record > 1 %}            
+        <nav id="navigation" aria-label="Page navigation">
+            <ul class="pagination pagination-lg">
+
+                {% if paging['firstPage']['disabled'] == true %}
+                    <li class='disabled'>
+                        <span aria-hidden="true">&laquo;</span>
+                    </li>
+                {% else %}
+                    <li>
+                        <a href="{{ path('intelligent_'~module~'_view', app.request.query.all| merge( {'page_no': 1})) }}" aria-label="Previous">
+                            <span aria-hidden="true">&laquo;</span>
+                        </a>
+                    </li>
+                {% endif %}
+
+                {% for pages in paging['inbetween'] %}
+                    {% if pages.disabled == true %}
+                        {% if pages.current == true %}
+                            <li class='active'>
+                                <span aria-hidden="true">{{pages.number}}</span>
+                            </li>
+                        {% else %}
+                            <li>
+                                <span aria-hidden="true">{{pages.number}}</span>
+                            </li>
+                        {% endif %}
+                    {% else %}
+                        {% if pages.current == true %}
+                            <li class='active'>
+                                <a href="{{ path('intelligent_'~module~'_view', app.request.query.all| merge( {'page_no': pages.number})) }}"
+                                   <span aria-hidden="true">{{pages.number}}</span>
+                                </a>
+                            </li>
+                        {% else %}
+                            <li>
+                                <a href="{{path('intelligent_'~module~'_view', app.request.query.all| merge( {'page_no': pages.number})) }}"
+                                   <span aria-hidden="true">{{pages.number}}</span>
+                                </a>
+                            </li>
+                        {% endif %}
+                    {% endif %}
+                {% endfor %}
+
+                {% if paging['lastPage']['disabled'] == true %}
+                    <li class='disabled'>
+                        <span aria-hidden="true">&raquo;</span>
+                    </li>
+                {% else %}
+                    <li>
+                        <a href="{{path('intelligent_'~module~'_view', app.request.query.all| merge( {'page_no': paging.lastPage.number})) }}" aria-label="Previous">
+                            <span aria-hidden="true">&raquo;</span>
+                        </a>
+                    </li>
+                {% endif %}
+            </ul>
+        </nav>
+    {% endif %}
+    
+   

@@ -15,7 +15,9 @@ use Symfony\Component\HttpFoundation\Session\Session;
 use Intelligent\SettingBundle\Lib\Helper;
 
 abstract class ModulebaseController extends Controller {
-
+    
+    const TOTAL_PAGINATION_VISIBLE_PAGES = 11; // Always an odd number
+    
     var $module_name; //variable should be initialize by extend class in constructor
     var $module_classname;
     var $module; //Module object
@@ -198,13 +200,14 @@ abstract class ModulebaseController extends Controller {
         $count = $module->totalCountOfLastFetch();
         $total_page_count = ceil($count / $this->limit);
         $pagination = array('active' => $page_no,'limit'=>$this->limit,'total_record'=>$count , 'total_count' => $total_page_count);
-
+        $paging = $this->getPagination($page_no,$this->limit,$count);
         $all_users = $this->getUsers();
 
         $parameters = array('rows' => $rows['row'],
             'schema' => $rows['schema'],
             'selected_filters' => $filters,
             'pagination' => $pagination,
+            'paging' => $paging,
             'users' => $all_users,
             'module_display_name' => $module_display_name,
             'module' => $this->module_route_identifier,
@@ -464,5 +467,134 @@ abstract class ModulebaseController extends Controller {
         }
         return new JsonResponse($key_pair);
     }
-
+    
+    public function getPagination($currentPage, $maxPage, $totalRecords){
+        $totalPage = ceil($totalRecords/$maxPage);
+        $pagination = array();
+        // First link
+        if($currentPage == 1){
+            $pagination['firstPage'] = array(
+                'disabled' => true
+            );
+        }else{
+            $pagination['firstPage'] = array(
+                'disabled' => false,
+                'number' => 1
+            );
+        }
+        // Last link
+        if($currentPage == $totalPage){
+            $pagination['lastPage'] = array(
+                'disabled' => true
+            );
+        }else{
+            $pagination['lastPage'] = array(
+                'disabled' => false,
+                'number' => $totalPage
+            );
+        }
+        
+        // Link in between
+        // We will have 19 links in between
+        $pagesInBetween = array();
+        if($totalPage <= self::TOTAL_PAGINATION_VISIBLE_PAGES){
+            for($i = 1; $i <=  $totalPage; $i++){
+                if($i == $currentPage){
+                    $pagesInBetween[] = array(
+                        'current' => true,
+                        'number'  => $i,
+                        'disabled' => true
+                    );
+                }else{
+                    $pagesInBetween[] = array(
+                        'current' => false,
+                        'number'  => $i,
+                        'disabled' => false
+                    );
+                }
+            }
+        }else{
+            $belowHalfMark = ceil(self::TOTAL_PAGINATION_VISIBLE_PAGES/2);
+            $aboveHalfMark = floor(self::TOTAL_PAGINATION_VISIBLE_PAGES/2);
+            // Pages will start from 1
+            if($currentPage - $belowHalfMark <= 0){
+                $startPage = 1;
+                for($i = $startPage; $i <=  self::TOTAL_PAGINATION_VISIBLE_PAGES; $i++){
+                    if($i == $currentPage){
+                        $pagesInBetween[] = array(
+                            'current' => true,
+                            'number'  => $i,
+                            'disabled' => false
+                        );
+                    }else{
+                        $pagesInBetween[] = array(
+                            'current' => false,
+                            'number'  => $i,
+                            'disabled' => false
+                        );
+                    }
+                }
+                $pagesInBetween[] = array(
+                    'current' => false,
+                    'number'  => '.',
+                    'disabled' => true
+                );
+            }
+            // Last pages will come in continuity
+            else if(($currentPage + $aboveHalfMark) >= $totalPage){
+                $pagesInBetween[] = array(
+                    'current' => false,
+                    'number'  => '.',
+                    'disabled' => true
+                );
+                $startPage = $totalPage - self::TOTAL_PAGINATION_VISIBLE_PAGES + 1;
+                for($i = $startPage; $i <=  $totalPage; $i++){
+                    if($i == $currentPage){
+                        $pagesInBetween[] = array(
+                            'current' => true,
+                            'number'  => $i,
+                            'disabled' => false
+                        );
+                    }else{
+                        $pagesInBetween[] = array(
+                            'current' => false,
+                            'number'  => $i,
+                            'disabled' => false
+                        );
+                    }
+                }
+            }
+            // Pages will start in middle and end in middle
+            else{
+                $pagesInBetween[] = array(
+                    'current' => false,
+                    'number'  => '.',
+                    'disabled' => true
+                );
+                $startPage = $currentPage - $belowHalfMark + 1;
+                for($i = $startPage; $i <=  $currentPage + $aboveHalfMark; $i++){
+                    if($i == $currentPage){
+                        $pagesInBetween[] = array(
+                            'current' => true,
+                            'number'  => $i,
+                            'disabled' => false
+                        );
+                    }else{
+                        $pagesInBetween[] = array(
+                            'current' => false,
+                            'number'  => $i,
+                            'disabled' => false
+                        );
+                    }
+                }
+                $pagesInBetween[] = array(
+                    'current' => false,
+                    'number'  => '.',
+                    'disabled' => true
+                );
+            }
+        }
+        $pagination['inbetween'] = $pagesInBetween;
+        return $pagination;
+    }
 }
