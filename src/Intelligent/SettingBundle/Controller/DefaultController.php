@@ -11,6 +11,8 @@ class DefaultController extends Controller {
     /*
      * Not in use
      */
+    
+    const TOTAL_PAGINATION_VISIBLE_PAGES = 11; // Always an odd number
 
     public function indexAction() {
         return $this->render('IntelligentSettingBundle:Default:index.html.twig');
@@ -148,7 +150,7 @@ class DefaultController extends Controller {
         $count = $settings->totalCountOfLastFetch();
         $total_page_count = ceil($count / $limit);
         $pagination = array('active' => $page_no, 'limit' => $limit, 'total_record' => $count, 'total_count' => $total_page_count);
-
+        $paging = $this->getPagination($page_no,$limit,$count);
 
         $modules = $settings->getModule();
         $datatypes = $settings->getModuleDataTypes();
@@ -159,7 +161,8 @@ class DefaultController extends Controller {
             'modules' => $modules,
             'datatypes' => $datatypes,
             'selected_filters' => $filters,
-            'pagination' => $pagination
+            'pagination' => $pagination,
+            'paging' => $paging
         );
         return $this->render('IntelligentSettingBundle:Default:view.html.twig', $parameters);
     }
@@ -312,4 +315,133 @@ class DefaultController extends Controller {
         return $this->render('IntelligentSettingBundle:Default:import.html.twig', $parameters);
     }
 
+    public function getPagination($currentPage, $maxPage, $totalRecords){
+        $totalPage = ceil($totalRecords/$maxPage);
+        $pagination = array();
+        // First link
+        if($currentPage == 1){
+            $pagination['firstPage'] = array(
+                'disabled' => true
+            );
+        }else{
+            $pagination['firstPage'] = array(
+                'disabled' => false,
+                'number' => 1
+            );
+        }
+        // Last link
+        if($currentPage == $totalPage){
+            $pagination['lastPage'] = array(
+                'disabled' => true
+            );
+        }else{
+            $pagination['lastPage'] = array(
+                'disabled' => false,
+                'number' => $totalPage
+            );
+        }
+        
+        // Link in between
+        // We will have 19 links in between
+        $pagesInBetween = array();
+        if($totalPage <= self::TOTAL_PAGINATION_VISIBLE_PAGES){
+            for($i = 1; $i <=  $totalPage; $i++){
+                if($i == $currentPage){
+                    $pagesInBetween[] = array(
+                        'current' => true,
+                        'number'  => $i,
+                        'disabled' => true
+                    );
+                }else{
+                    $pagesInBetween[] = array(
+                        'current' => false,
+                        'number'  => $i,
+                        'disabled' => false
+                    );
+                }
+            }
+        }else{
+            $belowHalfMark = ceil(self::TOTAL_PAGINATION_VISIBLE_PAGES/2);
+            $aboveHalfMark = floor(self::TOTAL_PAGINATION_VISIBLE_PAGES/2);
+            // Pages will start from 1
+            if($currentPage - $belowHalfMark <= 0){
+                $startPage = 1;
+                for($i = $startPage; $i <=  self::TOTAL_PAGINATION_VISIBLE_PAGES; $i++){
+                    if($i == $currentPage){
+                        $pagesInBetween[] = array(
+                            'current' => true,
+                            'number'  => $i,
+                            'disabled' => false
+                        );
+                    }else{
+                        $pagesInBetween[] = array(
+                            'current' => false,
+                            'number'  => $i,
+                            'disabled' => false
+                        );
+                    }
+                }
+                $pagesInBetween[] = array(
+                    'current' => false,
+                    'number'  => '.',
+                    'disabled' => true
+                );
+            }
+            // Last pages will come in continuity
+            else if(($currentPage + $aboveHalfMark) >= $totalPage){
+                $pagesInBetween[] = array(
+                    'current' => false,
+                    'number'  => '.',
+                    'disabled' => true
+                );
+                $startPage = $totalPage - self::TOTAL_PAGINATION_VISIBLE_PAGES + 1;
+                for($i = $startPage; $i <=  $totalPage; $i++){
+                    if($i == $currentPage){
+                        $pagesInBetween[] = array(
+                            'current' => true,
+                            'number'  => $i,
+                            'disabled' => false
+                        );
+                    }else{
+                        $pagesInBetween[] = array(
+                            'current' => false,
+                            'number'  => $i,
+                            'disabled' => false
+                        );
+                    }
+                }
+            }
+            // Pages will start in middle and end in middle
+            else{
+                $pagesInBetween[] = array(
+                    'current' => false,
+                    'number'  => '.',
+                    'disabled' => true
+                );
+                $startPage = $currentPage - $belowHalfMark + 1;
+                for($i = $startPage; $i <=  $currentPage + $aboveHalfMark; $i++){
+                    if($i == $currentPage){
+                        $pagesInBetween[] = array(
+                            'current' => true,
+                            'number'  => $i,
+                            'disabled' => false
+                        );
+                    }else{
+                        $pagesInBetween[] = array(
+                            'current' => false,
+                            'number'  => $i,
+                            'disabled' => false
+                        );
+                    }
+                }
+                $pagesInBetween[] = array(
+                    'current' => false,
+                    'number'  => '.',
+                    'disabled' => true
+                );
+            }
+        }
+        $pagination['inbetween'] = $pagesInBetween;
+        return $pagination;
+    }
 }
