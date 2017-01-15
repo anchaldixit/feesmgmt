@@ -23,7 +23,7 @@ abstract class ModulebaseController extends Controller {
     var $module; //Module object
     var $module_route_identifier;
     protected $permissions;
-    protected $limit = 20;
+    protected $limit = 30;
     protected $helper;
 
     function __construct() {
