@@ -21,9 +21,17 @@
 
                 {% elseif type == 'match' %}
 
-                    <div class="selected_filter" >
-                        <b>{{schema[selected_filter_name]['module_field_display_name']}}:</b> {{schema[selected_filter_name]['module_field_datatype'] == 'user'? users[selected_filter_value]:selected_filter_value}} <span data-resetfilter="{{selected_filter_name}}">X</span> 
-                    </div>
+                    {% if schema[selected_filter_name] is defined %}
+
+                        <div class="selected_filter" >
+                            <b>{{schema[selected_filter_name]['module_field_display_name']}}:</b> {{schema[selected_filter_name]['module_field_datatype'] == 'user'? users[selected_filter_value]:selected_filter_value}} <span data-resetfilter="{{selected_filter_name}}">X</span> 
+                        </div>
+                    {% elseif  'relationship_' in selected_filter_name %}  
+                        <div class="selected_filter" >
+                            <b>Relationship Module Filter</b> <span data-resetfilter="{{selected_filter_name}}">X</span> 
+                        </div>
+
+                    {% endif %}
                 {% elseif type == 'range' %}
 
                     <div class="selected_filter" >

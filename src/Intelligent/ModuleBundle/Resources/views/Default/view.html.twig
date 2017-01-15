@@ -280,7 +280,7 @@
                                                                                     {% if field_settings.module_field_datatype == 'user' %}
                                                                                     {{ include('IntelligentModuleBundle:Default:view/'~field_settings.module_field_datatype~'.html.twig', { 'field_settings': field_settings,'data': row[field_settings.module_field_name] is defined ? row[field_settings.module_field_name] : '','users':users,'permissions':permissions }) }}   
                                                                                 {% else %}
-                                                                                    {{ include('IntelligentModuleBundle:Default:view/'~field_settings.module_field_datatype~'.html.twig', { 'field_settings': field_settings,'data': row[field_settings.module_field_name] is defined ? row[field_settings.module_field_name] : '','permissions':permissions}) }}      
+                                                                                    {{ include('IntelligentModuleBundle:Default:view/'~field_settings.module_field_datatype~'.html.twig', { 'field_settings': field_settings,'data': row[field_settings.module_field_name] is defined ? row[field_settings.module_field_name] : '','permissions':permissions ,'id': row['id'] is defined ? row['id'] : ''}) }}      
                                                                                     {% endif %}
                                                                                         {% endfor %}
                                                                                         <td>{{row.modified_datetime}}</td>

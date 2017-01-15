@@ -1,4 +1,10 @@
 {% if permissions.custom == false or  (permissions.custom == true and permissions.custom_field[field_settings.module_field_name]>0) %}
 {# if custom access setting id done then allowed only for view & editview is true that is 1 or 2  #}
-<td>{{data is defined ? data : ''}}</td>
+{% set filter_key = 'filter[match][relationship_'~field_settings.module~'_id]'%}
+{% set aggregator_url = path('intelligent_'~(field_settings.relationship_module|replace({'_':''})) ~'_view', {(filter_key): id}) %}
+<td>
+    {% if data is defined %}
+    <a href="{{aggregator_url}}">{{data}} </a>
+    {% endif %}
+</td>
 {% endif %}
