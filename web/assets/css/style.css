@@ -304,7 +304,7 @@ input[type="submit"]:focus, input[type="button"]:focus {
   border-radius: 3px;
   box-shadow: 0px 0px 4px #343434;
   display: none;
-  z-index: 99; }
+  z-index: 9999; }
   .PopMenu ul {
     background-color: #fafafa; }
     .PopMenu ul li {
