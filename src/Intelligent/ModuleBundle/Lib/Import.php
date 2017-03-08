@@ -134,46 +134,42 @@ class Import {
         //insert it 
         //next row
     }
-    
+
     private function setDisplayMessages() {
-        
+
         //Show the list of all matched columns
-        var_dump($this->t);
-        if(!count($this->t['savelist_of_display_name'])){
+        if (!count($this->t['savelist_of_display_name'])) {
             $this->container->get('session')->getFlashBag()->add('errors', 'None of the column name match with module attribute\'s name');
-        }else{
-            $this->container->get('session')->getFlashBag()->add('success', 'Matched columns: '. implode(', ', $this->t['savelist_of_display_name']));
+        } else {
+            $this->container->get('session')->getFlashBag()->add('success', 'Matched columns: ' . implode(', ', $this->t['savelist_of_display_name']));
         }
-        
+
         //Show the list of all columns matched with key(forgien key)
-        if(!count($this->t['keylist_of_display_name'])){
+        if (!count($this->t['keylist_of_display_name'])) {
             //Dont send any msg
             //$this->get('session')->getFlashBag()->add('success', 'No Key found');
-        }else{
+        } else {
             $keylist = '';
             foreach ($this->t['keylist_of_display_name'] as $k_module => $list) {
-                $keylist="[$k_module: ".implode(', ', $list)."] ";
+                $keylist = "[$k_module: " . implode(', ', $list) . "] ";
             }
             $this->container->get('session')->getFlashBag()->add('success', "Colums identified as key: $keylist");
         }
-            
-        if(!count($this->t['csv_field_notfoundlist'])){
+
+        if (!count($this->t['csv_field_notfoundlist'])) {
             //Dont send msg best condition
-            
-        }else{
-            $this->container->get('session')->getFlashBag()->add('success', 'CSV columns not found in Module: '. implode(', ', $this->t['csv_field_notfoundlist']));
+        } else {
+            $this->container->get('session')->getFlashBag()->add('success', 'CSV columns not found in Module: ' . implode(', ', $this->t['csv_field_notfoundlist']));
         }
-        
-        if(!count($this->t['db_field_notfoundlist'])){
+
+        if (!count($this->t['db_field_notfoundlist'])) {
             //Dont send msg best condition
-            
-        }else{
-            $this->container->get('session')->getFlashBag()->add('success', 'Extra columns in CSV: '. implode(', ', $this->t['db_field_notfoundlist']));
+        } else {
+            $this->container->get('session')->getFlashBag()->add('success', 'Extra columns in CSV: ' . implode(', ', $this->t['db_field_notfoundlist']));
         }
-        
-        
+
+
         //$this->get('session')->getFlashBag()->add('success', 'Header details ');
-        
     }
 
     private function formate($value, $fieldname) {
@@ -267,7 +263,9 @@ class Import {
                         $foreign_key_id = $this->module->module_settings->prepareforeignKeyName($r_module);
                         $data[$foreign_key_id] = $results[0]['id'];
                     } elseif (count($results) > 1) {
-                        $this->helper->print_r($results);
+                        if ($this->console_customer_id) {
+                            $this->helper->print_r($results);
+                        }
                         throw new \Exception('Multiple foreign key ids found', '111');
                     } else {
                         //below condition not required, there are few data where mapping is optional like in CMN/marketing_projects
