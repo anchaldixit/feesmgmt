@@ -168,6 +168,13 @@
             {% if permissions['add'] %}
                 <a class="red-btn" href="{{ path('intelligent_'~module~'_edit', {'edit_id': 'new'}) }}"><i class="fa fa-plus"></i>New {{module_display_name}}</a>
             {% endif %}
+            {% if permissions['view'] %}
+                <a class="red-btn" href="{{ path('intelligent_'~module~'_export', app.request.query.all) }}"><i class="fa"></i>Export as spreadsheet</a>
+            {% endif %}
+            
+            {% if permissions['add'] %}
+                <a class="red-btn" href="{{ path('intelligent_'~module~'_import', app.request.query.all) }}"><i class="fa"></i>Import</a>
+            {% endif %}
             
             {% if permissions['setting_permissions'] %}
                 <a class="green-btn" href="{{ path('intelligent_setting_view', {'filter[match][module]': module_name}) }}"><i class="fa fa-gears"></i>Settings</a>

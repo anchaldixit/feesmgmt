@@ -16,7 +16,12 @@ intelligent_customer_autocomplete:
 intelligent_customer_fieldset:
     path:     /customer/fieldset
     defaults: { _controller: IntelligentModuleBundle:Customer:fieldset }
-    
+intelligent_customer_export:
+    path:     /customer/export
+    defaults: { _controller: IntelligentModuleBundle:Customer:export }
+intelligent_customer_import:
+    path:     /customer/import
+    defaults: { _controller: IntelligentModuleBundle:Customer:import } 
     
 intelligent_customerprojects:
     path:     /customerprojects
@@ -36,6 +41,12 @@ intelligent_customerprojects_autocomplete:
 intelligent_customerprojects_fieldset:
     path:     /customerprojects/fieldset
     defaults: { _controller: IntelligentModuleBundle:Customerprojects:fieldset }
+intelligent_customerprojects_export:
+    path:     /customerprojects/export
+    defaults: { _controller: IntelligentModuleBundle:Customerprojects:export }
+intelligent_customerprojects_import:
+    path:     /customerprojects/import
+    defaults: { _controller: IntelligentModuleBundle:Customerprojects:import }
     
     
 intelligent_marketingprojects:
@@ -56,7 +67,12 @@ intelligent_marketingprojects_autocomplete:
 intelligent_marketingprojects_fieldset:
     path:     /marketingprojects/fieldset
     defaults: { _controller: IntelligentModuleBundle:Marketingprojects:fieldset }
-    
+intelligent_marketingprojects_export:
+    path:     /marketingprojects/export
+    defaults: { _controller: IntelligentModuleBundle:Marketingprojects:export }
+intelligent_marketingprojects_import:
+    path:     /marketingprojects/import
+    defaults: { _controller: IntelligentModuleBundle:Marketingprojects:import }
     
 intelligent_initiative:
     path:     /initiative
@@ -76,6 +92,9 @@ intelligent_initiative_autocomplete:
 intelligent_initiative_fieldset:
     path:     /initiative/fieldset
     defaults: { _controller: IntelligentModuleBundle:Initiative:fieldset }
+intelligent_initiative_export:
+    path:     /initiative/export
+    defaults: { _controller: IntelligentModuleBundle:Initiative:export }
     
     
 intelligent_campaign:
@@ -96,7 +115,12 @@ intelligent_campaign_autocomplete:
 intelligent_campaign_fieldset:
     path:     /campaign/fieldset
     defaults: { _controller: IntelligentModuleBundle:Campaign:fieldset }
-    
+intelligent_campaign_export:
+    path:     /campaign/export
+    defaults: { _controller: IntelligentModuleBundle:Campaign:export }
+intelligent_campaign_import:
+    path:     /campaign/import
+    defaults: { _controller: IntelligentModuleBundle:Campaign:import }  
     
 intelligent_campaigncontacts:
     path:     /campaigncontacts
@@ -116,7 +140,12 @@ intelligent_campaigncontacts_autocomplete:
 intelligent_campaigncontacts_fieldset:
     path:     /campaigncontacts/fieldset
     defaults: { _controller: IntelligentModuleBundle:Campaigncontacts:fieldset }
-    
+intelligent_campaigncontacts_export:
+    path:     /campaigncontacts/export
+    defaults: { _controller: IntelligentModuleBundle:Campaigncontacts:export }
+intelligent_campaigncontacts_import:
+    path:     /campaigncontacts/import
+    defaults: { _controller: IntelligentModuleBundle:Campaigncontacts:import }
     
 intelligent_psuedoemailaccounts:
     path:     /psuedoemailaccounts
@@ -135,7 +164,12 @@ intelligent_psuedoemailaccounts_autocomplete:
 intelligent_psuedoemailaccounts_fieldset:
     path:     /psuedoemailaccounts/fieldset
     defaults: { _controller: IntelligentModuleBundle:Psuedoemailaccounts:fieldset }
-    
+intelligent_psuedoemailaccounts_export:
+    path:     /psuedoemailaccounts/export
+    defaults: { _controller: IntelligentModuleBundle:Psuedoemailaccounts:export }
+intelligent_psuedoemailaccounts_import:
+    path:     /psuedoemailaccounts/import
+    defaults: { _controller: IntelligentModuleBundle:Psuedoemailaccounts:import } 
     
 intelligent_assignpsuedo:
     path:     /assignpsuedo
@@ -155,7 +189,12 @@ intelligent_assignpsuedo_autocomplete:
 intelligent_assignpsuedo_fieldset:
     path:     /assignpsuedo/fieldset
     defaults: { _controller: IntelligentModuleBundle:Assignpsuedo:fieldset }
-    
+intelligent_assignpsuedo_export:
+    path:     /assignpsuedo/export
+    defaults: { _controller: IntelligentModuleBundle:Assignpsuedo:export }
+intelligent_assignpsuedo_import:
+    path:     /assignpsuedo/import
+    defaults: { _controller: IntelligentModuleBundle:Assignpsuedo:import }  
     
 intelligent_links:
     path:     /links
@@ -175,7 +214,12 @@ intelligent_links_autocomplete:
 intelligent_links_fieldset:
     path:     /links/fieldset
     defaults: { _controller: IntelligentModuleBundle:Links:fieldset }
-    
+intelligent_links_export:
+    path:     /links/export
+    defaults: { _controller: IntelligentModuleBundle:Links:export }
+intelligent_links_import:
+    path:     /links/import
+    defaults: { _controller: IntelligentModuleBundle:Links:import }
     
 intelligent_linkrates:
     path:     /linkrates
@@ -195,7 +239,12 @@ intelligent_linkrates_autocomplete:
 intelligent_linkrates_fieldset:
     path:     /linkrates/fieldset
     defaults: { _controller: IntelligentModuleBundle:Linkrates:fieldset }
-    
+intelligent_linkrates_export:
+    path:     /linkrates/export
+    defaults: { _controller: IntelligentModuleBundle:Linkrates:export }
+intelligent_linkrates_import:
+    path:     /linkrates/import
+    defaults: { _controller: IntelligentModuleBundle:Linkrates:import }
       
 intelligent_dnclists:
     path:     /dnclists
@@ -215,3 +264,9 @@ intelligent_dnclists_autocomplete:
 intelligent_dnclists_fieldset:
     path:     /dnclists/fieldset
     defaults: { _controller: IntelligentModuleBundle:Dnclists:fieldset }
+intelligent_dnclists_export:
+    path:     /dnclists/export
+    defaults: { _controller: IntelligentModuleBundle:Dnclists:export }
+intelligent_dnclists_import:
+    path:     /dnclists/import
+    defaults: { _controller: IntelligentModuleBundle:Dnclists:import }

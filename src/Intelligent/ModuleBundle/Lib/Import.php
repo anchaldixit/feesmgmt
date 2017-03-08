@@ -27,6 +27,8 @@ class Import {
         'csv_field_notfoundlist' => array(),
         'db_field_notfoundlist' => array(),
         'expected_keylist' => array(),
+        'savelist_of_display_name' => array(),
+        'keylist_of_display_name' => array()
     ); //tracker of header
     var $test_only_header = false;
     var $delete_before_insert = false;
@@ -34,14 +36,28 @@ class Import {
     var $usernotfound = array();
     var $users_list = array();
     var $quickbase_keyname;
+    public $console_customer_id;
 
     function init($module) {
 
+        if (empty($this->console_customer_id)) {
+            //Also validate Import is used as logged in feature. If yes then dont thru exception
+            $user_permission = $this->container->get("user_permissions");
+            $active_customer_filter = $user_permission->getCurrentViewCustomer()->getId();
+            if (empty($active_customer_filter)) {
+                throw new \Exception('011', 'Console customer cannot be empty');
+            }
+        }
         $this->module_name = $module;
         $this->module = $this->container->get("intelligent.{$this->module_name}.module");
         $this->field_set = $this->module->getFormFields();
         //$this->logger = $this->container->get('monolog.logger.import_logger');
         $this->helper = new Helper();
+    }
+
+    function setConsoleCustomer($v) {
+        $this->console_customer_id = $v;
+        $this->container->get('session')->set('console_cusotmer_id', $this->console_customer_id);
     }
 
     function setTestOnlyHeader($v) {
@@ -78,8 +94,12 @@ class Import {
                 $this->prepareHeader($csv_row);
                 //reaching this point means header validation is passed and header array is set. Otherwise exception was thrown in previous run
 
-                $this->helper->print_r($this->t);
+                if ($this->console_customer_id) {
+                    $this->helper->print_r($this->t);
+                }
                 if ($this->test_only_header) {
+                    $this->setDisplayMessages();
+                    //$this->get('session')->getFlashBag()->add('success', 'Header details ');
                     break;
                 }
             } else {
@@ -100,9 +120,10 @@ class Import {
                     }
                 }
 
-                $this->helper->print_r($data);
-                //exit;
+                if ($this->console_customer_id) {
 
+                    $this->helper->print_r($data);
+                }
                 $this->module->save($data);
             }
         }
@@ -112,6 +133,47 @@ class Import {
         //prepare foriegn key and get it
         //insert it 
         //next row
+    }
+    
+    private function setDisplayMessages() {
+        
+        //Show the list of all matched columns
+        var_dump($this->t);
+        if(!count($this->t['savelist_of_display_name'])){
+            $this->container->get('session')->getFlashBag()->add('errors', 'None of the column name match with module attribute\'s name');
+        }else{
+            $this->container->get('session')->getFlashBag()->add('success', 'Matched columns: '. implode(', ', $this->t['savelist_of_display_name']));
+        }
+        
+        //Show the list of all columns matched with key(forgien key)
+        if(!count($this->t['keylist_of_display_name'])){
+            //Dont send any msg
+            //$this->get('session')->getFlashBag()->add('success', 'No Key found');
+        }else{
+            $keylist = '';
+            foreach ($this->t['keylist_of_display_name'] as $k_module => $list) {
+                $keylist="[$k_module: ".implode(', ', $list)."] ";
+            }
+            $this->container->get('session')->getFlashBag()->add('success', "Colums identified as key: $keylist");
+        }
+            
+        if(!count($this->t['csv_field_notfoundlist'])){
+            //Dont send msg best condition
+            
+        }else{
+            $this->container->get('session')->getFlashBag()->add('success', 'CSV columns not found in Module: '. implode(', ', $this->t['csv_field_notfoundlist']));
+        }
+        
+        if(!count($this->t['db_field_notfoundlist'])){
+            //Dont send msg best condition
+            
+        }else{
+            $this->container->get('session')->getFlashBag()->add('success', 'Extra columns in CSV: '. implode(', ', $this->t['db_field_notfoundlist']));
+        }
+        
+        
+        //$this->get('session')->getFlashBag()->add('success', 'Header details ');
+        
     }
 
     private function formate($value, $fieldname) {
@@ -136,7 +198,7 @@ class Import {
             case 'date':
 
                 if (!empty($value)) {
-                    $dilmiter = strpos($value, '-') !==false? '-':'/';
+                    $dilmiter = strpos($value, '-') !== false ? '-' : '/';
                     $d = explode($dilmiter, $value);
                     $return = date('Y-m-d', mktime(0, 0, 0, $d[0], $d[1], $d[2]));
                 } else {
@@ -222,8 +284,9 @@ class Import {
 
 
         // $this->helper->print_r($this->field_set);
-
-        $this->helper->print_r($csv_header);
+        if ($this->console_customer_id) {
+            $this->helper->print_r($csv_header);
+        }
 
         $this->t['csv_field_notfoundlist'] = $csv_header;
 
@@ -237,24 +300,27 @@ class Import {
 
                 if ($field['module_field_datatype'] == 'relationship') {
                     //check foregin key
-                    if(empty($this->quickbase_keyname)) {
-                        
+                    if (empty($this->quickbase_keyname)) {
+
                         if (!isset($this->t['keylist'][$field['relationship_module']])) {
                             $this->t['keylist'][$field['relationship_module']] = array();
+                            $this->t['keylist_of_display_name'][$field['relationship_module']] = array();
                         }
 
                         $this->t['keylist'][$field['relationship_module']][$match_key] = $field['module_field_name'];
+                        $this->t['keylist_of_display_name'][$field['relationship_module']][$match_key] = $field['module_field_display_name'];
                     }
-                } elseif (! in_array($field['module_field_datatype'],array('formulafield', 'relationship-aggregator'))) {
+                } elseif (!in_array($field['module_field_datatype'], array('formulafield', 'relationship-aggregator'))) {
 
                     $this->t['savelist'][$match_key] = $field['module_field_name'];
+                    $this->t['savelist_of_display_name'][$match_key] = $field['module_field_display_name'];
                 } else {
 
                     //unexpected
                 }
                 unset($this->t['csv_field_notfoundlist'][$match_key]);
             } else {
-                $this->t['db_field_notfoundlist'][$match_key] = $field['module_field_name'];
+                $this->t['db_field_notfoundlist'][] = $field['module_field_display_name'];
             }
         }
         if (preg_match('/ID#$/', $csv_header[0])) {
@@ -262,21 +328,19 @@ class Import {
             $this->t['savelist']['0'] = 'quickbase_id';
             unset($this->t['csv_field_notfoundlist'][0]);
         }
-        if(!empty($this->quickbase_keyname)){
+        if (!empty($this->quickbase_keyname)) {
             foreach ($this->quickbase_keyname as $module => $head_col) {
                 //only for one time
                 $match_key = array_search($head_col, $csv_header);
                 if ($match_key !== FALSE) {
                     if (!isset($this->t['keylist'][$module])) {
-                            $this->t['keylist'][$module] = array();
-                        }
+                        $this->t['keylist'][$module] = array();
+                    }
                     $this->t['keylist'][$module][$match_key] = "$module.quickbase_id";
-                }else{
-                    throw new \Exception('Foriegn key name match not found. LINENO:'.__LINE__);
+                } else {
+                    throw new \Exception('Foriegn key name match not found. LINENO:' . __LINE__);
                 }
             }
-            
-            
         }
 
         //@todo total number of keys to match

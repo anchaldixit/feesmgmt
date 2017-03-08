@@ -27,6 +27,7 @@ abstract class Module {
     private $db_manager;
     protected $row_filter_enabled = true;
     protected $helper;
+    protected $console_customer_id;
 
     /*
      * Leave the construct blank, dont remove
@@ -126,11 +127,14 @@ abstract class Module {
         }
         if (is_array($fields) and count($fields)) {
             //Parameter is not default, create the where clause
-
             $select_fields = implode(' , ', $fields);
         }
+        
+        if($limit !== null){
+            $limit = " limit $limit";
+        }
 
-        $sql = "SELECT $select_fields FROM {$this->table} $join_condition $extended_where $groupby_part $order_by limit $limit";
+        $sql = "SELECT $select_fields FROM {$this->table} $join_condition $extended_where $groupby_part $order_by $limit";
         $this->last_sql_withoutlimit = "SELECT count(*) FROM {$this->table} $join_condition $extended_where $groupby_part ";
         if(count($group_by)){
             $this->last_sql_withoutlimit = "select count(*) from ({$this->last_sql_withoutlimit}) a ";
@@ -626,8 +630,14 @@ abstract class Module {
 
         //$session = new Session();
         //$val = $session->get('active_customer_filter');
-        $user_permission = $this->container->get("user_permissions");
-        $val = $user_permission->getCurrentViewCustomer()->getId();
+        $console_id = $this->container->get('session')->get('console_cusotmer_id');
+        if(!empty($console_id)){//only true for import process
+            $val = $console_id;
+        }else{
+            $user_permission = $this->container->get("user_permissions");
+            $val = $user_permission->getCurrentViewCustomer()->getId();
+        }
+        
 
         if ($this->module != 'customer' and ! empty($val)) {
             $params = array_merge($params, array("{$this->module}.linked_customer_id" => $val));
