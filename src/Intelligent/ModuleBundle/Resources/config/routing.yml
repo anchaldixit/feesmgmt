@@ -95,7 +95,9 @@ intelligent_initiative_fieldset:
 intelligent_initiative_export:
     path:     /initiative/export
     defaults: { _controller: IntelligentModuleBundle:Initiative:export }
-    
+intelligent_initiative_import:
+    path:     /initiative/import
+    defaults: { _controller: IntelligentModuleBundle:Initiative:import }
     
 intelligent_campaign:
     path:     /campaign

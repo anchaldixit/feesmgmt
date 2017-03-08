@@ -395,11 +395,12 @@ class Settings {
             //
         }
 
-        if ($post_data['module_field_datatype'] == 'link' and empty($post_data['link_text'])) {
-            $error[] = "Display text of link cannot be empty";
-        } else {
-            $data['link_text'] = $post_data['link_text'];
-        }
+        $data['link_text'] = $post_data['link_text'];
+//        if ($post_data['module_field_datatype'] == 'link' and empty($post_data['link_text'])) {
+//            $error[] = "Display text of link cannot be empty";
+//        } else {
+//            $data['link_text'] = $post_data['link_text'];
+//        }
 
         if ($post_data['module_field_datatype'] == 'enum' and empty($post_data['value'])) {
             $error[] = "Value set can be empty for selected datatype";
