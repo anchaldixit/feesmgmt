@@ -797,7 +797,7 @@ input[type="submit"],input[type="button"]{
                 &:first-child{
                     text-align: left;
                     i{
-                        margin-right: 10px;
+                        margin-right: 5px;
                         color: #393939;
                     }
                 }
@@ -1656,7 +1656,7 @@ input[type="submit"],input[type="button"]{
 .table-outer{
     overflow: auto;
     padding-bottom: 15px;
-    max-height:500px;
+    max-height:700px;
 }
 .hide{
     display: none;
