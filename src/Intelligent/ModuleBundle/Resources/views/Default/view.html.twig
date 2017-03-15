@@ -34,7 +34,7 @@
         .table-outer{
     overflow: auto;
     padding-bottom: 15px;
-    height:500px;
+    max-height:700px;
 }
 
 
@@ -169,11 +169,11 @@
                 <a class="red-btn" href="{{ path('intelligent_'~module~'_edit', {'edit_id': 'new'}) }}"><i class="fa fa-plus"></i>New {{module_display_name}}</a>
             {% endif %}
             {% if permissions['view'] %}
-                <a class="red-btn" href="{{ path('intelligent_'~module~'_export', app.request.query.all) }}"><i class="fa"></i>Export as spreadsheet</a>
+                <a class="red-btn" href="{{ path('intelligent_'~module~'_export', app.request.query.all) }}"><i class="fa fa-exchange"></i>Export as spreadsheet</a>
             {% endif %}
             
             {% if permissions['add'] %}
-                <a class="red-btn" href="{{ path('intelligent_'~module~'_import', app.request.query.all) }}"><i class="fa"></i>Import</a>
+                <a class="red-btn" href="{{ path('intelligent_'~module~'_import', app.request.query.all) }}"><i class="fa fa-file-excel-o"></i>Import</a>
             {% endif %}
             
             {% if permissions['setting_permissions'] %}
@@ -272,12 +272,12 @@
                                                                     {% for row in rows %}
                                                                         <tr>
                                                                             <td>
-                                                                                <a href="{{ path('intelligent_'~module~'_edit', {'edit_id': row.id}) }}">view</a>  
+                                                                                <a href="{{ path('intelligent_'~module~'_edit', {'edit_id': row.id}) }}" title="View"><i class="fa fa-eye"></i></a>  
                                                                                 {% if permissions.edit %} 
-                                                                                    | <a href="{{ path('intelligent_'~module~'_edit', {'edit_id': row.id}) }}">edit</a> 
+                                                                                     <a href="{{ path('intelligent_'~module~'_edit', {'edit_id': row.id}) }}" title="Edit"><i class="fa fa-edit"></i></a> 
                                                                                 {% endif %}
                                                                                 {% if permissions.delete %}     
-                                                                                    | <a href="{{ path('intelligent_'~module~'_delete', {'delete_id': row.id}) }}" class="delete-link">delete</a>
+                                                                                     <a href="{{ path('intelligent_'~module~'_delete', {'delete_id': row.id}) }}" class="delete-link" title="Delete"><i class="fa fa-trash"></i></a>
                                                                                 {% endif %}
                                                                             </td>
                                                                             <td>{{row.id}}
