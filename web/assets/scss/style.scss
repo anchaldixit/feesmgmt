@@ -214,7 +214,7 @@ input[type="submit"],input[type="button"]{
 .notify{
     position:fixed;
     left:50%;
-    top: -30px;
+    top: -130px;
     transform: translate(-50%,0);
     font-size: 13px;
     background-color: rgba(198,212,189,0.9);
@@ -222,16 +222,36 @@ input[type="submit"],input[type="button"]{
     border:1px solid #4e9221;
     padding: 5px 10px;
     z-index:999;
+    max-width:300px;
+    &.error{
+        border:1px solid #8B0000;
+        background-color: rgba(240,128,128,0.9);
+        .fa-info-circle{
+            color: #8B0000;
+        }
+        
+    }
     .fa-info-circle{
         color: #0c6501;
     }
     .info-notice{
         display: inline-block; margin: 0 20px;
     } 
+    br{
+        line-height: 25px;
+    }
 }
 .n-animation{
     top:70px;
     transition: top 500ms linear;
+}
+.highlight-row{
+    font-weight:bold;
+    transition: font-weight 500ms ease;
+}
+.n-movetoleft{
+    left:200px;
+    transition: left 500ms linear;
 }
 .access-msg{
     width:400px;
