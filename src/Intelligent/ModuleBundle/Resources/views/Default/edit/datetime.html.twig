@@ -9,7 +9,7 @@
             <input name="{{field_settings.module_field_name}}" id="{{field_settings.module_field_name}}"  value="{{data is defined ? data|date("m/d/Y") : ''}}" class="datepicker" type="text" ><br>
         {% else %}
             {# user only has view access   #}
-            {{data is defined ? data|date("m/d/Y") : ''}}
+            <div class="read_text"> {{data is defined ? data|date("m/d/Y") : ''}}</div>
         {% endif %}
     </div>
 </li>

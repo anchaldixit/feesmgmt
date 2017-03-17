@@ -9,7 +9,7 @@
             {% if data is not empty%}<a href="{{data}}">{{field_settings.link_text}}</a><br> {% endif%}
         {% else %}
             {# user only has view access   #}
-            {% if data is not empty%}<a href="{{data}}">{{field_settings.link_text}}</a><br> {% endif%}
+            <div class="read_text">{% if data is not empty%}<a href="{{data}}">{{field_settings.link_text}}</a><br> {% endif%}</div>
         {% endif %}
     </div>
 </li>

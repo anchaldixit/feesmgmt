@@ -18,7 +18,7 @@
             </div>
         {% else %}
             {# user only has view access   #}
-            {{data is defined ? users[data] : ''}}
+            <div class="read_text"> {{data is defined ? users[data] : ''}} </div>
         {% endif %}
 
     </div>

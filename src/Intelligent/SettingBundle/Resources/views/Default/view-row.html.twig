@@ -5,7 +5,7 @@
         <td>{{attribute(datatypes,row.module_field_datatype)}}</td>
         <td>{{row.display_position}}</td>
         <td>{{row.enable_filter}}</td>
-        <td>{{row.modified_datetime}}</td>
+        <td>{{row.modified_datetime is empty ? '' : row.modified_datetime | date("d/m/y g:i a")}}</td>
         <td><a href="{{ path('intelligent_setting_edit', app.request.query.all| merge( {'edit_id': row.id})) }}" title="View"><i class="fa fa-eye"></i></a>  
             <a href="{{ path('intelligent_setting_edit', app.request.query.all| merge( {'edit_id': row.id})) }}" title="Edit"><i class="fa fa-edit"></i></a>  
             <a href="{{ path('intelligent_setting_delete', app.request.query.all| merge({'delete_id': row.id} )) }}" class="delete-link" title="Delete">
