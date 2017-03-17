@@ -670,7 +670,7 @@ input[type="submit"]:focus, input[type="button"]:focus {
       .table-content table tr td:first-child {
         text-align: left; }
         .table-content table tr td:first-child i {
-          margin-right: 10px;
+          margin-right: 5px;
           color: #393939; }
     .table-content table tr:nth-child(2n) {
       background-color: #e4effc; }
@@ -1327,7 +1327,7 @@ input[type="submit"]:focus, input[type="button"]:focus {
 .table-outer {
   overflow: auto;
   padding-bottom: 15px;
-  max-height: 500px; }
+  max-height: 700px; }
 
 .hide {
   display: none; }
