@@ -6,6 +6,10 @@
         <td>{{row.display_position}}</td>
         <td>{{row.enable_filter}}</td>
         <td>{{row.modified_datetime}}</td>
-        <td><a href="#" data-edit-id="{{row.id}}" class="quick-edit">Quick Edit</a> | <a href="{{ path('intelligent_setting_edit', app.request.query.all| merge( {'edit_id': row.id})) }}">view</a> | <a href="{{ path('intelligent_setting_edit', app.request.query.all| merge( {'edit_id': row.id})) }}">edit</a> | <a href="{{ path('intelligent_setting_delete', app.request.query.all| merge({'delete_id': row.id} )) }}" class="delete-link">delete</a></td>
+        <td><a href="{{ path('intelligent_setting_edit', app.request.query.all| merge( {'edit_id': row.id})) }}" title="View"><i class="fa fa-eye"></i></a>  
+            <a href="{{ path('intelligent_setting_edit', app.request.query.all| merge( {'edit_id': row.id})) }}" title="Edit"><i class="fa fa-edit"></i></a>  
+            <a href="{{ path('intelligent_setting_delete', app.request.query.all| merge({'delete_id': row.id} )) }}" class="delete-link" title="Delete">
+                <i class="fa fa-trash"></i>
+            </a></td>
     </tr>
 {% endfor %}
