@@ -6,12 +6,13 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Intelligent\SettingBundle\Lib\Settings;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\Session;
+use Symfony\Component\HttpFoundation\JsonResponse;
 
 class DefaultController extends Controller {
     /*
      * Not in use
      */
-    
+
     const TOTAL_PAGINATION_VISIBLE_PAGES = 11; // Always an odd number
 
     public function indexAction() {
@@ -37,32 +38,53 @@ class DefaultController extends Controller {
         $allgroups = $settings->getGroupName();
 
         $request = Request::createFromGlobals();
+        $is_ajax = $request->query->get('ajax');
         $id = null;
 
         try {
             if ($request->isMethod('POST')) {//Result submited
+                //Not get, this time its post request
+                $is_ajax = $request->request->get('ajax');
+
                 $post = $request->request->all();
                 $result = array();
                 $result[] = $post;
+
                 if (empty($request->request->get('id'))) {
                     //save
 
                     $id = $settings->save($post);
                     $this->get('session')->getFlashBag()->add('success', "Row added successfully.");
-                    return $this->redirectToRoute('intelligent_setting_edit', array_merge($request->query->all(), array('edit_id' => $id)));
+                    if ($is_ajax) {
+                        $updated_row_html = $this->viewRowHtml($id);
+                        return new JsonResponse(array('msg' => 'Row added successfully.', 'action' => 'add', 'id' => $id, 'row' => $updated_row_html));
+                    } else {
+                        return $this->redirectToRoute('intelligent_setting_edit', array_merge($request->query->all(), array('edit_id' => $id)));
+                    }
                 } else {
 
                     if (!empty($request->request->get('delete_submit'))) {
                         //delete
-                        $settings->delete($request->request->get('id'));
+                        //$settings->delete($request->request->get('id'));
                         //@todo: redirect should be done 
-                        $this->get('session')->getFlashBag()->add('success', "Row Deleted Successfully.");
-                        return $this->redirectToRoute('intelligent_setting_view', $request->query->all());
+                        if ($is_ajax) {
+
+                            return new JsonResponse(array('msg' => 'Row Deleted Successfully.', 'action' => 'delete'));
+                        } else {
+                            $this->get('session')->getFlashBag()->add('success', "Row Deleted Successfully.");
+                            return $this->redirectToRoute('intelligent_setting_view', $request->query->all());
+                        }
                     } else {//update
                         $id = $edit_id;
                         $settings->update($post);
-                        $this->get('session')->getFlashBag()->add('success', "Row Updated successfully.");
-                        return $this->redirectToRoute('intelligent_setting_edit', array_merge($request->query->all(), array('edit_id' => $id)));
+
+                        if ($is_ajax) {
+                            $updated_row_html = $this->viewRowHtml($edit_id);
+                            return new JsonResponse(array('msg' => 'Row Updated successfully.', 'action' => 'update', 'row' => $updated_row_html));
+                        } else {
+                            $this->get('session')->getFlashBag()->add('success', "Row Updated successfully.");
+                            return $this->redirectToRoute('intelligent_setting_edit', array_merge($request->query->all(), array('edit_id' => $id)));
+                        }
                     }
                 }
                 $id = is_numeric($edit_id) ? $edit_id : null;
@@ -82,7 +104,11 @@ class DefaultController extends Controller {
             }
         } catch (\Exception $e) {
             //$message = $e->getMessage();
-            $this->get('session')->getFlashBag()->add('error', $e->getMessage() . '<br>' . $e->getTraceAsString());
+            if ($is_ajax) {
+                return new JsonResponse(array('error' => 'set', 'error_msgs' => $e->getMessage()));
+            } else {
+                $this->get('session')->getFlashBag()->add('error', $e->getMessage() . '<br>' . $e->getTraceAsString());
+            }
             //var_dump($e);
         }
 
@@ -93,9 +119,14 @@ class DefaultController extends Controller {
             'modules' => $modules,
             'datatypes' => $datatypes,
             'allgroups' => $allgroups,
-            'id' => $id);
+            'id' => $id,
+            'is_ajax' => $is_ajax);
 
-        return $this->render('IntelligentSettingBundle:Default:edit.html.twig', $parameters);
+        if ($is_ajax == 'yes') {
+            return $this->render('IntelligentSettingBundle:Default:edit-form.html.twig', $parameters);
+        } else {
+            return $this->render('IntelligentSettingBundle:Default:edit.html.twig', $parameters);
+        }
     }
 
     /*
@@ -150,7 +181,7 @@ class DefaultController extends Controller {
         $count = $settings->totalCountOfLastFetch();
         $total_page_count = ceil($count / $limit);
         $pagination = array('active' => $page_no, 'limit' => $limit, 'total_record' => $count, 'total_count' => $total_page_count);
-        $paging = $this->getPagination($page_no,$limit,$count);
+        $paging = $this->getPagination($page_no, $limit, $count);
 
         $modules = $settings->getModule();
         $datatypes = $settings->getModuleDataTypes();
@@ -182,6 +213,26 @@ class DefaultController extends Controller {
         $this->get('session')->getFlashBag()->add('success', "Row Deleted Successfully.");
 
         return $this->redirectToRoute('intelligent_setting_view', $request->query->all());
+    }
+
+    /*
+     * Get view row for axaj response
+     */
+
+    function viewRowHtml($id) {
+
+
+        $settings = $this->get('intelligent.setting.module');
+
+        $row = $settings->fetch(array('id' => $id));
+        $datatypes = $settings->getModuleDataTypes();
+        $modules = $settings->getModule();
+
+        $parameters = array('rows' => $row,
+            'modules' => $modules,
+            'datatypes' => $datatypes,
+        );
+        return $this->renderView('IntelligentSettingBundle:Default:view-row.html.twig', $parameters);
     }
 
     /*
@@ -269,7 +320,7 @@ class DefaultController extends Controller {
     public function importAction() {
 
         //
-        ini_set('memory_limit','25600M');
+        ini_set('memory_limit', '25600M');
         ini_set('max_execution_time', 0);
 
 
@@ -296,14 +347,13 @@ class DefaultController extends Controller {
                     $import->setTestOnlyHeader(isset($c['test_header']));
                     $import->setDeleteBeforeInsert(isset($c['delete_existing_before_insert']));
                 }
-                if(!empty($f) and strpos($f, '|') !== false){
+                if (!empty($f) and strpos($f, '|') !== false) {
                     $f2 = explode('|', $f);
-                    $import->setForeignKey(array($f2[0]=>$f2[1]));
-                    
+                    $import->setForeignKey(array($f2[0] => $f2[1]));
                 }
                 $import->init($m);
 
-                 $import->csvUpload($path);
+                $import->csvUpload($path);
             } else {
                 //throw new \Exception('Missing parameters');
             }
@@ -315,128 +365,128 @@ class DefaultController extends Controller {
         return $this->render('IntelligentSettingBundle:Default:import.html.twig', $parameters);
     }
 
-    public function getPagination($currentPage, $maxPage, $totalRecords){
-        $totalPage = ceil($totalRecords/$maxPage);
+    public function getPagination($currentPage, $maxPage, $totalRecords) {
+        $totalPage = ceil($totalRecords / $maxPage);
         $pagination = array();
         // First link
-        if($currentPage == 1){
+        if ($currentPage == 1) {
             $pagination['firstPage'] = array(
                 'disabled' => true
             );
-        }else{
+        } else {
             $pagination['firstPage'] = array(
                 'disabled' => false,
                 'number' => 1
             );
         }
         // Last link
-        if($currentPage == $totalPage){
+        if ($currentPage == $totalPage) {
             $pagination['lastPage'] = array(
                 'disabled' => true
             );
-        }else{
+        } else {
             $pagination['lastPage'] = array(
                 'disabled' => false,
                 'number' => $totalPage
             );
         }
-        
+
         // Link in between
         // We will have 19 links in between
         $pagesInBetween = array();
-        if($totalPage <= self::TOTAL_PAGINATION_VISIBLE_PAGES){
-            for($i = 1; $i <=  $totalPage; $i++){
-                if($i == $currentPage){
+        if ($totalPage <= self::TOTAL_PAGINATION_VISIBLE_PAGES) {
+            for ($i = 1; $i <= $totalPage; $i++) {
+                if ($i == $currentPage) {
                     $pagesInBetween[] = array(
                         'current' => true,
-                        'number'  => $i,
+                        'number' => $i,
                         'disabled' => true
                     );
-                }else{
+                } else {
                     $pagesInBetween[] = array(
                         'current' => false,
-                        'number'  => $i,
+                        'number' => $i,
                         'disabled' => false
                     );
                 }
             }
-        }else{
-            $belowHalfMark = ceil(self::TOTAL_PAGINATION_VISIBLE_PAGES/2);
-            $aboveHalfMark = floor(self::TOTAL_PAGINATION_VISIBLE_PAGES/2);
+        } else {
+            $belowHalfMark = ceil(self::TOTAL_PAGINATION_VISIBLE_PAGES / 2);
+            $aboveHalfMark = floor(self::TOTAL_PAGINATION_VISIBLE_PAGES / 2);
             // Pages will start from 1
-            if($currentPage - $belowHalfMark <= 0){
+            if ($currentPage - $belowHalfMark <= 0) {
                 $startPage = 1;
-                for($i = $startPage; $i <=  self::TOTAL_PAGINATION_VISIBLE_PAGES; $i++){
-                    if($i == $currentPage){
+                for ($i = $startPage; $i <= self::TOTAL_PAGINATION_VISIBLE_PAGES; $i++) {
+                    if ($i == $currentPage) {
                         $pagesInBetween[] = array(
                             'current' => true,
-                            'number'  => $i,
+                            'number' => $i,
                             'disabled' => false
                         );
-                    }else{
+                    } else {
                         $pagesInBetween[] = array(
                             'current' => false,
-                            'number'  => $i,
+                            'number' => $i,
                             'disabled' => false
                         );
                     }
                 }
                 $pagesInBetween[] = array(
                     'current' => false,
-                    'number'  => '.',
+                    'number' => '.',
                     'disabled' => true
                 );
             }
             // Last pages will come in continuity
-            else if(($currentPage + $aboveHalfMark) >= $totalPage){
+            else if (($currentPage + $aboveHalfMark) >= $totalPage) {
                 $pagesInBetween[] = array(
                     'current' => false,
-                    'number'  => '.',
+                    'number' => '.',
                     'disabled' => true
                 );
                 $startPage = $totalPage - self::TOTAL_PAGINATION_VISIBLE_PAGES + 1;
-                for($i = $startPage; $i <=  $totalPage; $i++){
-                    if($i == $currentPage){
+                for ($i = $startPage; $i <= $totalPage; $i++) {
+                    if ($i == $currentPage) {
                         $pagesInBetween[] = array(
                             'current' => true,
-                            'number'  => $i,
+                            'number' => $i,
                             'disabled' => false
                         );
-                    }else{
+                    } else {
                         $pagesInBetween[] = array(
                             'current' => false,
-                            'number'  => $i,
+                            'number' => $i,
                             'disabled' => false
                         );
                     }
                 }
             }
             // Pages will start in middle and end in middle
-            else{
+            else {
                 $pagesInBetween[] = array(
                     'current' => false,
-                    'number'  => '.',
+                    'number' => '.',
                     'disabled' => true
                 );
                 $startPage = $currentPage - $belowHalfMark + 1;
-                for($i = $startPage; $i <=  $currentPage + $aboveHalfMark; $i++){
-                    if($i == $currentPage){
+                for ($i = $startPage; $i <= $currentPage + $aboveHalfMark; $i++) {
+                    if ($i == $currentPage) {
                         $pagesInBetween[] = array(
                             'current' => true,
-                            'number'  => $i,
+                            'number' => $i,
                             'disabled' => false
                         );
-                    }else{
+                    } else {
                         $pagesInBetween[] = array(
                             'current' => false,
-                            'number'  => $i,
+                            'number' => $i,
                             'disabled' => false
                         );
                     }
                 }
                 $pagesInBetween[] = array(
                     'current' => false,
-                    'number'  => '.',
+                    'number' => '.',
                     'disabled' => true
                 );
             }
@@ -444,4 +494,5 @@ class DefaultController extends Controller {
         $pagination['inbetween'] = $pagesInBetween;
         return $pagination;
     }
+
 }

@@ -10,16 +10,16 @@ $.extend(Module.prototype,{
         var that = this;
         Module.baseurl = 'http://'+window.location.hostname+Module.getAppDevLink()+'/settings/fieldset/';
         
-        if($('#setting_edit_template').length){
+        //if($('#setting_edit_template').length){
             
             that.bindModuleFieldTypeAction();
             //that.openPopup('.open_formula_popup');
             that.closePopup();
             
-        }
-        if($('#group_dd').length){
+       // }
+        //if($('#group_dd').length){
             that.bindGroupDropDownAction();
-        }
+        //}
         
         that.bindModuleDropDownAction();
         that.bindFormulaFieldPopup();
