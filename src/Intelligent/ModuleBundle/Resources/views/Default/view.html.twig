@@ -29,7 +29,7 @@
             margin: 5px 15px;
         }
 
-        .marketingProjects thead tr th:first-child, .marketingProjects tbody tr td:first-child{text-align: center;}
+        .marketingProjects thead tr th:first-child, .marketingProjects tbody tr td:first-child{text-align: center; width: 150px !important;}
 
         .table-outer{
     overflow: auto;
@@ -290,7 +290,7 @@
                                                                                     {{ include('IntelligentModuleBundle:Default:view/'~field_settings.module_field_datatype~'.html.twig', { 'field_settings': field_settings,'data': row[field_settings.module_field_name] is defined ? row[field_settings.module_field_name] : '','permissions':permissions ,'id': row['id'] is defined ? row['id'] : ''}) }}      
                                                                                     {% endif %}
                                                                                         {% endfor %}
-                                                                                        <td>{{row.modified_datetime}}</td>
+                                                                                        <td>{{row.modified_datetime is empty ? '' : row.modified_datetime | date("m/d/Y g:i a")}}</td>
 
                                                                                     </tr>
                                                                                     {% endfor %}

@@ -373,7 +373,7 @@
                             <li> 
                                 <label>Last Modified:</label> 
                                 <div class="field-wrap">
-                                    {{config.modified_datetime}}<br>
+                                    {{config.modified_datetime is empty ? '' : config.modified_datetime | date("m/d/Y g:i a")}}<br>
                                 </div>
                             </li>
                             <li>
