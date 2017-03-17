@@ -1,0 +1,11 @@
+{% for row in rows %}
+    <tr id="row_id_{{row.id}}">
+        <td>{{modules[row.module]}}</td>
+        <td style="text-align:left">{{row.module_field_display_name}} <span style="font-size:7px;float:right;">{{row.module_field_name}}</span></td>
+        <td>{{attribute(datatypes,row.module_field_datatype)}}</td>
+        <td>{{row.display_position}}</td>
+        <td>{{row.enable_filter}}</td>
+        <td>{{row.modified_datetime}}</td>
+        <td><a href="#" data-edit-id="{{row.id}}" class="quick-edit">Quick Edit</a> | <a href="{{ path('intelligent_setting_edit', app.request.query.all| merge( {'edit_id': row.id})) }}">view</a> | <a href="{{ path('intelligent_setting_edit', app.request.query.all| merge( {'edit_id': row.id})) }}">edit</a> | <a href="{{ path('intelligent_setting_delete', app.request.query.all| merge({'delete_id': row.id} )) }}" class="delete-link">delete</a></td>
+    </tr>
+{% endfor %}
