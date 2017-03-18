@@ -11,7 +11,7 @@
             <small><i>Only Integer number allowed</i></small>
         {% else %}
             {# user only has view access   #}
-            {{data is defined ? data : ''}}
+            <div class="read_text">{{data is defined ? data : ''}}</div>
         {% endif %}
     </div>
 </li>

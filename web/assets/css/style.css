@@ -513,23 +513,27 @@ input[type="submit"]:focus, input[type="button"]:focus {
   min-height: 500px; }
   .content-table .left-sidebar {
     float: left;
-    width: 150px;
+    width: 250px;
     margin-top: 30px;
     padding-left: 15px; }
+    .content-table .left-sidebar .filter-box {
+      border-bottom: 1px solid #fff; }
     .content-table .left-sidebar h6 a {
       display: block;
       text-decoration: none;
-      background-color: #1fa67a;
+      background-color: #5aa3ff;
       color: #fff;
       font-weight: 400;
       padding: 7px 10px;
       overflow: hidden; }
       .content-table .left-sidebar h6 a:hover {
-        background-color: #5aa3ff; }
+        background-color: #4b99fb; }
       .content-table .left-sidebar h6 a i {
         float: right; }
     .content-table .left-sidebar ul {
-      margin: 15px 0; }
+      margin: 15px 0;
+      max-height: 370px;
+      overflow: auto; }
       .content-table .left-sidebar ul li {
         list-style: none;
         margin-left: 8px;
@@ -568,7 +572,7 @@ input[type="submit"]:focus, input[type="button"]:focus {
           border-radius: 4px; }
   .content-table .table-content {
     float: right;
-    width: calc(100% - 210px); }
+    width: calc(100% - 310px); }
 
 .customer-content {
   padding: 0 15px;
@@ -661,8 +665,9 @@ input[type="submit"]:focus, input[type="button"]:focus {
           .table-content table tr td a:hover .fa {
             color: #1fa67a; }
       .table-content table tr td .fa {
-        color: #5aa3ff;
-        margin: 0 3px; }
+        color: #393939;
+        margin: 0 3px;
+        font-size: 15px; }
         .table-content table tr td .fa.green {
           color: #02ca48; }
         .table-content table tr td .fa.red {

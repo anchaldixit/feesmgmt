@@ -4,7 +4,7 @@
 <li><label>{{field_settings.module_field_display_name}}{{field_settings.required_field=='Y'?'*':''}}:</label> 
     <div class="field-wrap">
         {# this readonly parameter will only come thru edit relationship.html.twig. Already decided to show field in readonly way#}
-            {{data is defined ? data : ''}}
+        <div class="read_text">{{data is defined ? data : ''}}</div>
     </div>
 </li>
 {% endif %}

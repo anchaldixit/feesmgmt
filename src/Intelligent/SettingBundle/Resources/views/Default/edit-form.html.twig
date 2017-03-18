@@ -240,13 +240,13 @@
                         <li> 
                             <label>Last Modified:</label> 
                             <div class="field-wrap">
-                                {{config.modified_datetime}}<br>
+                                <div class="read_text">{{config.modified_datetime is empty ? '' : config.modified_datetime | date("d/m/y g:i a")}}</div><br>
                             </div>
                         </li>
                         <li>
                             <label>Modified by:</label> 
                             <div class="field-wrap">
-                                {{config.modified_by}}
+                                <div class="read_text">{{config.modified_by}}</div>
                             </div>
                         </li>
                     {% endif %}

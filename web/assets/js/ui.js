@@ -347,6 +347,7 @@ $.extend(User.prototype, {
         if ($('#userList').length) {
             that.createUserPage();
         }
+        that.filterToggle();
 
     },
     activeModule: function(){
@@ -1011,6 +1012,21 @@ $.extend(User.prototype, {
                 }
             }
         });
+    },
+    filterToggle: function(){
+        if($('.left-sidebar').length){
+            $('.left-sidebar .filter-box h6').click(function(){
+                var icon_class = $(this).find('i');
+                if(icon_class.hasClass('fa-caret-down')){
+                    icon_class.removeClass('fa-caret-down').addClass('fa-caret-up');
+                }
+                else{
+                    icon_class.removeClass('fa-caret-up').addClass('fa-caret-down');
+                }
+                $(this).next().slideToggle();
+                return false;
+            });
+        }
     }
 
 });

@@ -613,20 +613,23 @@ input[type="submit"],input[type="button"]{
     min-height:500px;
     .left-sidebar{
         float: left;
-        width: 150px;
+        width: 250px;
         margin-top: 30px;
         padding-left: 15px;
+        .filter-box{
+            border-bottom: 1px solid #fff;
+        }
         h6{
             a{
                 display: block;
                 text-decoration: none;
-                background-color: #1fa67a;
+                background-color: #5aa3ff;
                 color: #fff;
                 font-weight:400;
                 padding:7px 10px;
                 overflow:hidden;
                 &:hover{
-                    background-color: #5aa3ff;
+                    background-color: #4b99fb;
                 }
                 i{
                     float: right;
@@ -635,6 +638,8 @@ input[type="submit"],input[type="button"]{
         }
         ul{
             margin:15px 0;
+            max-height: 370px;
+            overflow: auto;
             li{
                 list-style: none;
                 margin-left:8px;
@@ -684,7 +689,7 @@ input[type="submit"],input[type="button"]{
     }
     .table-content{
         float: right;
-        width: calc(100% - 210px);
+        width: calc(100% - 310px);
     }
 }
 .customer-content{
@@ -805,8 +810,9 @@ input[type="submit"],input[type="button"]{
                     }  
                 }
                 .fa{
-                    color: #5aa3ff;
+                    color: #393939;
                     margin: 0 3px;
+                    font-size:15px;
                     &.green{
                         color: #02ca48;
                     }
