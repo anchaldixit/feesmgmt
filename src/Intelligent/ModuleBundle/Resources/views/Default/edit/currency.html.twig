@@ -9,7 +9,7 @@
             <input name="{{field_settings.module_field_name}}" id="{{field_settings.module_field_name}}"  value="{{data is defined ? data | round (1.floor) : ''}}" type="text" ><br>
         {% else %}
             {# user only has view access   #}
-            <div class="read_text">{{data is defined ? data|date("m/d/Y") : ''}}</div>
+            <div class="read_text">{{data is defined ? data | round (1.floor) : ''}}</div>
         {% endif %}
     </div>
 </li>

@@ -20,7 +20,7 @@
             {% endif %}
 
                 {% endfor %}
-                    <td>{{row.modified_datetime}}</td>
+                    <td>{{row.modified_datetime is empty ? '' : row.modified_datetime | date("m/d/Y g:i a")}}</td>
 
                 </tr>
                 {% endfor %}
