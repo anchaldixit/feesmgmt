@@ -1,0 +1,26 @@
+{% for row in rows %}
+    <tr  id="row_id_{{row.id}}">
+        <td>
+            <a href="#" data-edit-id="{{row.id}}" class="quick-edit">Quick Edit</a> 
+            <a href="{{ path('intelligent_'~module~'_edit', {'edit_id': row.id}) }}" title="View"><i class="fa fa-eye"></i></a>  
+                {% if permissions.edit %} 
+                <a href="{{ path('intelligent_'~module~'_edit', {'edit_id': row.id}) }}" title="Edit"><i class="fa fa-edit"></i></a> 
+                {% endif %}
+                {% if permissions.delete %}     
+                <a href="{{ path('intelligent_'~module~'_delete', {'delete_id': row.id}) }}" class="delete-link" title="Delete"><i class="fa fa-trash"></i></a>
+                {% endif %}
+        </td>
+        <td>{{row.id}}</td>
+
+        {% for field_settings in schema %}
+            {% if field_settings.module_field_datatype == 'user' %}
+            {{ include('IntelligentModuleBundle:Default:view/'~field_settings.module_field_datatype~'.html.twig', { 'field_settings': field_settings,'data': row[field_settings.module_field_name] is defined ? row[field_settings.module_field_name] : '','users':users,'permissions':permissions }) }}
+        {% else %}
+            {{ include('IntelligentModuleBundle:Default:view/'~field_settings.module_field_datatype~'.html.twig', { 'field_settings': field_settings,'data': row[field_settings.module_field_name] is defined ? row[field_settings.module_field_name] : '','permissions':permissions ,'id': row['id'] is defined ? row['id'] : ''}) }}      
+            {% endif %}
+
+                {% endfor %}
+                    <td>{{row.modified_datetime}}</td>
+
+                </tr>
+                {% endfor %}

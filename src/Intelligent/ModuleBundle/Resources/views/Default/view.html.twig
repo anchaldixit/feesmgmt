@@ -19,7 +19,7 @@
         .right-container table{
             width: 100%;
         }
-        
+
         .selected_fitlers_container{
             width: 100%;
         }
@@ -32,10 +32,10 @@
         .marketingProjects thead tr th:first-child, .marketingProjects tbody tr td:first-child{text-align: center;}
 
         .table-outer{
-    overflow: auto;
-    padding-bottom: 15px;
-    max-height:700px;
-}
+            overflow: auto;
+            padding-bottom: 15px;
+            max-height:700px;
+        }
 
 
     </style>
@@ -107,18 +107,18 @@
             if ($('._decimal').length) {
                 $('._decimal').css('width', '100px');
             }
-            if($('._percentage').length){
-               $('._percentage').css('width','150px');
+            if ($('._percentage').length) {
+                $('._percentage').css('width', '150px');
             }
-            if($('._formulafield').length){
-               $('._formulafield').css('width','200px');
+            if ($('._formulafield').length) {
+                $('._formulafield').css('width', '200px');
             }
-            if($('._date').length){
-               $('._date').css('width','150px');
+            if ($('._date').length) {
+                $('._date').css('width', '150px');
 
             }
-            if($('._text').length){
-               $('._text').css('width','150px');
+            if ($('._text').length) {
+                $('._text').css('width', '150px');
 
             }
             if ($('._modified').length) {
@@ -137,13 +137,13 @@
             });
 
             $('.marketingProjects').css('width', _width + 'px');
-            
-            if($('.marketingProjects').length){
+
+            if ($('.marketingProjects').length) {
                 var table = $('table.marketingProjects');
-               //console.log(jQuery.floatThead());
+                //console.log(jQuery.floatThead());
                 table.floatThead({
                     position: 'absolute',
-                    scrollContainer: function(table){
+                    scrollContainer: function (table) {
                         return table.closest('.table-outer');
                     }
                 });
@@ -171,21 +171,18 @@
             {% if permissions['view'] %}
                 <a class="red-btn" href="{{ path('intelligent_'~module~'_export', app.request.query.all) }}"><i class="fa fa-exchange"></i>Export as spreadsheet</a>
             {% endif %}
-            
+
             {% if permissions['add'] %}
                 <a class="red-btn" href="{{ path('intelligent_'~module~'_import', app.request.query.all) }}"><i class="fa fa-file-excel-o"></i>Import</a>
             {% endif %}
-            
+
             {% if permissions['setting_permissions'] %}
                 <a class="green-btn" href="{{ path('intelligent_setting_view', {'filter[match][module]': module_name}) }}"><i class="fa fa-gears"></i>Settings</a>
             {% endif %}
-            
-            
-            
-            
+
         </div>
-        
-        
+
+
     </div>
     <div class="full-container content-table">
         <div class="left-container left-sidebar">
@@ -234,7 +231,7 @@
                                         <div class="right-container table-content">
 
                                             {{ include('IntelligentModuleBundle:Default:view/selected-labels.html.twig', { 'schema': schema,'selected_filters': selected_filters ,'users':users }) }}   
-                                            
+
                                             {% if pagination.total_record > 0 %}
                                                 <div id="display-count">
                                                     <p>
@@ -264,44 +261,21 @@
                                                                         {% endif %}
                                                                             {% endfor %}
                                                                             <th class="_modified">Last Modified</th>
-                                                                            
+
                                                                         </tr>
-                                                                    
+
                                                                     </thead>
                                                                     <tbody>
-                                                                    {% for row in rows %}
-                                                                        <tr>
-                                                                            <td>
-                                                                                <a href="{{ path('intelligent_'~module~'_edit', {'edit_id': row.id}) }}" title="View"><i class="fa fa-eye"></i></a>  
-                                                                                {% if permissions.edit %} 
-                                                                                     <a href="{{ path('intelligent_'~module~'_edit', {'edit_id': row.id}) }}" title="Edit"><i class="fa fa-edit"></i></a> 
-                                                                                {% endif %}
-                                                                                {% if permissions.delete %}     
-                                                                                     <a href="{{ path('intelligent_'~module~'_delete', {'delete_id': row.id}) }}" class="delete-link" title="Delete"><i class="fa fa-trash"></i></a>
-                                                                                {% endif %}
-                                                                            </td>
-                                                                            <td>{{row.id}}
+                                                                        {{ include('IntelligentModuleBundle:Default:view-row.html.twig', with_context = true) }}
 
-                                                                                {% for field_settings in schema %}
-
-                                                                                    {% if field_settings.module_field_datatype == 'user' %}
-                                                                                    {{ include('IntelligentModuleBundle:Default:view/'~field_settings.module_field_datatype~'.html.twig', { 'field_settings': field_settings,'data': row[field_settings.module_field_name] is defined ? row[field_settings.module_field_name] : '','users':users,'permissions':permissions }) }}   
-                                                                                {% else %}
-                                                                                    {{ include('IntelligentModuleBundle:Default:view/'~field_settings.module_field_datatype~'.html.twig', { 'field_settings': field_settings,'data': row[field_settings.module_field_name] is defined ? row[field_settings.module_field_name] : '','permissions':permissions ,'id': row['id'] is defined ? row['id'] : ''}) }}      
-                                                                                    {% endif %}
-                                                                                        {% endfor %}
-                                                                                        <td>{{row.modified_datetime}}</td>
-
-                                                                                    </tr>
-                                                                                    {% endfor %}
-                                                                                    </tbody>
-                                                                                    </table>
-                                                                                </div>
-                                                                                {{ include('IntelligentModuleBundle:Default:pagination.html.twig', { 'pagination': pagination,'module':module }) }}
-                                                                                {% else %}
-                                                                                    <br><br><br> 
-                                                                                    <div style="width:100%;display: block;">No Results found</div>
-                                                                                    {% endif %}
-                                                                                    </div>
-                                                                                </div>
-                                                                                {% endblock %}
+                                                                    </tbody>
+                                                                </table>
+                                                            </div>
+                                                            {{ include('IntelligentModuleBundle:Default:pagination.html.twig', { 'pagination': pagination,'module':module }) }}
+                                                            {% else %}
+                                                                <br><br><br> 
+                                                                <div style="width:100%;display: block;">No Results found</div>
+                                                                {% endif %}
+                                                                </div>
+                                                            </div>
+                                                            {% endblock %}
