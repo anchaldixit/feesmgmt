@@ -1,7 +1,7 @@
 {% for row in rows %}
     <tr  id="row_id_{{row.id}}">
         <td>
-            <a href="#" data-edit-id="{{row.id}}" class="quick-edit">Quick Edit</a> 
+            <a href="#" data-edit-id="{{row.id}}" class="quick-edit" title="Quick Edit"><i class="fa fa-pencil"></i></a> 
             <a href="{{ path('intelligent_'~module~'_edit', {'edit_id': row.id}) }}" title="View"><i class="fa fa-eye"></i></a>  
                 {% if permissions.edit %} 
                 <a href="{{ path('intelligent_'~module~'_edit', {'edit_id': row.id}) }}" title="Edit"><i class="fa fa-edit"></i></a> 
