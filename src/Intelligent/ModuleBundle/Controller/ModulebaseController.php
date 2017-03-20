@@ -67,11 +67,15 @@ abstract class ModulebaseController extends Controller {
         $module_display_name = $module->module_settings->getModule($this->module_name);
 
         $request = Request::createFromGlobals();
+        $is_ajax = $request->query->get('ajax');
         $id = null;
 
         try {
             if ($request->isMethod('POST')) {//Result submited
                 $post = $request->request->all();
+                //Not get, this time its post request
+                $is_ajax = $request->request->get('ajax');
+
                 $result = array();
                 $result['row'][0] = $post;
                 if (empty($request->request->get('id'))) {
@@ -81,9 +85,15 @@ abstract class ModulebaseController extends Controller {
                     }
                     $id = $module->save($post);
 
-                    $this->get('session')->getFlashBag()->add('success', "Row added successfully.");
-                    $this->_afterSaveEvent($id);
-                    return $this->redirectToRoute("intelligent_{$this->module_route_identifier}_edit", array('edit_id' => $id));
+                    if ($is_ajax) {
+                        $updated_row_html = $this->viewRowHtml($id);
+                        return new JsonResponse(array('msg' => 'Row added successfully.', 'action' => 'add', 'id' => $id, 'row' => $updated_row_html));
+                    } else {
+
+                        $this->get('session')->getFlashBag()->add('success', "Row added successfully.");
+                        $this->_afterSaveEvent($id);
+                        return $this->redirectToRoute("intelligent_{$this->module_route_identifier}_edit", array('edit_id' => $id));
+                    }
                 } else {
 
                     if (!empty($request->request->get('delete_submit'))) {
@@ -93,17 +103,25 @@ abstract class ModulebaseController extends Controller {
                         }
                         $module->delete($request->request->get('id'));
 
-                        $this->get('session')->getFlashBag()->add('success', "Row Deleted Successfully.");
-                        return $this->redirectToRoute("intelligent_{$this->module_route_identifier}_view");
+                        if ($is_ajax) {
+                            return new JsonResponse(array('msg' => 'Row Deleted Successfully.', 'action' => 'delete'));
+                        } else {
+                            $this->get('session')->getFlashBag()->add('success', "Row Deleted Successfully.");
+                            return $this->redirectToRoute("intelligent_{$this->module_route_identifier}_view");
+                        }
                     } else {//update
                         if ($this->noAccess('edit')) {
                             return $this->noAccessPage();
                         }
                         $id = $edit_id;
                         $module->update($post);
-
-                        $this->get('session')->getFlashBag()->add('success', "Row Updated successfully.");
-                        return $this->redirectToRoute("intelligent_{$this->module_route_identifier}_edit", array('edit_id' => $edit_id));
+                        if ($is_ajax) {
+                            $updated_row_html = $this->viewRowHtml($edit_id);
+                            return new JsonResponse(array('msg' => 'Row Updated successfully.', 'action' => 'update', 'row' => $updated_row_html));
+                        } else {
+                            $this->get('session')->getFlashBag()->add('success', "Row Updated successfully.");
+                            return $this->redirectToRoute("intelligent_{$this->module_route_identifier}_edit", array('edit_id' => $edit_id));
+                        }
                     }
                 }
                 $id = is_numeric($edit_id) ? $edit_id : null;
@@ -132,7 +150,11 @@ abstract class ModulebaseController extends Controller {
             }
         } catch (\Exception $e) {
             //$message = $e->getMessage();
+            if ($is_ajax) {
+                return new JsonResponse(array('error' => 'set', 'error_msgs' => $e->getMessage(). '|' . $e->getLine() . '|' . $e->getFile()));
+            } else {
             $this->get('session')->getFlashBag()->add('error', $e->getMessage() . '|' . $e->getLine() . '|' . $e->getFile());
+            }
             if (!isset($result['schema'])) {
                 //There are chance that schema is not initialized and exception is thrown. To display form schema is must required to create page
                 $result['schema'] = $module->getFormFields();
@@ -156,10 +178,15 @@ abstract class ModulebaseController extends Controller {
             'module_permission_asscess_key' => $this->moduleSessionKey(),
             'module_name' => $this->module_name,
             'permissions' => $this->permissions,
-            'parent_relationship_rows' => $parent_relationship_rows
+            'parent_relationship_rows' => $parent_relationship_rows,
+            'is_ajax'=>$is_ajax
         );
 
+        if ($is_ajax == 'yes') {
+            return $this->render('IntelligentModuleBundle:Default:edit-form.html.twig', $parameters);
+        } else {
         return $this->render('IntelligentModuleBundle:Default:edit.html.twig', $parameters);
+        }
     }
 
     public function viewAction($page_no) {
@@ -748,7 +775,7 @@ abstract class ModulebaseController extends Controller {
                         $import->setTestOnlyHeader(!empty($test_header));
 
                         $import->csvUpload($relativepath);
-                        
+
                         if (empty($test_header)) {
                             $this->get('session')->getFlashBag()->add('success', 'Product Uploaded process completed ');
                         }
@@ -774,6 +801,30 @@ abstract class ModulebaseController extends Controller {
             'permissions' => $this->permissions
         );
         return $this->render('IntelligentModuleBundle:Default:import.html.twig', $parameters);
+    }
+
+    /*
+     * Get view row for axaj response
+     */
+
+    function viewRowHtml($id) {
+
+
+        $module = $this->get("intelligent.{$this->module_name}.module");
+
+
+        $rows = $module->getRows(array("{$this->module_name}.id" => $id), array(), 1);
+        $all_users = $this->getUsers();
+
+        $parameters = array('rows' => $rows['row'],
+            'schema' => $rows['schema'],
+            'users' => $all_users,
+            'module_permission_asscess_key' => $this->moduleSessionKey(),
+            'module_name' => $this->module_name,
+            'permissions' => $this->permissions,
+            'module' => $this->module_route_identifier,
+        );
+        return $this->renderView('IntelligentModuleBundle:Default:view-row.html.twig', $parameters);
     }
 
 }

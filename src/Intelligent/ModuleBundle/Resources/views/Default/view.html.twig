@@ -36,6 +36,31 @@
             padding-bottom: 15px;
             max-height:700px;
         }
+        .form-control-outer .form-control{
+            width:100%;
+            margin:0 auto;
+            overflow: auto;
+            height: 500px;
+        }
+        #dialog{
+            padding: 0;
+        }
+        .form-control-outer .form-control ul li .field-wrap .dropdown{
+            width: 300px;
+        }
+        .form-control-outer .form-control ul li .field-wrap .dropdown .selectbox{
+            width:90%;
+        }
+        .action-button-row{
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            cursor: pointer;
+            width: 100%;
+            padding:10px 0;
+            background-color: lightblue;
+            background-color: rgba(173,216,230, 0.6);
+        }
 
 
     </style>
@@ -43,6 +68,7 @@
 {% block javascripts %}
     {{ parent() }}
     <script src="/assets/js/jquery-ui/jquery-ui.min.js" type="text/javascript"></script>
+    <script src="/assets/js/quickedit-module.js" type="text/javascript"></script>
     <script>
 
         jQuery(document).ready(function ($) {
@@ -128,7 +154,7 @@
                 $('._action').css('width', '170px');
             }
             var _width = 0;
-            var th = $('.marketingProjects thead tr th');
+            var th = $('.module_view_table thead tr th');
             th.each(function () {
                 w = $(this)[0].style.width;
                 //console.log(w);
@@ -136,10 +162,10 @@
                 //alert(w);
             });
 
-            $('.marketingProjects').css('width', _width + 'px');
+            $('.module_view_table').css('width', _width + 'px');
 
-            if ($('.marketingProjects').length) {
-                var table = $('table.marketingProjects');
+            if ($('.module_view_table').length) {
+                var table = $('table.module_view_table');
                 //console.log(jQuery.floatThead());
                 table.floatThead({
                     position: 'absolute',
@@ -148,6 +174,8 @@
                     }
                 });
             }
+            var q_edit_obj = new QuickEditModule();
+            q_edit_obj.init();
 
         });
 
@@ -156,6 +184,7 @@
 
 {% endblock %}
 {% block body %}
+    <div id="dialog" title="Quick Edit" style="display:none"></div>
 
     {#% set permissions = app.session.get(module_permission_asscess_key) %#}
     <div class="bottom-sec">
@@ -166,6 +195,7 @@
         </div>
         <div class="custom-feature">
             {% if permissions['add'] %}
+                <a class="red-btn" id="quick_add_row"><i class="fa fa-plus"></i> Quick Add</a>
                 <a class="red-btn" href="{{ path('intelligent_'~module~'_edit', {'edit_id': 'new'}) }}"><i class="fa fa-plus"></i>New {{module_display_name}}</a>
             {% endif %}
             {% if permissions['view'] %}
@@ -247,7 +277,7 @@
                                             {% endif %}
                                             {% if rows|length > 0 %}
                                                 <div class="table-outer">
-                                                    <table class="marketingProjects">
+                                                    <table class="module_view_table">
                                                         <thead>
                                                             <tr>
                                                                 <th class="_action">Action</th>
@@ -267,7 +297,6 @@
                                                                     </thead>
                                                                     <tbody>
                                                                         {{ include('IntelligentModuleBundle:Default:view-row.html.twig', with_context = true) }}
-
                                                                     </tbody>
                                                                 </table>
                                                             </div>
@@ -278,4 +307,6 @@
                                                                 {% endif %}
                                                                 </div>
                                                             </div>
+                                                            <span class="notify"><i class="fa fa-info-circle"></i><span class="info-notice"></span> </span>
+                                                            <input type="hidden" name="form-url" id="form-url" value="{{ path('intelligent_'~module~'_edit', {'edit_id': '_'}) }}">
                                                             {% endblock %}

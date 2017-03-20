@@ -1,49 +1,53 @@
 <div class="form-control-outer">
-        <div class="form-control">
-            <div class="form-header">
-                <h4>Edit/View</h4>
-            </div>
-            <form action="" method="POST">
-                <ul>
-                    {% for field_settings in schema %}
+    <div class="form-control">
+        {% if is_ajax != 'yes' %}
+        <div class="form-header">
+            <h4>Edit/View</h4>
+        </div>
+        {% endif %}
+        <form action="" method="POST" id="row-edit-form">
+            <ul>
+                {% for field_settings in schema %}
 
-                        {% if field_settings.module_field_datatype == 'relationship' %}
+                    {% if field_settings.module_field_datatype == 'relationship' %}
 
-                        {{ include('IntelligentModuleBundle:Default:edit/'~field_settings.module_field_datatype~'.html.twig', { 'field_settings': field_settings,'data': data,'permissions':permissions}) }}   
+                    {{ include('IntelligentModuleBundle:Default:edit/'~field_settings.module_field_datatype~'.html.twig', { 'field_settings': field_settings,'data': data,'permissions':permissions}) }}   
 
-                        {% elseif field_settings.module_field_datatype == 'user' %}
+                    {% elseif field_settings.module_field_datatype == 'user' %}
 
-                        {{ include('IntelligentModuleBundle:Default:edit/'~field_settings.module_field_datatype~'.html.twig', { 'field_settings': field_settings,'data': data[field_settings.module_field_name] is defined ? data[field_settings.module_field_name] : '','users':users,'permissions':permissions }) }}
+                    {{ include('IntelligentModuleBundle:Default:edit/'~field_settings.module_field_datatype~'.html.twig', { 'field_settings': field_settings,'data': data[field_settings.module_field_name] is defined ? data[field_settings.module_field_name] : '','users':users,'permissions':permissions }) }}
 
-                    {% else %}
+                {% else %}
 
-                        {{ include('IntelligentModuleBundle:Default:edit/'~field_settings.module_field_datatype~'.html.twig', { 'field_settings': field_settings,'data': data[field_settings.module_field_name] is defined ? data[field_settings.module_field_name] : '' ,'permissions':permissions}) }}
+                    {{ include('IntelligentModuleBundle:Default:edit/'~field_settings.module_field_datatype~'.html.twig', { 'field_settings': field_settings,'data': data[field_settings.module_field_name] is defined ? data[field_settings.module_field_name] : '' ,'permissions':permissions}) }}
 
-                        {% endif %}
-                            {% endfor %}
-                                <li>
-                                    <label>&nbsp;</label>
-                                    <div class="field-wrap">
+                    {% endif %}
+                        {% endfor %}
+                            <li class="action-button-row">
+                                <label>&nbsp;</label>
+                                <div class="field-wrap">
 
-                                        {% if id is defined and id is not empty %}
+                                    {% if id is defined and id is not empty %}
 
-                                            <input type="hidden" name="id" id="edit_id_hidden_field" value="{{id}}">
+                                        <input type="hidden" name="id" id="edit_id_hidden_field" value="{{id}}">
+                                        
 
-                                            {% if permissions['edit'] %}
-                                                <input type="submit" name="edit_submit" value="Save" > 
-                                            {% endif %}
-                                            {% if permissions['delete'] %}
-                                                <input type="submit" name="delete_submit" value="Delete" id="delete_action" onsubmit="return confirm('Are you sure to delete the column with data, this step cannot be rollbacked')">
-                                            {% endif %}
-                                        {% else %}
-                                            {% if permissions['add'] %}
-                                                <input type="submit" name="add_submit" value="Add" >
-                                            {% endif %}
+                                        {% if permissions['edit'] %}
+                                            <input type="submit" name="edit_submit" value="Save" > 
                                         {% endif %}
-                                    </div>
-                                </li>
+                                        {% if permissions['delete'] %}
+                                            <input type="submit" name="delete_submit" value="Delete" id="delete_action" onsubmit="return confirm('Are you sure to delete the column with data, this step cannot be rollbacked')">
+                                        {% endif %}
+                                    {% else %}
+                                        {% if permissions['add'] %}
+                                            <input type="submit" name="add_submit" value="Add" >
+                                            
+                                        {% endif %}
+                                    {% endif %}
+                                </div>
+                            </li>
 
-                            </ul>
-                        </form>
-                    </div>
+                        </ul>
+                    </form>
                 </div>
+            </div>
