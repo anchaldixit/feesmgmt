@@ -930,6 +930,8 @@ input[type="submit"]:focus, input[type="button"]:focus {
           display: block;
           margin-top: 5px;
           font-size: 12px; }
+        .form-control-outer .form-control ul li .field-wrap .read_text {
+          padding-top: 10px; }
       .form-control-outer .form-control ul li .check-wrap {
         padding-top: 10px;
         width: 65%;
@@ -1333,6 +1335,9 @@ input[type="submit"]:focus, input[type="button"]:focus {
   overflow: auto;
   padding-bottom: 15px;
   max-height: 700px; }
+  .table-outer .module_view_table tr th:first-child, .table-outer .module_view_table tr td:first-child {
+    text-align: center;
+    width: 200px; }
 
 .hide {
   display: none; }
@@ -1429,3 +1434,6 @@ table tr.bg {
       cursor: default;
       background-color: #337ab7;
       border-color: #337ab7; }
+
+.ui-widget.ui-widget-content {
+  z-index: 9999; }
