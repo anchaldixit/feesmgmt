@@ -1442,5 +1442,5 @@ table tr.bg {
   font-size: 13px; }
 #dialog .form-control-outer .form-control ul li .field-wrap input, #dialog .form-control-outer .form-control ul li .field-wrap select, #dialog .form-control-outer .form-control ul li .field-wrap .read_text {
   font-size: 13px; }
-#dialog .form-control-outer .form-control ul li .field-wrap small, #dialog .form-control-outer .form-control ul li .field-wrap #fieldname_edit {
+#dialog .form-control-outer .form-control ul li .field-wrap small, #dialog .form-control-outer .form-control ul li .field-wrap #fieldname_edit, #dialog .form-control-outer .form-control ul li .field-wrap a {
   font-size: 10px; }
