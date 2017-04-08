@@ -122,7 +122,7 @@ body{font-family: helvetica; font-weight: 300;}
     }
 }
 .red-btn{
-   padding: 5px 10px;
+    padding: 5px 10px;
     color: #fff !important;
     border-radius: 3px;
     display: inline-block;
@@ -136,7 +136,7 @@ body{font-family: helvetica; font-weight: 300;}
     } 
 }
 .grey-btn{
-   padding: 5px 10px;
+    padding: 5px 10px;
     color: #fff !important;
     border-radius: 3px;
     display: inline-block;
@@ -229,7 +229,7 @@ input[type="submit"],input[type="button"]{
         .fa-info-circle{
             color: #8B0000;
         }
-        
+
     }
     .fa-info-circle{
         color: #0c6501;
@@ -483,7 +483,7 @@ input[type="submit"],input[type="button"]{
         }
     }
     ul{
-        
+
         background-color:#5aa3ff; 
         overflow:hidden;
         position:absolute;
@@ -1155,7 +1155,7 @@ input[type="submit"],input[type="button"]{
                         font-size: 16px;
                         line-height: 20px;
                     }
-                    
+
                     small,#fieldname_edit{
                         display: block;
                         margin-top: 5px;
@@ -1669,19 +1669,19 @@ input[type="submit"],input[type="button"]{
         background: #cacaca;
         color: #393939;
     }
-    
+
 }
 .flash{
     position:relative;
     height:0;
     width: 750px;
     margin: 0 auto;
-    
+
 }
 .flash-msg{
     width: 750px;
     margin: 10px auto;
-    }
+}
 .table-outer{
     overflow: auto;
     padding-bottom: 15px;
@@ -1693,7 +1693,7 @@ input[type="submit"],input[type="button"]{
                     text-align: center;
                     width: 200px;
                 }
-                
+
             }
         }
     }
@@ -1729,8 +1729,8 @@ input[type="submit"],input[type="button"]{
                 padding: 7px 10px;
                 vertical-align: middle;
                 text-align: center;
-                
-                
+
+
             }
         }
     }
@@ -1788,7 +1788,7 @@ table{
         border-radius: 4px;
         li{
             display: inline;
-             > a, > span{
+            > a, > span{
                 padding: 7px 16px;
                 font-size: 18px;
                 line-height: 1.3333333;
@@ -1800,25 +1800,25 @@ table{
                 margin-left: -1px;
                 float: left;
                 &:hover{
-                   z-index: 2;
-                   color: #23527c;
-                   background-color: #eee;
-                   border-color: #ddd;
+                    z-index: 2;
+                    color: #23527c;
+                    background-color: #eee;
+                    border-color: #ddd;
                 }
             }
             &:first-child{
                 > a, > span{
-                border-top-left-radius: 6px;
-                border-bottom-left-radius: 6px;
-                }
-           }
-            &:last-child{
-                > a, > span{
-                     border-top-right-radius: 6px;
-                     border-bottom-right-radius: 6px;
+                    border-top-left-radius: 6px;
+                    border-bottom-left-radius: 6px;
                 }
             }
-            
+            &:last-child{
+                > a, > span{
+                    border-top-right-radius: 6px;
+                    border-bottom-right-radius: 6px;
+                }
+            }
+
             &.active{
                 a,span, a:hover, span:hover, a:focus, span:focus{
                     z-index: 3;
@@ -1846,8 +1846,18 @@ table{
                         input,select,.read_text{
                             font-size: 13px;
                         }
+                        input[type="text"],input[type="email"],select{
+                            padding-top: 3px;
+                            padding-bottom: 3px;
+                        }
                         small,#fieldname_edit,a{
                             font-size: 10px;
+                        }
+                        .dropdown{
+                            &:after{
+                                right:12px;
+                                margin-top:-7px;
+                            }
                         }
                     }
                 }
