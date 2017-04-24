@@ -172,7 +172,7 @@ class DefaultController extends Controller {
         }
         //Fetch the data
         if ($page_no > 0) {
-            $limit = 20;
+            $limit = 200;
             $offset = ($page_no - 1) * $limit;
             $limit_plus_offset = "$offset,$limit";
         }
