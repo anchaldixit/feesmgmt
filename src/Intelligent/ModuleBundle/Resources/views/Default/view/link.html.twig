@@ -1,4 +1,4 @@
 {% if permissions.custom == false or  (permissions.custom == true and permissions.custom_field[field_settings.module_field_name]>0) %}
 {# if custom access setting id done then allowed only for view & editview is true that is 1 or 2  #}
-<td style="word-break: break-all"> {% if data is not empty%}<a href="{{data}}" target="_blank">{{field_settings.link_text is empty ? data : field_settings.link_text}}</a><br> {% endif%}</td>
+<td style="word-break: break-all"> {% if data is not empty and data|slice(0, 4) == 'http'%}<a href="{{data}}" target="_blank">{{field_settings.link_text is empty ? data : field_settings.link_text}}</a> {% else %} {{data}} <br> {% endif%}</td>
 {% endif %}

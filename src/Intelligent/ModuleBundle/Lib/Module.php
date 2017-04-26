@@ -281,7 +281,11 @@ abstract class Module {
 
                             break;
                         case 'date':
+                            if(strpos($field_value, '/')!==FALSE){
                             $field_value = date('Y-m-d', strtotime($field_value));
+                            }else{
+                                //expecting Y-m-d format
+                            }
 
 
                             break;

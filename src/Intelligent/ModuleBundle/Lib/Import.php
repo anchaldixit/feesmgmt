@@ -115,7 +115,7 @@ class Import {
                 foreach ($this->t['savelist'] as $column_no => $field_name) {
 
                     $data[$field_name] = $this->formate($csv_row[$column_no], $field_name);
-                    if ($data[$field_name] == null) {
+                    if ($data[$field_name] === null) {
                         unset($data[$field_name]);
                     }
                 }
@@ -124,7 +124,12 @@ class Import {
 
                     $this->helper->print_r($data);
                 }
-                $this->module->save($data);
+                if (isset($data['id'])) {
+                    //var_dump($data);
+                    $this->module->update($data);
+                } else {
+                    $this->module->save($data);
+                }
             }
         }
         //extract data
@@ -195,8 +200,12 @@ class Import {
 
                 if (!empty($value)) {
                     $dilmiter = strpos($value, '-') !== false ? '-' : '/';
-                    $d = explode($dilmiter, $value);
-                    $return = date('Y-m-d', mktime(0, 0, 0, $d[0], $d[1], $d[2]));
+                    if ($dilmiter == '/') {
+                        $d = explode($dilmiter, $value);
+                        $return = date('Y-m-d', mktime(0, 0, 0, $d[0], $d[1], $d[2]));
+                    }else{
+                        //Dont do anything for 
+                    }
                 } else {
                     $return = null;
                 }
@@ -324,6 +333,10 @@ class Import {
         if (preg_match('/ID#$/', $csv_header[0])) {
 
             $this->t['savelist']['0'] = 'quickbase_id';
+            unset($this->t['csv_field_notfoundlist'][0]);
+        }
+        if ($csv_header[0] == 'Id') {
+            $this->t['savelist']['0'] = 'id';
             unset($this->t['csv_field_notfoundlist'][0]);
         }
         if (!empty($this->quickbase_keyname)) {
