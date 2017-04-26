@@ -124,7 +124,7 @@ class Import {
 
                     $this->helper->print_r($data);
                 }
-                if (isset($data['id'])) {
+                if (!empty($data['id'])) {
                     //var_dump($data);
                     $this->module->update($data);
                 } else {
