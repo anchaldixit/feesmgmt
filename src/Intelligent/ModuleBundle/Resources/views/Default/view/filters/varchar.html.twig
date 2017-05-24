@@ -4,7 +4,7 @@
 <div class="filter-box">
     <h6><a href="#"><i class="fa fa-caret-down"></i>{{field_settings.module_field_display_name}} </a></h6>
     <div class="filter_wrap">
-        <input type="text" placeholder="Search by {{field_settings.module_field_display_name}}" class="search_list" />
+        
         <ul>
             <li>
                 <input name="filter[text][{{field_settings.module_field_name}}]" type="text" placeholder="Text search" value="{{selected.text[field_settings.module_field_name] is defined and selected.text[field_settings.module_field_name] is not empty ? selected.text[field_settings.module_field_name] | trim:'' }}" class="filter-{{field_settings.module_field_name}}">

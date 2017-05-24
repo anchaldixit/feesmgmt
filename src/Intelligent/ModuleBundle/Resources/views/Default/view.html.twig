@@ -186,7 +186,7 @@
                         var text = $(this).find('label').text();
                         textL = text.toLowerCase();
 
-                        (textL.indexOf(valThis) == 0) ? $(this).show() : $(this).hide();
+                        (textL.indexOf(valThis) >= 0) ? $(this).show() : $(this).hide();
                     });
 
                 });
