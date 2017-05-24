@@ -557,7 +557,7 @@ input[type="submit"]:focus, input[type="button"]:focus {
           text-align: center; }
         .content-table .left-sidebar ul li input[type="radio"], .content-table .left-sidebar ul li input[type="checkbox"] {
           float: left;
-          margin-top: 0; }
+          margin-top: 1px; }
         .content-table .left-sidebar ul li input[type="text"] {
           width: 88%;
           padding: 4px 5px; }
@@ -1450,3 +1450,13 @@ table tr.bg {
 #dialog .form-control-outer .form-control ul li .field-wrap .dropdown:after {
   right: 12px;
   margin-top: -7px; }
+
+.search_list {
+  width: 85%;
+  padding: 4px 5% 4px 5px;
+  margin: 15px 0 0 0;
+  border: 1px solid #dbdbda;
+  background: url("/assets/images/search.png") 97% center no-repeat;
+  background-size: 12px; }
+  .search_list:focus {
+    outline: none; }

@@ -667,7 +667,7 @@ input[type="submit"],input[type="button"]{
                 }
                 input[type="radio"],input[type="checkbox"]{
                     float: left;
-                    margin-top: 0;
+                    margin-top: 1px;
                 }
                 input[type="text"]{
                     width:88%;
@@ -1863,5 +1863,16 @@ table{
                 }
             }
         }
+    }
+}
+.search_list{
+    width: 85%;
+    padding: 4px 5% 4px 5px;
+    margin: 15px 0 0 0;
+    border: 1px solid #dbdbda;
+    background:url('/assets/images/search.png') 97% center no-repeat;
+    background-size:12px;
+    &:focus{
+        outline: none;
     }
 }
