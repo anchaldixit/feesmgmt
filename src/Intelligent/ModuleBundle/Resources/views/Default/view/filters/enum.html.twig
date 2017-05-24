@@ -2,9 +2,11 @@
 {# if custom access setting id done then allowed only for view & editview is true that is 1 or 2  #}
 <div class="filter-box">
     <h6><a href="#"><i class="fa fa-caret-down"></i>{{field_settings.module_field_display_name}}</a></h6>
+    <div class="filter_wrap">
+    <input type="text" placeholder="Search by {{field_settings.module_field_display_name}}" class="search_list" />
     {% set select_values = field_settings.value|split('|') %}
 
-    <ul>
+    <ul id="{{field_settings.module_field_name}}">
         {% for v in select_values %}
             <li>
                 <input type="radio" name="filter[match][{{field_settings.module_field_name}}]"  value="{{v}}"
@@ -14,5 +16,6 @@
                 
         {% endfor %}
     </ul>
+    </div>
 </div>
 {% endif %}
