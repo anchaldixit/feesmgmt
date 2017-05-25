@@ -6,10 +6,11 @@
         {# this readonly parameter will only come thru edit relationship.html.twig. Already decided to show field in readonly way#}
         {% if readonly is not defined and (permissions.custom == false or field_permission == 2 )%}
             {# user has edit access   #}
-            <input name="{{field_settings.module_field_name}}" id="{{field_settings.module_field_name}}"  value="{{data is defined ? data|date("m/d/Y") : ''}}" class="datepicker" type="text" ><br>
+            <input name="{{field_settings.module_field_name}}" id="{{field_settings.module_field_name}}"  value="{{field_settings.modified_datetime is defined ? field_settings.modified_datetime|date("m/d/Y") : ''}}" class="datepicker" type="text" ><br>
+            
         {% else %}
             {# user only has view access   #}
-            <div class="read_text">{{data is defined ? data|date("m/d/Y") : ''}}</div>
+            <div class="read_text">{{field_settings.modified_datetime is defined ? field_settings.modified_datetime|date("m/d/Y") : ''}}</div>
         {% endif %}
     </div>
 </li>
