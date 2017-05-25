@@ -7,9 +7,9 @@
     <ul id="{{field_settings.module_field_name}}">
         {% for key,name in users %}
             <li>
-                <input type="radio" name="filter[match][{{field_settings.module_field_name}}]"  value="{{key}}"
+                <input type="radio" name="filter[match][{{field_settings.module_field_name}}]" id="{{key}}"  value="{{key}}"
                        {{selected_filters.filter.match[field_settings.module_field_name] is defined and selected_filters.filter.match[field_settings.module_field_name] == key? 'CHECKED':'' }} class="filter-{{field_settings.module_field_name}}">
-                <label>{{name}}</label> 
+                <label for="{{key}}">{{name}}</label> 
             </li>
                 
         {% endfor %}
