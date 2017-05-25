@@ -170,8 +170,8 @@
                         <input type="text" placeholder="Search by Modules" class="search_list" />
                         <ul id="modules_list">
                             {% for keyname, module in modules %}
-                                <li><input type="radio" name="filter[match][module]"  value="{{keyname}}"
-                                           {{selected_filters.filter.match.module is defined and selected_filters.filter.match.module == keyname? 'CHECKED':'' }}><label>{{module}}</label> </li>
+                                <li><input type="radio" name="filter[match][module]" id="{{keyname}}"  value="{{keyname}}"
+                                           {{selected_filters.filter.match.module is defined and selected_filters.filter.match.module == keyname? 'CHECKED':'' }}><label for="{{keyname}}">{{module}}</label> </li>
                                     {% endfor %}
 
                         </ul>
@@ -183,8 +183,8 @@
                         <input type="text" placeholder="Search by Datatype" class="search_list" />
                         <ul id="datatype_list">
                             {% for keyname, datatype in datatypes %}
-                                <li><input type="radio" name="filter[match][module_field_datatype]" value="{{keyname}}"
-                                           {{selected_filters.filter.match.module_field_datatype is defined and selected_filters.filter.match.module_field_datatype == keyname? 'CHECKED':'' }}> <label>{{datatype}}</label></li>
+                                <li><input type="radio" name="filter[match][module_field_datatype]" id="{{keyname}}" value="{{keyname}}"
+                                           {{selected_filters.filter.match.module_field_datatype is defined and selected_filters.filter.match.module_field_datatype == keyname? 'CHECKED':'' }}> <label for="{{keyname}}">{{datatype}}</label></li>
                                 {% endfor %}
                         </ul>
                     </div>
