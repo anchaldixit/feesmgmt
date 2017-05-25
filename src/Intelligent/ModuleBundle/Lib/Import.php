@@ -96,7 +96,7 @@ class Import {
 
                 if ($this->console_customer_id) {
                     $this->helper->print_r($this->t);
-                }
+                } 
                 if ($this->test_only_header) {
                     $this->setDisplayMessages();
                     //$this->get('session')->getFlashBag()->add('success', 'Header details ');
@@ -248,21 +248,27 @@ class Import {
                         $nd_condition = array();
                         foreach ($set as $key => $field) {
                             //$nd_condition = array("{$r_module}.$field" => $row[$key]);
+                            if (!empty($row[$key]))
                             $nd_condition["$field"] = $row[$key];
                             // $nd_condition = array()
                         }
+                        if (count($nd_condition)){
                         $row_result = $m->getRows($nd_condition, array(), 10);
                         $results = $row_result['row'];
+                        }
                     } else {
 
                         $select = array("$r_module.id");
                         $nd_condition = array();
                         foreach ($set as $key => $field) {
+                            if (!empty($row[$key]))
                             $nd_condition = array("{$r_module}.$field" => $row[$key]);
                             //$nd_condition["$field"] = $row[$key];
                             // $nd_condition = array()
                         }
+                        if (count($nd_condition)){
                         $results = $m->fetch($select, $nd_condition);
+                        }
                     }
 
                     //var_dump($row);exit;
@@ -290,7 +296,7 @@ class Import {
     function prepareHeader($csv_header) {
 
 
-        // $this->helper->print_r($this->field_set);
+         //$this->helper->print_r($this->field_set);
         if ($this->console_customer_id) {
             $this->helper->print_r($csv_header);
         }
@@ -302,7 +308,7 @@ class Import {
             $match_key = array_search($field['module_field_display_name'], $csv_header);
 
             $this->prepareExpectedKeyList($field);
-
+            
             if ($match_key !== FALSE) {
 
                 if ($field['module_field_datatype'] == 'relationship') {
