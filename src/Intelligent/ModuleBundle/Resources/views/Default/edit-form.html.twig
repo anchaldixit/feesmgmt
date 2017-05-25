@@ -18,7 +18,7 @@
                     {{ include('IntelligentModuleBundle:Default:edit/'~field_settings.module_field_datatype~'.html.twig', { 'field_settings': field_settings,'data': data[field_settings.module_field_name] is defined ? data[field_settings.module_field_name] : '','users':users,'permissions':permissions }) }}
 
                 {% else %}
-
+                    
                     {{ include('IntelligentModuleBundle:Default:edit/'~field_settings.module_field_datatype~'.html.twig', { 'field_settings': field_settings,'data': data[field_settings.module_field_name] is defined ? data[field_settings.module_field_name] : '' ,'permissions':permissions}) }}
 
                     {% endif %}
