@@ -690,17 +690,22 @@ abstract class Module {
                 $condition[] = "$key = ?";
                 $params[] = $value;
             }
-            $where = ' where ' . implode(' and ', $condition);
+            $where = ' where ' . implode(' and ', $condition) . "order by {$field_settings['module_field_name']}";
 
 
-            $sql = "select GROUP_CONCAT(distinct {$field_settings['module_field_name']} SEPARATOR '|') as 'values' from  {$field_settings['module']} $where";
+            $sql = "select distinct {$field_settings['module_field_name']}  as 'value' from  {$field_settings['module']} $where";
 
             $result = $this->db->fetchAll($sql, $params);
+            $arr_value;
+            foreach ($result as $key => $value) {
+                $arr_value[]= $value['value'];
+            }
+            $str_value = implode('|', $arr_value);
             if (count($result)) {
                 //do setting only if results found
                 $field_settings['module_field_datatype'] = 'enum';
                 //enum parameter understands pipe as dilimiter
-                $field_settings['value'] = $result[0]['values'];
+                $field_settings['value'] = $str_value;
             }
         }
     }
