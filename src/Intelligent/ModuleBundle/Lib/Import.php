@@ -269,9 +269,9 @@ class Import {
                         if (count($nd_condition)){
                         $results = $m->fetch($select, $nd_condition);
                         }
+                        
                     }
 
-                    //var_dump($row);exit;
                     //$row = $m->fetch($select, $nd_condition);
 
                     if (count($results) == 1) {
@@ -311,7 +311,7 @@ class Import {
             
             if ($match_key !== FALSE) {
 
-                if ($field['module_field_datatype'] == 'relationship') {
+                if ($field['module_field_datatype'] == 'relationship' and !in_array($field['core_field_settings']['module_field_datatype'],array('link'))) {
                     //check foregin key
                     if (empty($this->quickbase_keyname)) {
 
@@ -323,7 +323,9 @@ class Import {
                         $this->t['keylist'][$field['relationship_module']][$match_key] = $field['module_field_name'];
                         $this->t['keylist_of_display_name'][$field['relationship_module']][$match_key] = $field['module_field_display_name'];
                     }
-                } elseif (!in_array($field['module_field_datatype'], array('formulafield', 'relationship-aggregator'))) {
+                } elseif (!in_array($field['module_field_datatype'], array('formulafield', 'relationship-aggregator','relationship'))) {
+                    
+                    
 
                     $this->t['savelist'][$match_key] = $field['module_field_name'];
                     $this->t['savelist_of_display_name'][$match_key] = $field['module_field_display_name'];
