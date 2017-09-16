@@ -1,0 +1,56 @@
+<ul>
+                    <li>
+                        <a href="/">
+                            <i class="fa fa-home"></i>
+                            <span>Home</span>
+                        </a>
+                    </li>
+                    {% if is_app_admin() %}
+                    <li>
+                        <a href="{{ path('intelligent_setting_view')}}">
+                            <i class="fa fa-gears"></i>
+                            <span>Module Settings</span>
+                        </a>
+                    </li>
+                    {% endif %}
+                    {% if is_user_admin() %}
+                        <li>
+                            <a href="/users">
+                                <i class="fa fa-user"></i>
+                                <span>Users</span>
+                            </a>
+                        </li>
+                    {% endif %}
+                    {% if is_module_visible('customer') %}
+                    <li> 
+                        <a href="{{ path('intelligent_customer_view')}}">
+                            <i class="fa fa-users"></i>
+                            <span>Customer</span>
+                        </a>
+                    </li>
+                    {% endif %}
+                    {% if is_module_visible('customer_projects') %}
+                    <li> 
+                        <a href="{{ path('intelligent_customerprojects_view')}}">
+                            <i class="fa fa-users"></i>
+                            <span>Customer Projects</span>
+                        </a>
+                    </li>
+                    {% endif %}
+                    {% if is_module_visible('marketing_projects') %}
+                    <li>
+                        <a href="{{ path('intelligent_marketingprojects_view')}}">
+                            <i class="fa fa-list-alt"></i>
+                            <span>Marketing Projects</span>
+                        </a>
+                    </li>
+                    {% endif %}
+                    {% if is_report_visible() %}
+                    <li>
+                        <a href="/reports">
+                            <i class="fa fa-list-alt"></i>
+                            <span>Reports</span>
+                        </a>
+                    </li>
+                    {% endif %}
+                </ul>
