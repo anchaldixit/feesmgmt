@@ -23,17 +23,9 @@ class Settings {
      * KEY is exact name of db table & VALUE is display name
      */
     var $module = array(
-        'customer' => 'Customer',
+        'customer' => 'College',
         'customer_projects' => 'Customer Projects',
         'marketing_projects' => 'Marketing Projects',
-        'initiative' => 'Initiatives',
-        'campaign' => 'Campaigns',
-        'campaign_contacts' => 'Campaign Contacts',
-        'psuedo_email_accounts' => 'Psuedo Email Accounts',
-        'assign_psuedo' => 'Assign Psuedo',
-        'links' => 'Links',
-        'link_rates' => 'Link Rates',
-        'dnc_lists' => 'DNC Lists'
     );
     var $module_datatypes = array(
         'varchar' => 'Limited Character',

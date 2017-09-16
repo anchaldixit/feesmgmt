@@ -18,48 +18,7 @@ services:
         class: Intelligent\ModuleBundle\Lib\Marketingprojects
         calls: 
             - [setContainer, ["@service_container"]]
-            - [init]
-    intelligent.initiative.module:
-        class: Intelligent\ModuleBundle\Lib\Initiative
-        calls: 
-            - [setContainer, ["@service_container"]]
-            - [init]
-    intelligent.campaign.module:
-        class: Intelligent\ModuleBundle\Lib\Campaign
-        calls: 
-            - [setContainer, ["@service_container"]]
-            - [init]
-    intelligent.campaign_contacts.module:
-        class: Intelligent\ModuleBundle\Lib\Campaigncontacts
-        calls: 
-            - [setContainer, ["@service_container"]]
-            - [init]
-    intelligent.psuedo_email_accounts.module:
-        class: Intelligent\ModuleBundle\Lib\Psuedoemailaccounts
-        calls: 
-            - [setContainer, ["@service_container"]]
-            - [init]
-    intelligent.assign_psuedo.module:
-        class: Intelligent\ModuleBundle\Lib\Assignpsuedo
-        calls: 
-            - [setContainer, ["@service_container"]]
-            - [init]
-    intelligent.links.module:
-        class: Intelligent\ModuleBundle\Lib\Links
-        calls: 
-            - [setContainer, ["@service_container"]]
-            - [init]
-    intelligent.link_rates.module:
-        class: Intelligent\ModuleBundle\Lib\Linkrates
-        calls: 
-            - [setContainer, ["@service_container"]]
-            - [init]
-    intelligent.dnc_lists.module:
-        class: Intelligent\ModuleBundle\Lib\Dnclists
-        calls: 
-            - [setContainer, ["@service_container"]]
-            - [init]
-            
+            - [init]     
     intelligent.import.module:
         class: Intelligent\ModuleBundle\Lib\Import
         calls: 
