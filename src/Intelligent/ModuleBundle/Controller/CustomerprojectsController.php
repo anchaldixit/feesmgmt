@@ -4,9 +4,7 @@ namespace Intelligent\ModuleBundle\Controller;
 
 use Intelligent\ModuleBundle\Controller\ModulebaseController;
 
-
 class CustomerprojectsController extends ModulebaseController {
-    
     
     public function __construct() {
         
@@ -20,11 +18,9 @@ class CustomerprojectsController extends ModulebaseController {
         $this->module_name = 'customer_projects';
     }
 
-
     public function autocompleteAction(){
         
         return new JsonResponse(array('name' => 'shashank'));
-
     }
 
 }

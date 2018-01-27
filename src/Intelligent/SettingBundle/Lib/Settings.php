@@ -26,7 +26,11 @@ class Settings {
         'customer' => 'College',
         'customer_projects' => 'Customer Projects',
         'marketing_projects' => 'Marketing Projects',
+        'degrees' => 'Degrees',
+        'subjects' => 'Subjects',
+        'degree_subjects' => 'Degree Subjects'
     );
+    var $genric_modules = array('degrees','subjects','degree_subjects');
     var $module_datatypes = array(
         'varchar' => 'Limited Character',
         'text' => 'Long Text',
@@ -308,10 +312,8 @@ class Settings {
             if (in_array($post_data['module_field_datatype'], array('relationship', 'relationship-aggregator'))) {
 //If Type is set as relationship then need to validate extra for module_field_name also
                 if (empty($post_data['relationship_module'])) {
-
                     $error[] = "Relationship Module cannot be empty for '{$post_data['module_field_datatype']}' datatype";
                 } elseif ($post_data['relationship_module'] == $post_data['module']) {
-
                     $error[] = "Relationship Module cannot be same as module name.";
                 } else {
 //check the field name exist in relationship module
@@ -319,14 +321,10 @@ class Settings {
                             array(
                                 'module' => $post_data['relationship_module'],
                                 'module_field_name' => $data['module_field_name']));
-
-
-
                     if (!count($result1)) {
 //Field not found
                         $error[] = "{$data['module_field_name']} field not found for relationship module";
                     } else {
-
                         $data['relationship_module'] = $post_data['relationship_module'];
                         ;
                     }
@@ -363,6 +361,8 @@ class Settings {
                     $data['relationship_module_unique_field'] = $post_data['relationship_module_unique_field'];
                 }
             }
+            $data['one_2_many_relationship'] = $post_data['one_2_many_relationship'];
+            
         }
         if ($post_data['module_field_datatype'] == 'relationship-aggregator') {
 
@@ -496,8 +496,14 @@ class Settings {
         $index_type = '';
         if ($data['module_field_datatype'] == 'varchar') {
             $other_details = $data['varchar_limit'];
-        } elseif ($data['module_field_datatype'] == 'relationship') {
+        } elseif ($data['module_field_datatype'] == 'relationship' and $data['one_2_many_relationship'] == 'N') {
             $this->createForeignKey($data['module'], $this->prepareforeignKeyName($data['relationship_module']));
+            return;
+        }elseif ($data['module_field_datatype'] == 'relationship' and $data['one_2_many_relationship'] == 'Y') {
+            //$table = "relationship_{$data['module']}_{$data['module_field_name']}";
+            $t = $this->one2ManyRelationshipTableName($data['module'], $data['module_field_name']);
+            $module_id = "{$data['module']}_id";
+            $this->createOne2ManyRelationTable($t, $module_id, $this->prepareforeignKeyName($data['relationship_module']));
             return;
         } elseif (in_array($data['module_field_datatype'], array('formulafield'))) {
             //keys required to be created
@@ -651,6 +657,26 @@ class Settings {
 
     function setGroupInfo($data) {
         $this->modified_group_info = $data;
+    }
+    function isGenric($module) {
+        return in_array($module, $this->genric_modules);
+        
+    }
+    function createOne2ManyRelationTable($table, $fieldname_1, $fieldname_2) {
+        $sql = "CREATE TABLE `$table` (
+            `$fieldname_1` int(11) DEFAULT NULL,
+            `$fieldname_2` int(11) DEFAULT NULL,
+            KEY `$fieldname_1` (`$fieldname_1`),
+            KEY `$fieldname_2` (`$fieldname_2`))";
+        
+            $this->db->executeQuery($sql);
+            if ($this->db->errorCode() != 0) {
+                throw new \Exception($this->db->errorInfo(), '002');
+            }
+    }
+    function one2ManyRelationshipTableName($module, $module_fieldname) {
+        return "relationship_{$module}_{$module_fieldname}";
+        
     }
 
 }

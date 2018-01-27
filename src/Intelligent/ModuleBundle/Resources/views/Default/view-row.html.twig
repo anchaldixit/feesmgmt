@@ -2,12 +2,12 @@
     <tr  id="row_id_{{row.id}}">
         <td>
             <a href="#" data-edit-id="{{row.id}}" class="quick-edit" title="Quick Edit"><i class="fa fa-pencil"></i></a> 
-            <a href="{{ path('intelligent_'~module~'_edit', {'edit_id': row.id}) }}" title="View"><i class="fa fa-eye"></i></a>  
+            <a href="{{ path('intelligent_'~module~'_edit', module == 'genric'?{'module':backend_module_name, 'edit_id': row.id}:{'edit_id': row.id}) }}" title="View"><i class="fa fa-eye"></i></a>  
                 {% if permissions.edit %} 
-                <a href="{{ path('intelligent_'~module~'_edit', {'edit_id': row.id}) }}" title="Edit"><i class="fa fa-edit"></i></a> 
+                <a href="{{ path('intelligent_'~module~'_edit', module == 'genric'?{'module':backend_module_name, 'edit_id': row.id}:{'edit_id': row.id}) }}" title="Edit"><i class="fa fa-edit"></i></a> 
                 {% endif %}
                 {% if permissions.delete %}     
-                <a href="{{ path('intelligent_'~module~'_delete', {'delete_id': row.id}) }}" class="delete-link" title="Delete"><i class="fa fa-trash"></i></a>
+                <a href="{{ path('intelligent_'~module~'_delete', module == 'genric'?{'module':backend_module_name, 'delete_id': row.id}:{'delete_id': row.id}) }}" class="delete-link" title="Delete"><i class="fa fa-trash"></i></a>
                 {% endif %}
         </td>
         <td>{{row.id}}</td>

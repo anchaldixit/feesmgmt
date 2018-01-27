@@ -42,8 +42,10 @@
                 
                 if ($(this).val() == 'relationship') {
                     $('#relationship_module_unique_field_row').slideDown('slow');
+                    $('#one_2_many_relationship_row').slideDown('slow');
                 } else {
                     $('#relationship_module_unique_field_row').slideUp('slow');
+                    $('#one_2_many_relationship_row').slideUp('slow');
                 }
                 
                 if (['relationship-aggregator', 'relationship'].indexOf($(this).val()) > -1 ) {
@@ -87,6 +89,7 @@
                 //$('#field_has_relationship').attr('DISABLED', true);
                 $('#varchar_limit').attr('DISABLED', true);
                 $('#unique_field').attr('DISABLED', true);
+                $('#one_2_many_relationship').attr('DISABLED', true);
 
                 $('#fieldname_edit').hide();
 

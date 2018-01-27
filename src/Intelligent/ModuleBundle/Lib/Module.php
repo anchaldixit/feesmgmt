@@ -40,21 +40,14 @@ abstract class Module {
     /*
      * Function will be called thru service
      */
-
     function init() {
-
         $this->db = $this->container->get('database_connection');
         $this->module_settings = $this->container->get('intelligent.setting.module');
         $this->helper = new Helper();
-
         $this->_init();
     }
 
     abstract function _init();
-
-
-
-
 
     /*
      * 
@@ -64,7 +57,6 @@ abstract class Module {
      * param4: $sort = array('field-name' => 'ASC')
      * param5: $limit = '1000'
      */
-
     function fetch($fields = array(), $nd_condition = array(), $join = array(), $sort = array(), $group_by=array(), $limit = '1000') {
 
         $extended_where = '';
@@ -73,16 +65,18 @@ abstract class Module {
         $params = array();
         $select_fields = '*';
         $groupby_part = '';
-
         if (!isset($nd_condition['field-name']) and is_array($nd_condition) and count($nd_condition)) {
             //prepare where clause based on condition
-
             $arr_where = array();
             foreach ($nd_condition as $column => $value) {
                 if (is_array($value) and isset($value['like'])) {
                     //$arr_where[]= " $column like '{$value['like']}'";
                     $arr_where[] = " $column like ?";
                     $params[] = "%{$value['like']}%";
+                }elseif (is_array($value) and isset($value['in']) and count($value['in'])) {
+                    $p = substr(str_repeat('?,', count($value['in'])), 0, -1);
+                    $arr_where[] = " $column in ($p)";
+                    array_splice($params,-1 ,0 ,$value['in']);
                 } elseif (is_array($value) and ( isset($value['min']) or isset($value['min']) )) {
                     //range bound condtion
                     if (isset($value['min']) and ! empty($value['min'])) {
@@ -147,57 +141,52 @@ abstract class Module {
     public function save($post_data) {
 
         $data = $this->validateAndSet($post_data, 'save');
-
         $data['modified_datetime'] = date("Y-m-d H:i:s");
-
         if ($this->row_filter_enabled) {
             $data = $this->addViewAccessCondition($data);
         }
-
-        $this->db->insert(
-                $this->table, $data
-        );
-        if ($this->db->errorCode() != 0) {
-
-            throw new \Exception($this->db->errorInfo(), '001');
-        }
-
-        $this->last_insert_id = $new_id = $this->db->lastInsertId();
-
         try {
-            $this->afterSave($data);
-        } catch (\Exception $ex) {
-            //rollback the first insert of setting module
-            $this->delete($new_id);
+            $this->db->beginTransaction();
+            $this->db->insert(
+                    $this->table, $data
+            );
+            if ($this->db->errorCode() != 0){ throw new \Exception($this->db->errorInfo(), '001');}
+            $this->last_insert_id = $new_id = $this->db->lastInsertId();
+            $this->afterSave($post_data, $data);
+            $this->db->commit();
+        } catch (Exception $ex) {
+            $this->db->rollback();
             throw $ex;
         }
         return $new_id;
     }
-
     /*
      * Description: Update wrt to id
      * Param1: array
      * Return: array
      */
-
     function update($post_data) {
 
         if (!empty($post_data['id'])) {
             $data = $this->validateAndSet($post_data, 'update');
-
-
             $data['modified_datetime'] = date("Y-m-d H:i:s");
-
-            $this->db->update(
-                    $this->table, $data, array('id' => $post_data['id'])
-            );
-            if ($this->db->errorCode() != 0) {
-
-                throw new \Exception($this->db->errorInfo(), '002');
-            }
+            try {
+                $this->db->beginTransaction();
+                $this->db->update(
+                        $this->table, $data, array('id' => $post_data['id'])
+                );
+                if ($this->db->errorCode() != 0){ throw new \Exception($this->db->errorInfo(), '002'); }
+                $this->afterSave($post_data, $data);
+                //All good
+                $this->db->commit();
+            } catch (Exception $ex) {
+                $this->db->rollback();
+                throw $ex;
+            }  
         } else {
             throw new \Exception('Error Code: 234234, Unexpected Error', '001');
         }
+       
     }
 
     /*
@@ -207,9 +196,16 @@ abstract class Module {
      */
 
     function delete($delete_id) {
-
-
-        $respid = $this->db->delete("{$this->table}", array('id' => $delete_id));
+        try {
+            $this->db->beginTransaction();
+            $respid = $this->db->delete("{$this->table}", array('id' => $delete_id));
+            $this->afterDelete($delete_id);
+            //All good
+            $this->db->commit();
+        } catch (Exception $ex) {
+                $this->db->rollback();
+                throw $ex;
+        }    
         return $respid;
     }
 
@@ -217,40 +213,30 @@ abstract class Module {
 
         $data = array();
         $error = array();
-
         array_walk_recursive($post_data, function(&$val) {
             $val = trim($val);
             $val = stripslashes($val);
         });
         $fields_config = $this->getFormFields();
-
         //validate each field based on its configurations & data type
         foreach ($fields_config as $key => $field_schema) {
-
             //Check if is already configured
-            if (isset($post_data[$field_schema['module_field_name']])) {
-
+            if (isset($post_data[$field_schema['module_field_name']]) and $field_schema['module_field_datatype'] != 'relationship') {
                 $field_name = $field_schema['module_field_name'];
                 $field_value = $post_data[$field_name];
                 $field_display_name = $field_schema['module_field_display_name'];
                 $field_datatype = $field_schema['module_field_datatype'];
-
-
                 if ($field_schema['required_field'] == 'Y' and empty($field_value)) {
-
                     $error[] = "$field_display_name cannot be empty.";
                 } else {
-
                     switch ($field_datatype) {
                         case 'varchar':
-
                             if (strlen($field_value) > $field_schema['varchar_limit']) {
                                 $error[] = "$field_display_name crossed the character limit of {$field_schema['varchar_limit']}.";
                             }
                             break;
                         case 'percentage':
                         case 'currency':
-
                             if (!empty($field_value) and ! is_numeric($field_value)) {
                                 $error[] = "$field_display_name should be a number.";
                             } else {
@@ -258,12 +244,9 @@ abstract class Module {
                             }
                             break;
                         case 'text':
-
-
                             break;
                         case 'decimal':
                         case 'number':
-
                             if (!empty($field_value) and ! is_numeric($field_value)) {
                                 $error[] = "$field_display_name should be a number.";
                             }
@@ -271,14 +254,11 @@ abstract class Module {
                         case 'enum':
                             break;
                         case 'link':
-
                             if (!empty($field_value) and filter_var($field_value, FILTER_VALIDATE_URL, ~FILTER_FLAG_SCHEME_REQUIRED) === false) {
                                 $error[] = "$field_display_name should be a URL.";
                             }
                             break;
                         case 'user':
-
-
                             break;
                         case 'date':
                             if(strpos($field_value, '/')!==FALSE){
@@ -286,52 +266,37 @@ abstract class Module {
                             }else{
                                 //expecting Y-m-d format
                             }
-
-
                             break;
                         case 'datetime':
-
-
                             break;
                         case 'relationship':
-
                             if ($field_schema['required_field'] == 'Y' and empty($post_data[$field_name])) {
                                 $error[] = "{$field_schema['relationship_module']} Relationship field cannot be empty";
                             } else {
                                 $field_value = $post_data[$field_name];
                             }
                             break;
-
                         default:
                             break;
                     }
-
                     $data[$field_name] = $field_value;
                 }
             } elseif ($field_schema['module_field_datatype'] == 'relationship') {
                 //relationship field need to handled separately
-
                 if (isset($field_schema['relationship_field_name'])) {
                     $field_name = $field_schema['relationship_field_name'];
-
                     if ($field_schema['required_field'] == 'Y' and empty($post_data[$field_name])) {
                         $error[] = "{$field_schema['relationship_module']} Relationship field cannot be empty";
                     } else {
                         if (isset($post_data[$field_name])) {
                             $field_value = $post_data[$field_name];
                             $data[$field_name] = $field_value;
+                        }else{//Most probably multivalue, need to be saved after save 
                         }
                     }
                 }
             }
         }
-
-        if (!empty($post_data['quickbase_id'])) {
-            //only get in case of bulk upload  process(first quickbase migration)
-            $data['quickbase_id'] = $post_data['quickbase_id'];
-        }
-
-
         if (!empty($error)) {
             throw new \Exception(implode('<br>', $error), '001');
         }
@@ -339,74 +304,60 @@ abstract class Module {
     }
 
     function totalCountOfLastFetch() {
-
         if (!empty($this->last_sql_withoutlimit)) {
             $result = $this->db->fetchAll($this->last_sql_withoutlimit, $this->last_sql_withoutlimit_params);
             if ($this->db->errorCode() != 0) {
-
                 throw new \Exception($this->db->errorInfo(), '002');
             }
         } else {
             throw new \Exception('last_sql_withoutlimit is empty', '002');
         }
-
         return $result[0]['count(*)'];
     }
 
     function getRow($id) {
-
         $this->table;
         $join = array();
         $fieldset = array();
-        $where = array("{$this->module}.id" => $id);
+        $where = array("{$this->table}.id" => $id);
         $groupby = array();
-
+        $one_2_many =array();
         $module_field_set = $this->getFormFields();
-
         foreach ($module_field_set as $key => $row) {
-
             $schema[$row['module_field_name']] = $row;
-
             if ($row['module_field_datatype'] == 'relationship') {
                 //relationship datatype need to handle is separately.
                 //append module name before field name
-                $this->prepareSQLParams($row, $join, $fieldset, $where);
+                if($row['one_2_many_relationship'] == 'Y'){
+                    //Run the multivalues sql separately
+                    $one_2_many[$row['module_field_name']] = $this->getValueSubset($id, $row);
+                }else{
+                    $this->prepareSQLParams($row, $join, $fieldset, $where);
+                }
             } elseif ($row['module_field_datatype'] == 'formulafield') {
                 $fieldset[] = "{$row['formulafield']} as {$row['module_field_name']}";
             } elseif($row['module_field_datatype'] == 'relationship-aggregator'){
-                
                 $fieldset[] = "{$row['aggregator_function']}({$row['relationship_module']}.{$row['module_field_name']}) as {$row['module_field_name']}";
                 $join[$row['relationship_module']] = array("{$row['module']}.id" => "{$row['relationship_module']}." . $this->module_settings->prepareforeignKeyName($row['module']));
                 //$this->module_settings->prepareforeignKeyName
                 $groupby= array("{$this->table}.id");
-                
-                
             } else {
                 $fieldset[] = "{$row['module']}.{$row['module_field_name']}";
             }
         }
-
         $filters = $this->addViewAccessCondition($where);
-
         $result = $this->fetch($fieldset, $filters, $join, array(),$groupby);
-
+        $result[0] = array_merge($result[0], $one_2_many);
         return array('schema' => $module_field_set, 'row' => $result);
     }
 
     function getRows($where, $order_by, $limit) {
-
         $join = array();
         $fieldset = array("{$this->table}.id");
         $groupby = array();
-
         $module_field_set = $this->getDisplayGridFields();
-        
-        //$this->helper->print_r($module_field_set);
-
         foreach ($module_field_set as $key => $row) {
-
             $schema[$row['module_field_name']] = $row;
-
             if ($row['module_field_datatype'] == 'relationship') {
                 //relationship datatype need to handle is separately.
                 //append module name before field name
@@ -414,13 +365,10 @@ abstract class Module {
             } elseif ($row['module_field_datatype'] == 'formulafield') {
                 $fieldset[] = "{$row['formulafield']} as {$row['module_field_name']}";
             } elseif($row['module_field_datatype'] == 'relationship-aggregator'){
-                
                 $fieldset[] = "{$row['aggregator_function']}({$row['relationship_module']}.{$row['module_field_name']}) as {$row['module_field_name']}";
                 $join[$row['relationship_module']] = array("{$row['module']}.id" => "{$row['relationship_module']}." . $this->module_settings->prepareforeignKeyName($row['module']));
                 //$this->module_settings->prepareforeignKeyName
                 $groupby= array("{$this->table}.id");
-                
-                
             }else {
                 $fieldset[] = "{$row['module']}.{$row['module_field_name']}";
                 if (isset($where[$row['module_field_name']])) {
@@ -431,36 +379,25 @@ abstract class Module {
             }
         }
         $fieldset[] = "{$this->table}.modified_datetime";
-
         $where = $this->addViewAccessCondition($where);
-
         $result = $this->fetch($fieldset, $where, $join, $order_by, $groupby, $limit);
-
         return array('schema' => $module_field_set, 'row' => $result);
     }
 
     /*
      * Function is expected to be used for view page, it will fetch all the settings required to show fields & filters
      */
-
     function getDisplayGridFields() {
-
-
         $results = $this->module_settings->fetch(
-                array('module' => $this->module, 'show_in_grid' => 'Y'), array('display_position' => 'ASC'));
-
+                array('module' => $this->table, 'show_in_grid' => 'Y'), array('display_position' => 'ASC'));
         $fieldset = array();
-
         foreach ($results as $value) {
-
             # If datatype is relationship then extract the field setting of relationship field and include into relationship table
             if (in_array($value['module_field_datatype'], array('relationship','relationship-aggregator'))) {
                 //relationship field also required setting for relationship module
-
                 $result2 = $this->getFieldSettings($value['relationship_module'], $value['module_field_name']);
                 $core_field_settings = $this->getCoreSettingsOfRelationshipField($result2);
                 $value['core_field_settings'] = $core_field_settings;
-
                 # Add field setting to $fieldset only for if relationship settings found for it
                 if (count($result2)) {
                     $value['relationship_field_settings'] = $result2;
@@ -473,7 +410,6 @@ abstract class Module {
                 $fieldset[$value['module_field_name']] = $value;
             }
         }
-
         return $fieldset;
     }
 
@@ -495,7 +431,6 @@ abstract class Module {
             if (in_array($result[0]['module_field_datatype'] , array('relationship','relationship-aggregator'))) {
                 //Recursive call
                 $result2 = $this->getFieldSettings($result[0]['relationship_module'], $result[0]['module_field_name']);
-
                 if (count($result2)) {
                     $result[0]['relationship_field_settings'] = $result2;
                 }
@@ -516,11 +451,8 @@ abstract class Module {
         if (isset($field_settings['relationship_field_settings']) and $field_settings['relationship_field_settings']['module_field_datatype'] == 'relationship') {
             $join_table = $field_settings['relationship_field_settings']['relationship_module'];
             //one extra join required(nested)
-
             $join[$field_settings['relationship_module']] = array("{$field_settings['relationship_module']}.id" => "{$field_settings['module']}." . $this->module_settings->prepareforeignKeyName($field_settings['relationship_module']));
-
             $join[$join_table] = array("$join_table.id" => "{$field_settings['relationship_module']}." . $this->module_settings->prepareforeignKeyName($join_table));
-
             $this->prepareSQLParams($field_settings['relationship_field_settings'], $join, $select, $where);
             if (isset($where[$field_settings['module_field_name']])) {
                 $temp = $where[$field_settings['module_field_name']];
@@ -531,9 +463,7 @@ abstract class Module {
             return;
         } else {
             $join_table = $field_settings['relationship_module'];
-
             $join[$join_table] = array("$join_table.id" => "{$field_settings['module']}." . $this->module_settings->prepareforeignKeyName($join_table));
-
             if (isset($where[$field_settings['module_field_name']])) {
                 $temp = $where[$field_settings['module_field_name']];
                 $where["$join_table.{$field_settings['module_field_name']}"] = $temp;
@@ -545,73 +475,55 @@ abstract class Module {
     }
 
     function getEnableFilters() {
-
         $results = $this->module_settings->fetch(
-                array('module' => $this->module, 'enable_fitler' => 'Y'), array('display_position' => 'ASC'));
-
-
-
+                array('module' => $this->table, 'enable_fitler' => 'Y'), array('display_position' => 'ASC'));
         return $results;
     }
 
     function getFormFields() {
-
         $session = $this->container->get('session');
-        $cache = $session->get("formfields-{$this->module}");
+        $cache = $session->get("formfields-{$this->table}");
         if (0 and ! empty($cache)) {
             return $cache;
         }
-
-
         $results = $this->module_settings->fetch(
-                array('module' => $this->module), array('display_position' => 'ASC'));
+                array('module' => $this->table), array('display_position' => 'ASC'));
         //@todo: give 
         $fieldset = array();
         $dependencies = array();
-
         foreach ($results as $key => $value) {
-
             if ($value['module_field_datatype'] !== 'relationship') {
                 $fieldset[$value['module_field_name']] = $value;
             } else {
                 //In case there are multiple fields of same relationship table is there, do not send  all fields. Only send the one field.
                 if (!isset($dependencies[$value['relationship_module']])) {
-
                     $value['relationship_foregin_key'] = 'set';
                     $dependencies[$value['relationship_module']] = 'set';
                     $value['relationship_field_name'] = $this->module_settings->prepareforeignKeyName($value['relationship_module']);
                     $value['relationship_module_display_name'] = $this->module_settings->getModule($value['relationship_module']);
                 }
                 $result2 = $this->getFieldSettings($value['relationship_module'], $value['module_field_name']);
-
                 $core_field_settings = $this->getCoreSettingsOfRelationshipField($result2);
                 $value['core_field_settings'] = $core_field_settings;
                 if (count($result2)) {
                     $value['relationship_field_settings'] = $result2;
                 }
-
                 $fieldset[$value['module_field_name']] = $value;
             }
-            //$fieldset[]
         }
-        $session->set("formfields-{$this->module}", $fieldset);
-
-
+        $session->set("formfields-{$this->table}", $fieldset);
         return $fieldset;
     }
 
     function setDbManager($db_manager) {
-
         $this->db_manager = $db_manager;
     }
 
     function getUsers() {
-
         $query = $this->db_manager->createQueryBuilder();
         $query->select("u")
                 ->from("IntelligentUserBundle:User", "u");
        // $query->andWhere($query->expr()->in("u.status", 1));
-
         $dql = $query->getQuery();
         $results = $dql->getResult();
         $userlist = array();
@@ -621,8 +533,57 @@ abstract class Module {
         return $userlist;
     }
 
-    function afterSave($data) {
+    private function afterSave($request, $validated_saved_data) {
+        $this->saveOnetoManyRelationship($request);
+    }
+    private function afterDelete($id) {
+        $this->deleteOnetoManyRelationship($id);
+    }
+    
+    /*
+     * delete all relationship associated to $id
+     */
+    private function deleteOnetoManyRelationship($id){
+        $f = $this->getFormFields();
+        $fields_config = $this->helper->filterRowsbyFieldMatch($f, array('one_2_many_relationship'=>'Y'), 'EXACT');
+        foreach ($fields_config as $key => $field) {
+            $table = $this->module_settings->one2ManyRelationshipTableName($field['module'], $field['module_field_name']);
+            $one2many_field_name = $field['relationship_field_name'];
+            $module_id_field_name = "{$field['module']}_id";
+            //Remove existing rows
+            $this->db->delete($table, array($module_id_field_name => $id));
+            if ($this->db->errorCode() != 0) { throw new \Exception($this->db->errorInfo(), '001'); }
+        }
+    }
+    
+    /*
+     * Handle one to many request, remove existing values & insert new values
+     */
+    private function saveOnetoManyRelationship($request){
         
+        $f = $this->getFormFields();
+        $fields_config = $this->helper->filterRowsbyFieldMatch($f, array('one_2_many_relationship'=>'Y'), 'EXACT');
+        foreach ($fields_config as $key => $field) {
+            $table = $this->module_settings->one2ManyRelationshipTableName($field['module'], $field['module_field_name']);
+            if(isset($request['id'])){
+                $mapped_id = $request['id'];
+            }  elseif ($this->last_insert_id) {
+                $mapped_id = $this->last_insert_id;
+            }else{
+                throw new Exception('saveOnetoManyRelationship Error','Mising row id',234234);
+            }
+            $one2many_field_name = $field['relationship_field_name'];
+            $module_id_field_name = "{$field['module']}_id";
+            //Remove existing rows
+            $this->db->delete($table, array($module_id_field_name => $mapped_id));
+            if ($this->db->errorCode() != 0) { throw new \Exception($this->db->errorInfo(), '001'); }
+            //Add new mappings
+            $insert_rows = isset($request[$field['module_field_name']])?$request[$field['module_field_name']]:array();
+            foreach ($insert_rows as $insert) {
+                $this->db->insert($table, array($module_id_field_name => $mapped_id, $one2many_field_name => $insert));
+            }
+            if ($this->db->errorCode() != 0) { throw new \Exception($this->db->errorInfo(), '001');  }
+        }        
     }
 
     /*
@@ -631,9 +592,6 @@ abstract class Module {
      */
 
     function addViewAccessCondition($params) {
-
-        //$session = new Session();
-        //$val = $session->get('active_customer_filter');
         $console_id = $this->container->get('session')->get('console_cusotmer_id');
         if(!empty($console_id)){//only true for import process
             $val = $console_id;
@@ -641,14 +599,11 @@ abstract class Module {
             $user_permission = $this->container->get("user_permissions");
             $val = $user_permission->getCurrentViewCustomer()->getId();
         }
-        
-
         if ($this->module != 'customer' and ! empty($val)) {
-            $params = array_merge($params, array("{$this->module}.linked_customer_id" => $val));
+            $params = array_merge($params, array("{$this->table}.linked_customer_id" => $val));
         } elseif ($this->module == 'customer') {
-            $params = array_merge($params, array("{$this->module}.id" => $val));
+            $params = array_merge($params, array("{$this->table}.id" => $val));
         }
-
         return $params;
     }
 
@@ -658,9 +613,7 @@ abstract class Module {
      */
 
     function filterSettings(&$field_settings) {
-
         if ($field_settings['enable_filter'] == 'Y') {
-
             if ($field_settings['enable_filter_with_option'] == 'Y') {
                 //change the datatype of field to enum
                 //$field_settings['value']='';
@@ -675,26 +628,19 @@ abstract class Module {
      */
 
     private function convert2EnumDatatype4Filter(&$field_settings) {
-
         if ($field_settings['module_field_datatype'] == 'relationship') {
-
             $this->convert2EnumDatatype4Filter($field_settings['relationship_field_settings']);
         } else {
-
-            $module = $this->container->get("intelligent.{$field_settings['module']}.module");
+            $module = $this->getOtherModule($field_settings['module']);
+            //$this->container->get("intelligent.{$field_settings['module']}.module");
             $filters = $module->addViewAccessCondition(array());
-
             $params = $condition = array();
-
             foreach ($filters as $key => $value) {
                 $condition[] = "$key = ?";
                 $params[] = $value;
             }
             $where = ' where ' . implode(' and ', $condition) . "order by {$field_settings['module_field_name']}";
-
-
             $sql = "select distinct {$field_settings['module_field_name']}  as 'value' from  {$field_settings['module']} $where";
-
             $result = $this->db->fetchAll($sql, $params);
             $arr_value;
             foreach ($result as $key => $value) {
@@ -709,37 +655,29 @@ abstract class Module {
             }
         }
     }
-
     /*
      * Fetch the core settings of relationsihp field. It may go to array nested level of 3 -4
      */
-
     function getCoreSettingsOfRelationshipField($field_settings) {
-
         if (isset($field_settings['relationship_field_settings']) and in_array($field_settings['module_field_datatype'] , array('relationship','relationship-aggregator')) and count($field_settings['relationship_field_settings'])) {
             return $this->getCoreSettingsOfRelationshipField($field_settings['relationship_field_settings']);
         } else {
             return $field_settings;
         }
     }
-
     /*
-     * function get all parent relationship 
+     * function get all parent relationship field values
      */
-
     function collectParentRelationshipRows() {
-
         $result_set = $result = array();
         $fieldset = $this->getFormFields();
         $marker = array();
-
         foreach ($fieldset as $field) {
-
             if ($field['module_field_datatype'] == 'relationship' and isset($field['relationship_foregin_key'])) {
                 //Only run for one time for relationship module, there may be multiple conditions
                 $result = array();
-
-                $parentRelationship = $this->container->get("intelligent.{$field['relationship_module']}.module");
+                $parentRelationship = $this->getOtherModule($field['relationship_module']);
+                //$this->container->get("intelligent.{$field['relationship_module']}.module");
                 $key = $this->module_settings->prepareforeignKeyName($field['relationship_module']);
                 $field_list = explode('|', $field['relationship_module_unique_field']);
                 $result[$key] = $parentRelationship->getFieldsAsString($field_list);
@@ -749,18 +687,12 @@ abstract class Module {
         return $result_set;
     }
 
-    function getFieldsAsString($fields) {
-
+    function getFieldsAsString($fields, $filter = array()) {
         $join = $param = $where = $condition = array();
-
         $fieldset = $fields;
-
         $module_field_set = $this->getFormFields();
-
         foreach ($module_field_set as $key => $row) {
-
             if (in_array($row['module_field_name'], $fields)) {
-
                 if ($row['module_field_datatype'] == 'relationship') {
                     //relationship datatype need to handle is separately.
                     //append module name before field name
@@ -772,16 +704,12 @@ abstract class Module {
                 }
             }
         }
-        //$string_field = implode('  ', $fieldset) . ' as field';
         $order_by = array();
         foreach ($fieldset as $value) {
             $order_by[$value] = 'asc';
         }
-
-        $where = $this->addViewAccessCondition($where);
-
-        $results = $this->fetch(array_merge(array("{$this->module}.id"), $fieldset), $where, $join, $order_by);
-
+        $where = array_merge($filter, $this->addViewAccessCondition($where));
+        $results = $this->fetch(array_merge(array("{$this->table}.id"), $fieldset), $where, $join, $order_by);
         //All circus to prepare key value pare
         if (count($results)) {
             $return = array();
@@ -796,8 +724,46 @@ abstract class Module {
         } else {
             return array();
         }
-
         //return count($field)? $res
     }
-
+    function getTable(){
+        return $this->table;
+    }
+    function mapDbModule($table){
+        if(empty($this->table)){
+            $this->table = $table;
+        }
+    }
+    function getOtherModule($module_name) {
+        if($this->module_settings->isGenric($module_name)){
+            $m = clone $this->container->get("intelligent.genric.module");
+            //Need to change the table name directly
+            $m->table = $module_name;
+        }else{
+            $m = $this->container->get("intelligent.{$module_name}.module");
+        }
+        return $m;
+    }
+    /*
+     * It will be used to fetch all the one to many relationship data for this $id
+     */
+    private function getValueSubset($id, $field_schema){
+        $result = array();
+        $table = $this->module_settings->one2ManyRelationshipTableName($field_schema['module'], $field_schema['module_field_name']);
+        $params = array();
+        $sql = "select * from $table where {$this->table}_id = ?";
+        $params[] = $id;
+        $result1 = $this->db->fetchAll($sql, $params);
+        if(count($result1)){
+            $relationship_field = "relationship_{$field_schema['core_field_settings']['module']}_id";
+            $ids = $this->helper->filterbyKeyName($result1, $relationship_field);
+            //Now got ids, fetch the name value pair from relational table.
+            $filter = array("{$field_schema['core_field_settings']['module']}.id"=>array('in' =>$ids));
+            $parentRelationship = $this->getOtherModule($field_schema['relationship_module']);
+            $key = $this->module_settings->prepareforeignKeyName($field_schema['relationship_module']);
+            $field_list = explode('|', $field_schema['relationship_module_unique_field']);
+            $result = $parentRelationship->getFieldsAsString($field_list, $filter);
+        }
+        return $result;
+    }
 }

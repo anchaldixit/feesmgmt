@@ -142,17 +142,19 @@ class Helper {
     function sortByField($source, $field) {
 
         $source = groupByField($source, $field);
-
         ksort($source);
-
         $sorted_array = array();
-
         foreach ($source as $key => $part) {
             $sorted_array = array_merge($sorted_array, $part);
         }
         return $sorted_array;
     }
-
- 
-
+    
+    function filterbyKeyName($source, $keyname){
+        $r = array();
+        foreach ($source as $row) {
+            if(array_key_exists($keyname, $row)) $r[] = $row[$keyname];
+        }
+        return $r;
+    }
 }

@@ -5,6 +5,14 @@
         {# First display the relationship field foreign key #}
         <li><label>{{field_settings.relationship_module_display_name }}(relationship){{field_settings.required_field=='Y'?'*':''}}:</label> 
             <div class="field-wrap">
+                {% if field_settings.one_2_many_relationship == 'Y' %}
+                    
+                        {% for key, item in field_settings[field_settings.relationship_field_name] %}
+                        <div style="width=50%;padding-right:10px;float:left">
+                        <input name="{{field_settings.module_field_name}}[]" type="checkbox" value="{{key}}" {{data[field_settings.module_field_name] is defined and data[field_settings.module_field_name][key] is defined ? 'checked':''}}> {{item}}</div>
+                        {% endfor %}
+                    
+                {% else %}
                     <div class=" dropdown">
                         <select class="selectbox" name="{{field_settings.relationship_field_name}}" >
                             <option value>Select option...</option>
@@ -13,6 +21,7 @@
                             {% endfor %}
                         </select>
                     </div>
+                {% endif %}
             </div>
         </li>
     {% endif%}
@@ -21,7 +30,15 @@
     {# most propably this is edit field required. Relationship had to set yet  
     only proceed data[field_settings.core_field_settings.module_field_name] is defined, otherwise dont display#}
     {% set d= field_settings.relationship_field_settings.module_field_datatype=='relationship'? data:data[field_settings.module_field_name]%}
-
-    {{ include('IntelligentModuleBundle:Default:edit/'~field_settings.core_field_settings.module_field_datatype~'.html.twig', { 'field_settings': field_settings,'data': data[field_settings.core_field_settings.module_field_name] is defined ? data[field_settings.core_field_settings.module_field_name] : '' ,'permissions':permissions,'readonly':true}) }}
-
+    {% if field_settings.one_2_many_relationship == 'Y' %}
+        <li><label>{{field_settings.relationship_module_display_name }}(relationship){{field_settings.required_field=='Y'?'*':''}}:</label> 
+        <div class="field-wrap">
+        {% for key, item in  data[field_settings.module_field_name] %}
+            {{item}}, 
+        {% endfor %}
+        </div>
+        </li>
+    {% else %}
+        {{ include('IntelligentModuleBundle:Default:edit/'~field_settings.core_field_settings.module_field_datatype~'.html.twig', { 'field_settings': field_settings,'data': data[field_settings.core_field_settings.module_field_name] is defined ? data[field_settings.core_field_settings.module_field_name] : '' ,'permissions':permissions,'readonly':true}) }}
+        {% endif%}
 {% endif %}

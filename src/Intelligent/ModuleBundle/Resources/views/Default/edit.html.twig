@@ -13,20 +13,20 @@
 {% block body %}
     <div class="bottom-sec">
         <div class="bread-crumb">
-            <span>{{module_name}}</span>
+            <span>{{backend_module_name}}</span>
             <i class="fa fa-long-arrow-right"></i>
             <span>Edit</span>
         </div>
         <div class="custom-feature">
             {% if permissions['add'] %}
-                <a class="red-btn" href="{{ path('intelligent_'~module~'_edit', {'edit_id': 'new'}) }}"><i class="fa fa-plus"></i>New {{module_name}}</a>
+                <a class="red-btn" href="{{ path('intelligent_'~module~'_edit', module == 'genric'?{'module':backend_module_name, 'edit_id': 'new'}:{'edit_id': 'new'}) }}"><i class="fa fa-plus"></i>New {{backend_module_name}}</a>
             {% endif %}
 
             {% if permissions['setting_permissions'] %}
                 <a class="grey-btn" href="{{ path('intelligent_setting_view', {'filter[match][module]': module_name}) }}"><i class="fa fa-gears"></i>Settings</a>
             {% endif %}
 
-            <a class="grey-btn" href="{{ path('intelligent_'~module~'_view') }}"><i class="fa fa-arrow-circle-left"></i>Back</a>
+            <a class="grey-btn" href="{{ path('intelligent_'~module~'_view', module == 'genric'?{'module':backend_module_name}:{}) }}"><i class="fa fa-arrow-circle-left"></i>Back</a>
 
 
         </div>

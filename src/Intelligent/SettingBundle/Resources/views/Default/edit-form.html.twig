@@ -141,6 +141,17 @@
                             <small><i>Field can be combined with pipe separated name like field1|field2 </i></small>
                         </div>
                     </li>
+                    <li id="one_2_many_relationship_row"> 
+                        <label>One 2 Many Relationship: </label>
+                        <div class="field-wrap">
+                             <div class="dropdown">
+                                <select name="one_2_many_relationship" id="one_2_many_relationship"  class="selectbox" >
+                                    <option value="N" {{config.one_2_many_relationship is defined and config.one_2_many_relationship == 'N' ? 'SELECTED': ''}}>No</option>
+                                    <option value="Y" {{config.one_2_many_relationship is defined and config.one_2_many_relationship == 'Y' ? 'SELECTED': ''}}>Yes</option>
+                                </select><br>
+                            </div>
+                        </div>
+                    </li>
                     <li><label>Display Position:</label> 
                         <div class="field-wrap">
                             <input name="display_position" id="display_position"  value="{{config.display_position is defined ? config.display_position : '100'}}" type="text" />

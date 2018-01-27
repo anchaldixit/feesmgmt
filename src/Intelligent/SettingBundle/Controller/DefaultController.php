@@ -299,10 +299,12 @@ class DefaultController extends Controller {
      */
 
     public function fieldsetAction($module_name) {
-
-        $var = str_replace('_', '', $module_name);
+        
+        $settings = $this->get('intelligent.setting.module');
+        $var = $settings->isGenric($module_name) ? 'genric': str_replace('_', '', $module_name);
         $controller_class = $this->routeToControllerName("intelligent_{$var}_fieldset");
-        $response = $this->forward($controller_class);
+        $param = $settings->isGenric($module_name) ? array('module'=>$module_name) : array();
+        $response = $this->forward($controller_class,$param);
 
         return $response;
     }

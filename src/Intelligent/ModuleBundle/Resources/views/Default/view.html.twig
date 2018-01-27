@@ -210,7 +210,7 @@
         <div class="custom-feature">
             {% if permissions['add'] %}
                 <a class="red-btn" id="quick_add_row"><i class="fa fa-plus"></i> Quick Add</a>
-                <a class="red-btn" href="{{ path('intelligent_'~module~'_edit', {'edit_id': 'new'}) }}"><i class="fa fa-plus"></i>New {{module_display_name}}</a>
+                <a class="red-btn" href="{{ path('intelligent_'~module~'_edit', module == 'genric'?{'module':backend_module_name, 'edit_id': 'new'}:{'edit_id': 'new'}) }}"><i class="fa fa-plus"></i>New {{module_display_name}}</a>
             {% endif %}
             {% if permissions['view'] %}
                 <a class="red-btn" href="{{ path('intelligent_'~module~'_export', app.request.query.all) }}"><i class="fa fa-exchange"></i>Export as spreadsheet</a>
@@ -221,7 +221,7 @@
             {% endif %}
 
             {% if permissions['setting_permissions'] %}
-                <a class="green-btn" href="{{ path('intelligent_setting_view', {'filter[match][module]': module_name}) }}"><i class="fa fa-gears"></i>Settings</a>
+                <a class="green-btn" href="{{ path('intelligent_setting_view', {'filter[match][module]': backend_module_name}) }}"><i class="fa fa-gears"></i>Settings</a>
             {% endif %}
 
         </div>
@@ -322,5 +322,5 @@
                                                                 </div>
                                                             </div>
                                                             <span class="notify"><i class="fa fa-info-circle"></i><span class="info-notice"></span> </span>
-                                                            <input type="hidden" name="form-url" id="form-url" value="{{ path('intelligent_'~module~'_edit', {'edit_id': '_'}) }}">
+                                                            <input type="hidden" name="form-url" id="form-url" value="{{ path('intelligent_'~module~'_edit', module == 'genric'?{'module':backend_module_name, 'edit_id': '_'}:{'edit_id': '_'}) }}">
                                                             {% endblock %}

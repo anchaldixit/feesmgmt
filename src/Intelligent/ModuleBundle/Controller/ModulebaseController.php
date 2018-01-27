@@ -21,6 +21,7 @@ abstract class ModulebaseController extends Controller {
     const TOTAL_PAGINATION_VISIBLE_PAGES = 11; // Always an odd number
 
     var $module_name; //variable should be initialize by extend class in constructor
+    var $module_type;
     var $module_classname;
     var $module; //Module object
     var $module_route_identifier;
@@ -30,10 +31,10 @@ abstract class ModulebaseController extends Controller {
 
     function __construct() {
 
-        if (empty($this->module_name)) {
+        if (empty($this->module_name) and empty($this->module_type)) {
             throw new \Exception('Module name not configured', '001');
         } else {
-            $this->module_route_identifier = str_replace('_', '', $this->module_name);
+            $this->module_route_identifier = str_replace('_', '', empty($this->module_type) ? $this->module_name : $this->module_type);
             $this->module_classname = ucfirst($this->module_route_identifier);
             $class = "Intelligent\\ModuleBundle\\Lib\\{$this->module_classname}";
             if (!class_exists($class)) {
@@ -50,7 +51,7 @@ abstract class ModulebaseController extends Controller {
 
     abstract function setModuleName();
 
-    public function editAction($edit_id) {
+    public function editAction(Request $req, $edit_id) {
 
 
         $this->initPermissionsDetails();
@@ -60,9 +61,7 @@ abstract class ModulebaseController extends Controller {
         if ($this->noAccess('view')) {
             return $this->render('IntelligentUserBundle:Default:noaccess.html.twig', array());
         }
-
-        $module = $this->get("intelligent.{$this->module_name}.module");
-
+        $module = $this->getModule();
 
         $module_display_name = $module->module_settings->getModule($this->module_name);
 
@@ -92,7 +91,7 @@ abstract class ModulebaseController extends Controller {
 
                         $this->get('session')->getFlashBag()->add('success', "Row added successfully.");
                         $this->_afterSaveEvent($id);
-                        return $this->redirectToRoute("intelligent_{$this->module_route_identifier}_edit", array('edit_id' => $id));
+                        return $this->redirectToRoute("intelligent_{$this->module_route_identifier}_edit", $this->module_type=='genric'? array('module' => $this->module_name, 'edit_id' => $id) : array('edit_id' => $id));
                     }
                 } else {
 
@@ -107,7 +106,7 @@ abstract class ModulebaseController extends Controller {
                             return new JsonResponse(array('msg' => 'Row Deleted Successfully.', 'action' => 'delete'));
                         } else {
                             $this->get('session')->getFlashBag()->add('success', "Row Deleted Successfully.");
-                            return $this->redirectToRoute("intelligent_{$this->module_route_identifier}_view");
+                            return $this->redirectToRoute("intelligent_{$this->module_route_identifier}_view",  $this->module_type=='genric'? array('module' => $this->module_name) : array());
                         }
                     } else {//update
                         if ($this->noAccess('edit')) {
@@ -120,7 +119,7 @@ abstract class ModulebaseController extends Controller {
                             return new JsonResponse(array('msg' => 'Row Updated successfully.', 'action' => 'update', 'row' => $updated_row_html));
                         } else {
                             $this->get('session')->getFlashBag()->add('success', "Row Updated successfully.");
-                            return $this->redirectToRoute("intelligent_{$this->module_route_identifier}_edit", array('edit_id' => $edit_id));
+                            return $this->redirectToRoute("intelligent_{$this->module_route_identifier}_edit",  $this->module_type=='genric'? array('module' => $this->module_name, 'edit_id' => $id) : array('edit_id' => $edit_id));
                         }
                     }
                 }
@@ -139,7 +138,7 @@ abstract class ModulebaseController extends Controller {
                     if (!count($result['row'])) {
                         //@todo: just for testing, redirect to listing page
                         $this->get('session')->getFlashBag()->add('error', "Invalid URL/Access");
-                        return $this->redirectToRoute("intelligent_{$this->module_route_identifier}_view");
+                        return $this->redirectToRoute("intelligent_{$this->module_route_identifier}_view",  $this->module_type=='genric'? array('module' => $this->module_name) : array());
                     }
                 } else {
                     //new item, display empty form
@@ -168,7 +167,7 @@ abstract class ModulebaseController extends Controller {
         //All active users
         $all_users = $this->getUsers();
 
-        //var_dump($result);exit;
+        #$this->helper->print_r($result);//exit;
         $parameters = array('data' => isset($result['row'][0]) ? $result['row'][0] : array(),
             'schema' => $result['schema'],
             'id' => $id,
@@ -179,7 +178,8 @@ abstract class ModulebaseController extends Controller {
             'module_name' => $this->module_name,
             'permissions' => $this->permissions,
             'parent_relationship_rows' => $parent_relationship_rows,
-            'is_ajax'=>$is_ajax
+            'is_ajax'=>$is_ajax,
+            'backend_module_name' => $this->module_name
         );
 
         if ($is_ajax == 'yes') {
@@ -189,7 +189,7 @@ abstract class ModulebaseController extends Controller {
         }
     }
 
-    public function viewAction($page_no) {
+    public function viewAction(Request $req, $page_no) {
 
 
         $this->initPermissionsDetails();
@@ -198,9 +198,7 @@ abstract class ModulebaseController extends Controller {
         if ($this->noAccess('view')) {
             return $this->noAccessPage();
         }
-
-
-        $module = $this->get("intelligent.{$this->module_name}.module");
+        $module = $this->getModule();
 
         $request = Request::createFromGlobals();
         //$class = "Intelligent\\ModuleBundle\\Lib\\{$this->module_classname}";
@@ -241,8 +239,9 @@ abstract class ModulebaseController extends Controller {
             'module_display_name' => $module_display_name,
             'module' => $this->module_route_identifier,
             'module_permission_asscess_key' => $this->moduleSessionKey(),
-            'module_name' => $this->module_name,
-            'permissions' => $this->permissions
+            'module_name' => $this->moduleName(),
+            'permissions' => $this->permissions,
+            'backend_module_name' => $this->module_name
         );
         return $this->render('IntelligentModuleBundle:Default:view.html.twig', $parameters);
     }
@@ -258,7 +257,7 @@ abstract class ModulebaseController extends Controller {
         }
 
 
-        $module = $this->get("intelligent.{$this->module_name}.module");
+        $module = $this->getModule();
 
         $request = Request::createFromGlobals();
         //$class = "Intelligent\\ModuleBundle\\Lib\\{$this->module_classname}";
@@ -365,7 +364,7 @@ abstract class ModulebaseController extends Controller {
      * Param1: number $delete_id
      */
 
-    public function deleteAction($delete_id) {
+    public function deleteAction(Request $req, $delete_id) {
 
         $this->initPermissionsDetails();
         //$this->initRowAccessPermission();
@@ -374,16 +373,13 @@ abstract class ModulebaseController extends Controller {
             return $this->noAccessPage();
         }
 
-
-        $module = $this->get("intelligent.{$this->module_name}.module");
+        $module = $this->getModule();
         $request = Request::createFromGlobals();
-
-
         $module->delete($delete_id);
 
         $this->get('session')->getFlashBag()->add('success', "Row Deleted Successfully.");
 
-        return $this->redirectToRoute("intelligent_" . str_replace('_', '', $this->module_name) . "_view");
+        return $this->redirectToRoute("intelligent_" . str_replace('_', '', $this->moduleName()) . "_view",  $this->module_type=='genric'? array('module' => $this->module_name) : array());
     }
 
     function getUsers() {
@@ -396,7 +392,6 @@ abstract class ModulebaseController extends Controller {
 
         $dql = $query->getQuery();
         $results = $dql->getResult();
-
         //$this->helper->print_r($results);
         $userlist = array();
         foreach ($results as $key => $user) {
@@ -410,8 +405,10 @@ abstract class ModulebaseController extends Controller {
     }
 
     function prepareSort($filters) {
-
-        $sort = array("{$this->module_name}.id" => 'DESC');
+        #$mname = $this->moduleName();
+        #$module = $this->get("intelligent.{$mname}.module");
+        $t = $this->getModule()->getTable();
+        $sort = array("{$t}.id" => 'DESC');
 
         //Set sort filter
         if (isset($filters['sort']) and ! empty($filters['sort'])) {
@@ -548,8 +545,8 @@ abstract class ModulebaseController extends Controller {
     }
 
     function moduleSessionKey() {
-
-        return "access-key-{$this->module_name}-permission";
+        $m = $this->moduleName();
+        return "access-key-{$m}-permission";
     }
 
     public function indexAction() {
@@ -586,10 +583,9 @@ abstract class ModulebaseController extends Controller {
      * 
      */
 
-    public function fieldsetAction() {
+    public function fieldsetAction(Request $req) {
 
-        $module = $this->get("intelligent.{$this->module_name}.module");
-
+        $module = $this->getModule();
 
         $module_display_name = $module->module_settings->getModule($this->module_name);
 
@@ -810,10 +806,9 @@ abstract class ModulebaseController extends Controller {
     function viewRowHtml($id) {
 
 
-        $module = $this->get("intelligent.{$this->module_name}.module");
-
-
-        $rows = $module->getRows(array("{$this->module_name}.id" => $id), array(), 1);
+        $module = $this->getModule();
+        $t = $module->getTable();
+        $rows = $module->getRows(array("{$t}.id" => $id), array(), 1);
         $all_users = $this->getUsers();
 
         $parameters = array('rows' => $rows['row'],
@@ -823,8 +818,19 @@ abstract class ModulebaseController extends Controller {
             'module_name' => $this->module_name,
             'permissions' => $this->permissions,
             'module' => $this->module_route_identifier,
+            'backend_module_name' => $this->module_name
         );
         return $this->renderView('IntelligentModuleBundle:Default:view-row.html.twig', $parameters);
+    }
+
+    private function moduleName(){
+        return empty($this->module_type) ? $this->module_name : $this->module_type;
+    }
+    protected function getModule(){
+        $mname = $this->moduleName();
+        $m = $this->get("intelligent.{$mname}.module");
+        $m->mapDbModule($this->module_name);
+        return $m;
     }
 
 }

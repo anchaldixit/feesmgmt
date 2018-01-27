@@ -73,3 +73,28 @@ intelligent_marketingprojects_export:
 intelligent_marketingprojects_import:
     path:     /marketingprojects/import
     defaults: { _controller: IntelligentModuleBundle:Marketingprojects:import }
+
+intelligent_genric:
+    path:     /genric
+    defaults: { _controller: IntelligentModuleBundle:Genric:index }
+intelligent_genric_edit:
+    path:     /genric/edit/{module}/{edit_id}
+    defaults: { _controller: IntelligentModuleBundle:Genric:edit }
+intelligent_genric_view:
+    path:     /genric/view/{module}/{page_no}
+    defaults: { _controller: IntelligentModuleBundle:Genric:view , page_no: 1 }
+intelligent_genric_delete:
+    path:     /genric/delete/{module}/{delete_id}
+    defaults: { _controller: IntelligentModuleBundle:Genric:delete }
+intelligent_genric_autocomplete:
+    path:     /genric/autocomplete
+    defaults: { _controller: IntelligentModuleBundle:Genric:autocomplete }
+intelligent_genric_fieldset:
+    path:     /genric/fieldset/{module}
+    defaults: { _controller: IntelligentModuleBundle:Genric:fieldset }
+intelligent_genric_export:
+    path:     /genric/export
+    defaults: { _controller: IntelligentModuleBundle:Genric:export }
+intelligent_genric_import:
+    path:     /genric/import
+    defaults: { _controller: IntelligentModuleBundle:Genric:import }
